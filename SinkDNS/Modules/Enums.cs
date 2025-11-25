@@ -1,8 +1,8 @@
 ﻿namespace SinkDNS.Modules
 {
-    internal class Enums
+    public class Enums
     {
-        public enum NotificationType
+        public enum StatusSeverityType
         {
             Information,
             Warning,

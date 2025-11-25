@@ -8,14 +8,16 @@ namespace SinkDNS
             InitializeComponent();
         }
 
-        private void testBtn_Click(object sender, EventArgs e)
+        private void testBtn_Click(object sender, EventArgs e) //Testing
         {
-
+            var configWriter = new DNSCryptConfigurationWriter("C:\\Program Files\\dnscrypt-proxy\\dnscrypt-proxy.toml"); 
+            MessageBox.Show(configWriter.GetSetting("[blocked_names]", "blocked_names_file"));
+            configWriter.BackupDNSCryptConfiguration();
         }
 
         private void SinkDNSMainForm_Load(object sender, EventArgs e)
         {
-            FileManager.CreateNecessaryDirectories();
+            IOManager.CreateNecessaryDirectories();
         }
     }
 }

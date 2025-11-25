@@ -1,6 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Net.NetworkInformation;
 using System.Text;
+using System.Threading.Tasks;
+using Microsoft.Win32;
 
 //MIT License
 
@@ -26,10 +31,10 @@ using System.Text;
 
 namespace SinkDNS.Modules
 {
-    //This class is responsible for parsing and writing configuration data to and from DNSCrypt.
-    //It handles reading configuration files, interpreting settings, and converting them into usable formats for the application.
-    internal class ConfigurationWriter
+    //This will change the DNS settings on the system to the DNSCrypt local 127.0.0.1 address.
+    //But also will save the previous DNS settings to be restored later if the user wants to disable SinkDNS.
+    internal class SystemDNSManager
     {
-        
-    }
+
+    }   
 }

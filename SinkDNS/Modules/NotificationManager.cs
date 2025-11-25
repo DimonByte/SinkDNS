@@ -5,12 +5,12 @@ namespace SinkDNS.Modules
     internal class NotificationManager
     {
         // This will handle notifications to the user via the Notification Area (System Tray).
-        public static void ShowNotification(string title, string message, NotificationType messageType, int duration = 5000)
+        public static void ShowNotification(string title, string message, StatusSeverityType messageType, int duration = 5000)
         {
             ShowSystemTrayNotification(title, message, messageType, duration);
         }
 
-        private static void ShowSystemTrayNotification(string title, string message, NotificationType messageType, int duration = 5000)
+        private static void ShowSystemTrayNotification(string title, string message, StatusSeverityType messageType, int duration = 5000)
         {
             try
             {
@@ -42,22 +42,21 @@ namespace SinkDNS.Modules
             }
             catch (Exception ex)
             {
-                // If all else fails, just write to console
-                Console.WriteLine($"Notification failed: {title} - {message}, {ex.Message}");
+                TraceLogger.Log($"Failed to show system tray notification: {ex.Message}", StatusSeverityType.Error);
             }
         }
 
-        private static Icon GetNotificationIcon(NotificationType messageType)
+        private static Icon GetNotificationIcon(StatusSeverityType messageType)
         {
             try
             {
                 switch (messageType)
                 {
-                    case NotificationType.Error:
+                    case StatusSeverityType.Error:
                         return SystemIcons.Error;
-                    case NotificationType.Warning:
+                    case StatusSeverityType.Warning:
                         return SystemIcons.Warning;
-                    case NotificationType.Information:
+                    case StatusSeverityType.Information:
                         return SystemIcons.Information;
                     default:
                         return SystemIcons.Information;
@@ -69,15 +68,15 @@ namespace SinkDNS.Modules
             }
         }
 
-        private static ToolTipIcon GetBalloonTipIcon(NotificationType messageType)
+        private static ToolTipIcon GetBalloonTipIcon(StatusSeverityType messageType)
         {
             switch (messageType)
             {
-                case NotificationType.Error:
+                case StatusSeverityType.Error:
                     return ToolTipIcon.Error;
-                case NotificationType.Warning:
+                case StatusSeverityType.Warning:
                     return ToolTipIcon.Warning;
-                case NotificationType.Information:
+                case StatusSeverityType.Information:
                     return ToolTipIcon.Info;
                 default:
                     return ToolTipIcon.Info;

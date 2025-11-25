@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text;
+﻿using System.Diagnostics;
 
 //MIT License
 
@@ -28,21 +25,22 @@ using System.Text;
 namespace SinkDNS.Modules
 {
     //This will handle folder and file management for SinkDNS, like creating necessary directories.
-    internal class FileManager
+    internal class IOManager
     {
         public static void CreateNecessaryDirectories()
         {
-            string[] directories = { "config", "resolvers", "blocklists" };
+            string[] directories = { "logs", "config", "resolvers", "blocklists", "backup" };
             foreach (string dir in directories) {
                 if (!Directory.Exists(dir))
                 {
                     try
                     {
-                        Directory.CreateDirectory(dir); 
+                        Directory.CreateDirectory(dir);
+                        TraceLogger.Log($"Created directory: {dir}", Enums.StatusSeverityType.Information);
                     } 
                     catch (Exception ex) 
                     {
-                        Debug.WriteLine($"Error creating directory {dir}: {ex.Message}");
+                        TraceLogger.Log($"Error creating directory {dir}: {ex.Message}", Enums.StatusSeverityType.Error);
                     }
                 }
             }
@@ -53,11 +51,12 @@ namespace SinkDNS.Modules
             {
                 try
                 {
+                    TraceLogger.Log($"Deleting existing output file {outputFilePath} before merging.", Enums.StatusSeverityType.Information);
                     File.Delete(outputFilePath); //Ensure that the last combined file isn't added to the merge.
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"Error deleting existing output file {outputFilePath}: {ex.Message}");
+                    TraceLogger.Log($"Error deleting existing output file {outputFilePath}: {ex.Message}", Enums.StatusSeverityType.Error);
                     return;
                 }
             }
@@ -67,8 +66,25 @@ namespace SinkDNS.Modules
                 {
                     using (var inputStream = File.OpenRead(inputFilePath))
                     {
+                        TraceLogger.Log($"Merging file {inputFilePath} into {outputFilePath}", Enums.StatusSeverityType.Information);
                         inputStream.CopyTo(outputStream);
                     }
+                }
+            }
+        }
+        public static void BackupFile(string filePath)
+        {
+            if (File.Exists(filePath))
+            {
+                string backupFilePath = $"backup/{Path.GetFileName(filePath) + Path.GetExtension(filePath)}.bak";
+                try
+                {
+                    TraceLogger.Log($"Creating backup for file {filePath} at {backupFilePath}", Enums.StatusSeverityType.Information);
+                    File.Copy(filePath, backupFilePath, true);
+                }
+                catch (Exception ex)
+                {
+                    TraceLogger.Log($"Error creating backup for file {filePath}: {ex.Message}", Enums.StatusSeverityType.Error);
                 }
             }
         }

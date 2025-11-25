@@ -1,9 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Net.Http;
-using System.Threading.Tasks;
-using System.Net.Http.Headers;
-using System.Text;
+﻿using System.Net.Http.Headers;
 //MIT License
 
 //Copyright (c) 2025 Dimon
@@ -50,7 +45,7 @@ namespace SinkDNS.Modules
             {
                 if (string.IsNullOrEmpty(localPath))
                 {
-                    Console.WriteLine("Local path is null or empty");
+                    TraceLogger.Log("Local path is null or empty", Enums.StatusSeverityType.Error);
                     return false;
                 }
 
@@ -72,13 +67,13 @@ namespace SinkDNS.Modules
                 }
                 else
                 {
-                    Console.WriteLine($"Download failed with status code: {response.StatusCode}");
+                    TraceLogger.Log($"Download failed with status code: {response.StatusCode}", Enums.StatusSeverityType.Error);
                     return false;
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error downloading file: {ex.Message}");
+                TraceLogger.Log($"Error downloading file: {ex.Message}", Enums.StatusSeverityType.Error);
                 return false;
             }
         }
@@ -95,13 +90,13 @@ namespace SinkDNS.Modules
                 }
                 else
                 {
-                    Console.WriteLine($"Download failed with status code: {response.StatusCode}");
+                    TraceLogger.Log($"Download failed with status code: {response.StatusCode}", Enums.StatusSeverityType.Error);
                     return null;
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error downloading string: {ex.Message}");
+                TraceLogger.Log($"Error downloading string: {ex.Message}", Enums.StatusSeverityType.Error);
                 return null;
             }
         }
@@ -123,7 +118,7 @@ namespace SinkDNS.Modules
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error getting HTTP headers: {ex.Message}");
+                TraceLogger.Log($"Error getting HTTP headers: {ex.Message}", Enums.StatusSeverityType.Error);
                 return null;
             }
         }

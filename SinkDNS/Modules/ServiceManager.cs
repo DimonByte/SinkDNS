@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.ServiceProcess;
-using System.Threading.Tasks;
+﻿using System.ServiceProcess;
 using System.Diagnostics;
 
 //MIT License
@@ -46,7 +42,7 @@ namespace SinkDNS.Modules
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Error checking DNSCrypt service status: {ex.Message}");
+                TraceLogger.Log($"Error checking DNSCrypt service status: {ex.Message}", Enums.StatusSeverityType.Error);
                 return false;
             }
         }
@@ -65,7 +61,7 @@ namespace SinkDNS.Modules
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Error checking DNSCrypt service installation: {ex.Message}");
+                TraceLogger.Log($"Error checking DNSCrypt service installation: {ex.Message}", Enums.StatusSeverityType.Error);
                 return false;
             }
         }
@@ -78,6 +74,7 @@ namespace SinkDNS.Modules
                 {
                     if (service.Status != ServiceControllerStatus.Running)
                     {
+                        TraceLogger.Log("Starting DNSCrypt service...", Enums.StatusSeverityType.Information);
                         service.Start();
                         service.WaitForStatus(ServiceControllerStatus.Running, TimeSpan.FromSeconds(30));
                         return true;
@@ -87,7 +84,7 @@ namespace SinkDNS.Modules
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Error starting DNSCrypt service: {ex.Message}");
+                TraceLogger.Log($"Error starting DNSCrypt service: {ex.Message}", Enums.StatusSeverityType.Error);
                 return false;
             }
         }
@@ -100,6 +97,7 @@ namespace SinkDNS.Modules
                 {
                     if (service.Status == ServiceControllerStatus.Running)
                     {
+                        TraceLogger.Log("Stopping DNSCrypt service...", Enums.StatusSeverityType.Information);
                         service.Stop();
                         service.WaitForStatus(ServiceControllerStatus.Stopped, TimeSpan.FromSeconds(30));
                         return true;
@@ -109,24 +107,27 @@ namespace SinkDNS.Modules
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Error stopping DNSCrypt service: {ex.Message}");
+                TraceLogger.Log($"Error stopping DNSCrypt service: {ex.Message}", Enums.StatusSeverityType.Error);
                 return false;
             }
         }
         public static bool RestartDnsCrypt()
         {
+            TraceLogger.Log("Attempting restart of DNSCrypt service...", Enums.StatusSeverityType.Information);
             try
             {
                 if (!StopDnsCrypt())
+                {
+                    TraceLogger.Log("Failed to stop DNSCrypt service during restart.", Enums.StatusSeverityType.Error);
                     return false; //Failed to stop service, bail.
-
+                }
                 Task.Delay(1000).Wait();
 
                 return StartDnsCrypt();
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Error restarting DNSCrypt service: {ex.Message}");
+                TraceLogger.Log($"Error restarting DNSCrypt service: {ex.Message}", Enums.StatusSeverityType.Error);
                 return false;
             }
         }

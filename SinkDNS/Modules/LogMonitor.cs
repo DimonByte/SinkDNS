@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-//MIT License
+﻿//MIT License
 
 //Copyright (c) 2025 Dimon
 
