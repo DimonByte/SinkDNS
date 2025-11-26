@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-
-//MIT License
+﻿//MIT License
 
 //Copyright (c) 2025 Dimon
 
@@ -22,14 +20,16 @@
 //OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //SOFTWARE.
 
-namespace SinkDNS.Modules
+using SinkDNS.Modules.SinkDNSInternals;
+
+namespace SinkDNS.Modules.System
 {
     //This will handle folder and file management for SinkDNS, like creating necessary directories.
     internal class IOManager
     {
         public static void CreateNecessaryDirectories()
         {
-            string[] directories = { "logs", "config", "resolvers", "blocklists", "backup" };
+            string[] directories = ["logs", "config", "resolvers", "blocklists", "backup"];
             foreach (string dir in directories) {
                 if (!Directory.Exists(dir))
                 {
@@ -60,16 +60,12 @@ namespace SinkDNS.Modules
                     return;
                 }
             }
-            using (var outputStream = File.Create(outputFilePath))
+            using var outputStream = File.Create(outputFilePath);
+            foreach (var inputFilePath in inputFilePaths)
             {
-                foreach (var inputFilePath in inputFilePaths)
-                {
-                    using (var inputStream = File.OpenRead(inputFilePath))
-                    {
-                        TraceLogger.Log($"Merging file {inputFilePath} into {outputFilePath}", Enums.StatusSeverityType.Information);
-                        inputStream.CopyTo(outputStream);
-                    }
-                }
+                using var inputStream = File.OpenRead(inputFilePath);
+                TraceLogger.Log($"Merging file {inputFilePath} into {outputFilePath}", Enums.StatusSeverityType.Information);
+                inputStream.CopyTo(outputStream);
             }
         }
         public static void BackupFile(string filePath)

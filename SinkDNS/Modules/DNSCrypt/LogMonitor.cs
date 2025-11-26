@@ -20,10 +20,10 @@
 //OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //SOFTWARE.
 
-namespace SinkDNS.Modules
+namespace SinkDNS.Modules.DNSCrypt
 {
-    // This will load the public resolvers from DNSCrypt and return a list of them.
-    internal class PublicResolverManager
+    // This will monitor the logs (dns activity/blocked dns activity) from DNSCrypt to something readable on SinkDNS.
+    internal class LogMonitor
     {
     }
 }

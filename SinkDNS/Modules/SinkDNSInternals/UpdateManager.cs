@@ -20,7 +20,7 @@
 //OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //SOFTWARE.
 
-namespace SinkDNS.Modules
+namespace SinkDNS.Modules.SinkDNSInternals
 {
     // This will manage updates for SinkDNS, and DNSCrypt, including checking for new versions and downloading them via the DownloadManager.
     internal class UpdateManager

@@ -1,7 +1,4 @@
-﻿using System.ServiceProcess;
-using System.Diagnostics;
-
-//MIT License
+﻿//MIT License
 
 //Copyright (c) 2025 Dimon
 
@@ -23,7 +20,10 @@ using System.Diagnostics;
 //OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //SOFTWARE.
 
-namespace SinkDNS.Modules
+using SinkDNS.Modules.SinkDNSInternals;
+using System.ServiceProcess;
+
+namespace SinkDNS.Modules.DNSCrypt
 {
     //This will manage and monitor DNSCrypt as a service. It will start, stop, and restart the service as needed. Including checking its status.
     //This will also handle the installation of DNSCrypt if the user hasn't installed it yet.
@@ -34,10 +34,8 @@ namespace SinkDNS.Modules
         {
             try
             {
-                using (var serviceController = new ServiceController(DnsCryptServiceName))
-                {
-                    return serviceController.Status == ServiceControllerStatus.Running;
-                }
+                using var serviceController = new ServiceController(DnsCryptServiceName);
+                return serviceController.Status == ServiceControllerStatus.Running;
 
             }
             catch (Exception ex)
@@ -50,10 +48,8 @@ namespace SinkDNS.Modules
         {
             try
             {
-                using (var service = new ServiceController(DnsCryptServiceName))
-                {
-                    return true;
-                }
+                using var service = new ServiceController(DnsCryptServiceName);
+                return true;
             }
             catch (InvalidOperationException)
             {
@@ -70,17 +66,15 @@ namespace SinkDNS.Modules
         {
             try
             {
-                using (var service = new ServiceController(DnsCryptServiceName))
+                using var service = new ServiceController(DnsCryptServiceName);
+                if (service.Status != ServiceControllerStatus.Running)
                 {
-                    if (service.Status != ServiceControllerStatus.Running)
-                    {
-                        TraceLogger.Log("Starting DNSCrypt service...", Enums.StatusSeverityType.Information);
-                        service.Start();
-                        service.WaitForStatus(ServiceControllerStatus.Running, TimeSpan.FromSeconds(30));
-                        return true;
-                    }
+                    TraceLogger.Log("Starting DNSCrypt service...", Enums.StatusSeverityType.Information);
+                    service.Start();
+                    service.WaitForStatus(ServiceControllerStatus.Running, TimeSpan.FromSeconds(30));
                     return true;
                 }
+                return true;
             }
             catch (Exception ex)
             {
@@ -93,17 +87,15 @@ namespace SinkDNS.Modules
         {
             try
             {
-                using (var service = new ServiceController(DnsCryptServiceName))
+                using var service = new ServiceController(DnsCryptServiceName);
+                if (service.Status == ServiceControllerStatus.Running)
                 {
-                    if (service.Status == ServiceControllerStatus.Running)
-                    {
-                        TraceLogger.Log("Stopping DNSCrypt service...", Enums.StatusSeverityType.Information);
-                        service.Stop();
-                        service.WaitForStatus(ServiceControllerStatus.Stopped, TimeSpan.FromSeconds(30));
-                        return true;
-                    }
+                    TraceLogger.Log("Stopping DNSCrypt service...", Enums.StatusSeverityType.Information);
+                    service.Stop();
+                    service.WaitForStatus(ServiceControllerStatus.Stopped, TimeSpan.FromSeconds(30));
                     return true;
                 }
+                return true;
             }
             catch (Exception ex)
             {

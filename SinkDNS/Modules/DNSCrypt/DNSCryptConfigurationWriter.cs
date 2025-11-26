@@ -20,81 +20,59 @@
 //OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //SOFTWARE.
 
-namespace SinkDNS.Modules
+using SinkDNS.Modules.SinkDNSInternals;
+using SinkDNS.Modules.System;
+
+namespace SinkDNS.Modules.DNSCrypt
 {
     //This class is responsible for parsing and writing configuration data to and from DNSCrypt.
     //It handles reading configuration files, interpreting settings, and converting them into usable formats for the application.
     internal class DNSCryptConfigurationWriter(string configFilePath)
     {
         private readonly string _configFilePath = configFilePath ?? throw new ArgumentNullException(nameof(configFilePath));
+        private List<string> _configLines = [];
+        private bool _hasChanges = false;
+        private bool _configLoaded = false;
 
-        public void ChangeSetting(string section, string settingName, string value)
+        public void ChangeSetting(string settingName, string value)
         {
+            if (!_configLoaded)
+            {
+                LoadConfiguration();
+            }
+
             if (!File.Exists(_configFilePath))
+            {
                 TraceLogger.Log("Configuration file not found!", Enums.StatusSeverityType.Error);
-
-            var lines = File.ReadAllLines(_configFilePath).ToList();
-            var modified = false;
-
-            if (string.IsNullOrEmpty(section))
-            {
-                modified = ModifySettingInSection(lines, null, settingName, value);
-            }
-            else
-            {
-                // Search for section and modify setting within it, e.g. [blocked_lists]
-                modified = ModifySettingInSection(lines, section, settingName, value);
+                return;
             }
 
+            bool modified = ModifySettingInConfigFile(_configLines, settingName, value);
             if (modified)
             {
-                TraceLogger.Log($"Setting '{settingName}' changed to '{value}' in section '{section ?? "global"}'.", Enums.StatusSeverityType.Information);
-                File.WriteAllLines(_configFilePath, lines);
-                TraceLogger.Log("Configuration file updated successfully.", Enums.StatusSeverityType.Information);
+                _hasChanges = true;
+                TraceLogger.Log($"Setting '{settingName}' changed to '{value}'.", Enums.StatusSeverityType.Information);
             }
         }
 
-        private bool ModifySettingInSection(List<string> lines, string? section, string settingName, string value)
+        private void LoadConfiguration()
+        {
+            if (!File.Exists(_configFilePath))
+            {
+                TraceLogger.Log("Configuration file not found!", Enums.StatusSeverityType.Error);
+                return;
+            }
+
+            _configLines = [.. File.ReadAllLines(_configFilePath)];
+            _configLoaded = true;
+        }
+
+        private static bool ModifySettingInConfigFile(List<string> lines, string settingName, string value)
         {
             bool found = false;
-            int startLine = -1;
-            int endLine = -1;
+            int startLine = 0;
+            int endLine = lines.Count;
 
-            // Find section if specified
-            if (!string.IsNullOrEmpty(section))
-            {
-                for (int i = 0; i < lines.Count; i++)
-                {
-                    if (lines[i].Trim() == section)
-                    {
-                        startLine = i;
-                        break;
-                    }
-                }
-
-                if (startLine == -1)
-                    return false; // Section not found
-
-                // Find end of section (next section or end of file)
-                for (int i = startLine + 1; i < lines.Count; i++)
-                {
-                    if (lines[i].Trim().StartsWith("[") && lines[i].Trim().EndsWith("]"))
-                    {
-                        endLine = i;
-                        break;
-                    }
-                }
-
-                if (endLine == -1)
-                    endLine = lines.Count;
-            }
-            else
-            {
-                startLine = 0;
-                endLine = lines.Count;
-            }
-
-            // Search for setting within section
             for (int i = startLine; i < endLine; i++)
             {
                 var line = lines[i].Trim();
@@ -129,19 +107,17 @@ namespace SinkDNS.Modules
             return true;
         }
 
-        private string FormatValue(string value)
+        private static string FormatValue(string value)
         {
             // If value contains spaces or special characters, wrap in quotes
             if (string.IsNullOrEmpty(value))
                 return "\"\"";
-
-            if (value.Contains(" ") || value.Contains("=") || value.Contains("#"))
+            if (value.Contains(' ') || value.Contains("=") || value.Contains("#"))
             {
                 // Escape quotes in value
                 var escapedValue = value.Replace("\"", "\\\"");
                 return $"\"{escapedValue}\"";
             }
-
             return value;
         }
 
@@ -150,62 +126,97 @@ namespace SinkDNS.Modules
             if (!File.Exists(_configFilePath))
                 throw new FileNotFoundException("Configuration file not found", _configFilePath);
 
-            var lines = File.ReadAllLines(_configFilePath);
+            if (!_configLoaded)
+            {
+                LoadConfiguration();
+            }
+
             int startLine = -1;
             int endLine = -1;
 
             // Find section if specified
             if (!string.IsNullOrEmpty(section))
             {
-                for (int i = 0; i < lines.Length; i++)
+                for (int i = 0; i < _configLines.Count; i++)
                 {
-                    if (lines[i].Trim() == section)
+                    if (_configLines[i].Trim() == section)
                     {
                         startLine = i;
                         break;
                     }
                 }
-
                 if (startLine == -1)
                     return null; // Section not found
 
                 // Find end of section (next section or end of file)
-                for (int i = startLine + 1; i < lines.Length; i++)
+                for (int i = startLine + 1; i < _configLines.Count; i++)
                 {
-                    if (lines[i].Trim().StartsWith("[") && lines[i].Trim().EndsWith("]"))
+                    if (_configLines[i].Trim().StartsWith("[") && _configLines[i].Trim().EndsWith("]"))
                     {
                         endLine = i;
                         break;
                     }
                 }
-
                 if (endLine == -1)
-                    endLine = lines.Length;
+                    endLine = _configLines.Count;
             }
             else
             {
                 startLine = 0;
-                endLine = lines.Length;
+                endLine = _configLines.Count;
             }
 
             // Search for setting within section
             for (int i = startLine; i < endLine; i++)
             {
-                var line = lines[i].Trim();
+                var line = _configLines[i].Trim();
                 if (line.StartsWith(settingName + "=") || line.StartsWith(settingName + " ="))
                 {
-                    var value = line.Substring(settingName.Length + 1).Trim();
+                    var value = line[(settingName.Length + 1)..].Trim();
                     // Remove quotes if present
                     if (value.StartsWith("\"") && value.EndsWith("\""))
                     {
-                        return value.Substring(1, value.Length - 2);
+                        return value[1..^1];
                     }
                     return value;
                 }
             }
-
-            return null; // Setting not found
+            return null;
         }
+        public void WriteToConfigFile()
+        {
+            if (!_configLoaded || !_hasChanges)
+                return;
+
+            if (!File.Exists(_configFilePath))
+            {
+                TraceLogger.Log("Configuration file not found!", Enums.StatusSeverityType.Error);
+                return;
+            }
+
+            try
+            {
+                File.WriteAllLines(_configFilePath, _configLines);
+                _hasChanges = false;
+                TraceLogger.Log("Configuration file updated successfully.", Enums.StatusSeverityType.Information);
+            }
+            catch (Exception ex)
+            {
+                TraceLogger.Log($"Failed to write configuration file: {ex.Message}", Enums.StatusSeverityType.Error);
+            }
+        }
+
+        public void DiscardChanges()
+        {
+            if (!_configLoaded)
+                return;
+
+            _hasChanges = false;
+            LoadConfiguration();
+        }
+
+        public bool HasPendingChanges => _hasChanges;
+
         public void BackupDNSCryptConfiguration()
         {
             if (File.Exists(_configFilePath))

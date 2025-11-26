@@ -1,4 +1,4 @@
-//MIT License
+﻿//MIT License
 
 //Copyright (c) 2025 Dimon
 
@@ -20,27 +20,13 @@
 //OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //SOFTWARE.
 
-using SinkDNS.Modules.DNSCrypt;
-using SinkDNS.Modules.System;
-namespace SinkDNS
+namespace SinkDNS.Modules.System
 {
-    public partial class SinkDNSMainForm : Form
+    //This will change the DNS settings on the system to the DNSCrypt local 127.0.0.1 address.
+    //But also will save the previous DNS settings to be restored later if the user wants to disable SinkDNS.
+    //And will get list of adapters. So basically a system network manager.
+    internal class SystemNetworkManager
     {
-        public SinkDNSMainForm()
-        {
-            InitializeComponent();
-        }
 
-        private void testBtn_Click(object sender, EventArgs e) //Testing
-        {
-            //Todo: change the blocked_reply to 0.0.0.0 to see if the ChangeSetting method works
-            var configParse = new DNSCryptConfigParser("config\\sinkdns.ini", "C:\\Program Files\\dnscrypt-proxy\\dnscrypt-proxy.toml");
-            configParse.ParseAndApplySettings();
-        }
-
-        private void SinkDNSMainForm_Load(object sender, EventArgs e)
-        {
-            IOManager.CreateNecessaryDirectories();
-        }
-    }
+    }   
 }

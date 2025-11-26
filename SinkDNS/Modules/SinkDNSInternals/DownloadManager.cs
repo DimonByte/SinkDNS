@@ -1,5 +1,4 @@
-﻿using System.Net.Http.Headers;
-//MIT License
+﻿//MIT License
 
 //Copyright (c) 2025 Dimon
 
@@ -21,13 +20,15 @@
 //OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //SOFTWARE.
 
-namespace SinkDNS.Modules
+using System.Net.Http.Headers;
+
+namespace SinkDNS.Modules.SinkDNSInternals
 {
     //This will manage downloads for SinkDNS, DNSCrypt, and BlockLists, including starting, stopping, and monitoring download progress.
     //I'll be honest and say this might not work. This needs testing.
     internal class DownloadManager
     {
-        private static readonly HttpClient httpClient = new HttpClient();
+        private static readonly HttpClient httpClient = new();
         private static readonly TimeSpan DefaultTimeout = TimeSpan.FromSeconds(30);
 
         static DownloadManager()
@@ -59,10 +60,8 @@ namespace SinkDNS.Modules
 
                 if (response.IsSuccessStatusCode)
                 {
-                    using (var fileStream = new FileStream(localPath, FileMode.Create, FileAccess.Write, FileShare.None))
-                    {
-                        await response.Content.CopyToAsync(fileStream);
-                    }
+                    using var fileStream = new FileStream(localPath, FileMode.Create, FileAccess.Write, FileShare.None);
+                    await response.Content.CopyToAsync(fileStream);
                     return true;
                 }
                 else

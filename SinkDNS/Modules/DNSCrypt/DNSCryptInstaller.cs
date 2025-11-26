@@ -1,13 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net.NetworkInformation;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Win32;
-
-//MIT License
+﻿//MIT License
 
 //Copyright (c) 2025 Dimon
 
@@ -29,12 +20,12 @@ using Microsoft.Win32;
 //OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //SOFTWARE.
 
-namespace SinkDNS.Modules
+namespace SinkDNS.Modules.DNSCrypt
 {
-    //This will change the DNS settings on the system to the DNSCrypt local 127.0.0.1 address.
-    //But also will save the previous DNS settings to be restored later if the user wants to disable SinkDNS.
-    internal class SystemDNSManager
+    internal class DNSCryptInstaller
     {
-
-    }   
+        //Will handle installation of DNSCrypt but also check if an installation already exists.
+        //If so, configure that but backup the config first.
+        //User needs to agree to the license of DNSCrypt before installation.
+    }
 }
