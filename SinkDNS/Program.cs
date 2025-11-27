@@ -13,9 +13,9 @@ namespace SinkDNS
         {
             // To customize application configuration such as set high DPI settings or default font,
             // see https://aka.ms/applicationconfiguration.
-            TraceLogger.Log("Application Starting...", Enums.StatusSeverityType.Information);
+            TraceLogger.Log("Application Starting...");
             ApplicationConfiguration.Initialize();
-            Application.Run(new SinkDNSMainForm());
+            Application.Run(new SinkDNSManagerForm());
         }
     }
 }

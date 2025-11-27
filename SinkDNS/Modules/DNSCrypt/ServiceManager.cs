@@ -69,7 +69,7 @@ namespace SinkDNS.Modules.DNSCrypt
                 using var service = new ServiceController(DnsCryptServiceName);
                 if (service.Status != ServiceControllerStatus.Running)
                 {
-                    TraceLogger.Log("Starting DNSCrypt service...", Enums.StatusSeverityType.Information);
+                    TraceLogger.Log("Starting DNSCrypt service...");
                     service.Start();
                     service.WaitForStatus(ServiceControllerStatus.Running, TimeSpan.FromSeconds(30));
                     return true;
@@ -90,7 +90,7 @@ namespace SinkDNS.Modules.DNSCrypt
                 using var service = new ServiceController(DnsCryptServiceName);
                 if (service.Status == ServiceControllerStatus.Running)
                 {
-                    TraceLogger.Log("Stopping DNSCrypt service...", Enums.StatusSeverityType.Information);
+                    TraceLogger.Log("Stopping DNSCrypt service...");
                     service.Stop();
                     service.WaitForStatus(ServiceControllerStatus.Stopped, TimeSpan.FromSeconds(30));
                     return true;
@@ -105,7 +105,7 @@ namespace SinkDNS.Modules.DNSCrypt
         }
         public static bool RestartDnsCrypt()
         {
-            TraceLogger.Log("Attempting restart of DNSCrypt service...", Enums.StatusSeverityType.Information);
+            TraceLogger.Log("Attempting restart of DNSCrypt service...");
             try
             {
                 if (!StopDnsCrypt())

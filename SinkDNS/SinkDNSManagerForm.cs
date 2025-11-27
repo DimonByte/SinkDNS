@@ -20,27 +20,37 @@
 //OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //SOFTWARE.
 
+//TODO: SinkDNS will run from localappdata to allow non-admin writes to blocklists and such.
+
 using SinkDNS.Modules.DNSCrypt;
+using SinkDNS.Modules.SinkDNSInternals;
 using SinkDNS.Modules.System;
+
 namespace SinkDNS
 {
-    public partial class SinkDNSMainForm : Form
+    public partial class SinkDNSManagerForm : Form
     {
-        public SinkDNSMainForm()
+        public SinkDNSManagerForm()
         {
             InitializeComponent();
         }
-
-        private void testBtn_Click(object sender, EventArgs e) //Testing
-        {
-            //Todo: change the blocked_reply to 0.0.0.0 to see if the ChangeSetting method works
-            var configParse = new DNSCryptConfigParser("config\\sinkdns.ini", "C:\\Program Files\\dnscrypt-proxy\\dnscrypt-proxy.toml");
-            configParse.ParseAndApplySettings();
-        }
-
         private void SinkDNSMainForm_Load(object sender, EventArgs e)
         {
             IOManager.CreateNecessaryDirectories();
+            if (ServiceManager.IsDNSCryptRunning())
+            {
+                DNSCryptStatusLabel.Text = "DNSCrypt Status: Running";
+            }
+            else
+            {
+                DNSCryptStatusLabel.Text = "DNSCrypt Status: Stopped";
+            }
+
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            BlocklistManager.DownloadBlocklistsAsync().GetAwaiter().GetResult();
         }
     }
 }

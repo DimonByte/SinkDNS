@@ -20,12 +20,12 @@
 //OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //SOFTWARE.
 
+using System.IO.Compression;
 using System.Net.Http.Headers;
 
 namespace SinkDNS.Modules.SinkDNSInternals
 {
     //This will manage downloads for SinkDNS, DNSCrypt, and BlockLists, including starting, stopping, and monitoring download progress.
-    //I'll be honest and say this might not work. This needs testing.
     internal class DownloadManager
     {
         private static readonly HttpClient httpClient = new();
@@ -40,10 +40,16 @@ namespace SinkDNS.Modules.SinkDNSInternals
             httpClient.Timeout = DefaultTimeout;
         }
 
-        public static async Task<bool> DownloadFileAsync(string url, string localPath)
+        public static async Task<bool> DownloadFileAsync(string url, string localPath, CancellationToken cancellationToken = default)
         {
             try
             {
+                TraceLogger.Log($"Download from {url} to {localPath} triggered. Running checks...");
+                if (string.IsNullOrEmpty(url))
+                {
+                    TraceLogger.Log("URL is null or empty", Enums.StatusSeverityType.Error);
+                    return false;
+                }
                 if (string.IsNullOrEmpty(localPath))
                 {
                     TraceLogger.Log("Local path is null or empty", Enums.StatusSeverityType.Error);
@@ -54,14 +60,37 @@ namespace SinkDNS.Modules.SinkDNSInternals
                 if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
                 {
                     Directory.CreateDirectory(directory);
+                    TraceLogger.Log($"Directory created: {directory}");
                 }
 
-                HttpResponseMessage response = await httpClient.GetAsync(url);
+                TraceLogger.Log("About to check HTTPclient GetAsync...");
+                using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+                cts.CancelAfter(TimeSpan.FromMinutes(5));
+                HttpResponseMessage response = await httpClient.GetAsync(url, cts.Token).ConfigureAwait(false);
+                TraceLogger.Log("HTTPclient GetAsync passed through.");
 
                 if (response.IsSuccessStatusCode)
                 {
-                    using var fileStream = new FileStream(localPath, FileMode.Create, FileAccess.Write, FileShare.None);
-                    await response.Content.CopyToAsync(fileStream);
+                    TraceLogger.Log($"HTTP response received with status code: {response.StatusCode}");
+                    TraceLogger.Log($"Downloading file from {url} to {localPath}");
+                    byte[] contentBytes = await response.Content.ReadAsByteArrayAsync(cts.Token).ConfigureAwait(false);
+                    bool isGzipped = response.Content.Headers.ContentEncoding?.Any(e => e.Contains("gzip")) ?? false;
+                    if (isGzipped)
+                    {
+                        TraceLogger.Log("Content is gzipped, decompressing...");
+                        using var compressedStream = new MemoryStream(contentBytes);
+                        using var decompressedStream = new GZipStream(compressedStream, CompressionMode.Decompress);
+                        using var fileStream = new FileStream(localPath, FileMode.Create, FileAccess.Write, FileShare.None, 4096, FileOptions.Asynchronous);
+                        await decompressedStream.CopyToAsync(fileStream, cts.Token).ConfigureAwait(false);
+                    }
+                    else
+                    {
+                        TraceLogger.Log("Content is not gzipped, writing directly to file...");
+                        using var fileStream = new FileStream(localPath, FileMode.Create, FileAccess.Write, FileShare.None, 4096, FileOptions.Asynchronous);
+                        await fileStream.WriteAsync(contentBytes, cts.Token).ConfigureAwait(false);
+                    }
+
+                    TraceLogger.Log("Download completed successfully");
                     return true;
                 }
                 else
@@ -70,9 +99,15 @@ namespace SinkDNS.Modules.SinkDNSInternals
                     return false;
                 }
             }
+            catch (OperationCanceledException)
+            {
+                TraceLogger.Log("Download was cancelled or timed out", Enums.StatusSeverityType.Error);
+                return false;
+            }
             catch (Exception ex)
             {
                 TraceLogger.Log($"Error downloading file: {ex.Message}", Enums.StatusSeverityType.Error);
+                TraceLogger.Log($"Exception details: {ex}", Enums.StatusSeverityType.Error);
                 return false;
             }
         }
@@ -81,6 +116,7 @@ namespace SinkDNS.Modules.SinkDNSInternals
         {
             try
             {
+                TraceLogger.Log($"Downloading string from {url}");
                 HttpResponseMessage response = await httpClient.GetAsync(url);
 
                 if (response.IsSuccessStatusCode)
@@ -104,6 +140,7 @@ namespace SinkDNS.Modules.SinkDNSInternals
         {
             try
             {
+                TraceLogger.Log($"Getting HTTP headers from {url}");
                 var request = new HttpRequestMessage(HttpMethod.Head, url);
                 HttpResponseMessage response = await httpClient.SendAsync(request);
 
@@ -126,11 +163,14 @@ namespace SinkDNS.Modules.SinkDNSInternals
         {
             try
             {
+                TraceLogger.Log($"Checking accessibility of URL: {url}");
                 HttpResponseMessage response = await httpClient.GetAsync(url);
+                TraceLogger.Log($"URL accessibility check returned status code: {response.StatusCode}");
                 return response.IsSuccessStatusCode;
             }
             catch
             {
+                TraceLogger.Log($"URL is not accessible: {url}", Enums.StatusSeverityType.Warning);
                 return false;
             }
         }

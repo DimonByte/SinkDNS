@@ -37,19 +37,19 @@ namespace SinkDNS.Modules.DNSCrypt
                 TraceLogger.Log("Configuration file not found!", Enums.StatusSeverityType.Error);
                 return;
             }
-            TraceLogger.Log($"Reading configuration from {_SinkDNSconfigFilePath}", Enums.StatusSeverityType.Information);
+            TraceLogger.Log($"Reading configuration from {_SinkDNSconfigFilePath}");
             var lines = File.ReadAllLines(_SinkDNSconfigFilePath);
-            TraceLogger.Log($"Read {lines.Length} lines from configuration file.", Enums.StatusSeverityType.Information);
+            TraceLogger.Log($"Read {lines.Length} lines from configuration file.");
             var settings = ParseSettings(lines);
-            TraceLogger.Log($"Parsed {settings.Count} settings from configuration file.", Enums.StatusSeverityType.Information);
+            TraceLogger.Log($"Parsed {settings.Count} settings from configuration file.");
 
             foreach (var setting in settings)
             {
-                TraceLogger.Log($"Applying setting: {setting.Key} = '{setting.Value}'", Enums.StatusSeverityType.Information);
+                TraceLogger.Log($"Applying setting: {setting.Key} = '{setting.Value}'");
                 _DNSCryptConfigWriter.ChangeSetting(setting.Key, setting.Value);
             }
             _DNSCryptConfigWriter.WriteToConfigFile();
-            TraceLogger.Log("All settings have been applied.", Enums.StatusSeverityType.Information);
+            TraceLogger.Log("All settings have been applied.");
         }
 
         private static Dictionary<string, string> ParseSettings(string[] lines)

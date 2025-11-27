@@ -25,55 +25,184 @@ namespace SinkDNS.Modules.SinkDNSInternals
     //This will manage the block lists for SinkDNS, including downloading, updating, and parsing them.
     //There will be a list of the block lists that are the most popular on this repo that SinkDNS references.
     //BlockListCompression as well, that will remove any # comments and blank lines from the block lists to reduce their size.
-    internal class BlockListManager
+    public static class BlocklistManager
     {
-        //CheckBlockListForUpdates
-        //ForEachSelectedBlockList in Settings
-        //IsBlockListUpdateAvailable() from UpdateManager
-        //If IsBlockListUpdateAvailable() == true
-        //DownloadManager.DownloadBlockList(BlockListItem)
-        //After For each
-        //ParseBlockLists() //This will combine all the block lists into one file for DNSCrypt to use.
-        //ServiceManager.RestartDNSCryptService() //Restart the DNSCrypt service to apply the new block lists.
+        private static readonly string BlocklistFolder = "hostfiles/blocklist";
+        private static readonly string WhitelistFolder = "hostfiles/whitelist";
+        private static readonly string BlocklistIni = "config/blocklist.ini";
+        private static readonly string WhitelistIni = "config/whitelist.ini";
+        private static readonly string UserBlocklistIni = "config/userblocklist.ini";
+        private static readonly string UserWhitelistIni = "config/userwhitelist.ini";
+        private static readonly string CombinedBlocklistFile = "hostfiles/blocklist/combined-blocklist.txt";
+        private static readonly string CombinedWhitelistFile = "hostfiles/whitelist/combined-whitelist.txt";
 
-        public static void MergeBlockLists()
+        public static async Task DownloadBlocklistsAsync()
         {
-            //This will merge all the block lists into one file for DNSCrypt to use.
-            //
+            if (!File.Exists(BlocklistIni))
+            {
+                TraceLogger.Log($"Blocklist configuration file not found: {BlocklistIni}", Enums.StatusSeverityType.Warning);
+                return;
+            }
+
+            var urls = ReadUrlsFromFile(BlocklistIni);
+            foreach (var url in urls)
+            {
+                TraceLogger.Log($"Downloading blocklist from: {url}");
+                var fileName = Path.GetFileName(url);
+                var filePath = Path.Combine(BlocklistFolder, fileName);
+                await DownloadManager.DownloadFileAsync(url, filePath).ConfigureAwait(false);
+            }
+            TraceLogger.Log("Finished downloading blocklists.");
         }
-        public static void AddToBlockList(string domain)
+        public static async Task DownloadWhitelistsAsync()
         {
-            //This will add a domain to the custom block list.
+            if (!File.Exists(WhitelistIni))
+            {
+                TraceLogger.Log($"Whitelist configuration file not found: {WhitelistIni}", Enums.StatusSeverityType.Warning);
+                return;
+            }
+
+            var urls = ReadUrlsFromFile(WhitelistIni);
+            foreach (var url in urls)
+            {
+                TraceLogger.Log($"Downloading whitelist from: {url}");
+                var fileName = Path.GetFileName(url);
+                var filePath = Path.Combine(WhitelistFolder, fileName);
+                await DownloadManager.DownloadFileAsync(url, filePath);
+            }
+            TraceLogger.Log("Finished downloading whitelists.");
         }
-        public static void RemoveFromBlockList(string domain)
+
+        public static void AddToUserBlocklist(string domain)
         {
-            //This will remove a domain from the custom block list.
+            TraceLogger.Log($"Adding domain to user blocklist: {domain}");
+            AddToIniFile(UserBlocklistIni, domain);
         }
-        public static bool IsDomainBlocked(string domain)
+
+        public static void AddToUserWhitelist(string domain)
         {
-            //This will check if a domain is in the block list.
-            return false;
+            TraceLogger.Log($"Adding domain to user whitelist: {domain}");
+            AddToIniFile(UserWhitelistIni, domain);
         }
-        public static void ClearBlockList()
+
+        public static void MergeBlocklists()
         {
-            //This will clear the custom block list.
+            TraceLogger.Log("Merging blocklist files...");
+            MergeFiles(BlocklistFolder, CombinedBlocklistFile);
         }
-        public static void WhitelistDomain(string domain)
+
+        public static void MergeWhitelists()
         {
-            //This will add a domain to the whitelist, so it won't be blocked.
+            TraceLogger.Log("Merging whitelist files...");
+            MergeFiles(WhitelistFolder, CombinedWhitelistFile);
         }
-        public static void RemoveFromWhitelist(string domain)
+        public static void ClearBlocklists()
         {
-            //This will remove a domain from the whitelist.
+            TraceLogger.Log("Clearing blocklist files...");
+            ClearFiles(BlocklistFolder);
         }
-        public static bool IsDomainWhitelisted(string domain)
+
+        public static void ClearWhitelists()
         {
-            //This will check if a domain is in the whitelist.
-            return false;
+            TraceLogger.Log("Clearing whitelist files...");
+            ClearFiles(WhitelistFolder);
         }
-        public static void ClearWhitelist()
+
+        public static bool IsBlocked(string domain)
         {
-            //This will clear the whitelist.
+            if (!File.Exists(CombinedBlocklistFile))
+                return false;
+
+            var lines = File.ReadAllLines(CombinedBlocklistFile);
+            return lines.Any(line =>
+                !string.IsNullOrWhiteSpace(line) &&
+                !line.StartsWith("#") &&
+                line.Contains(domain));
+        }
+
+        public static bool IsWhitelisted(string domain)
+        {
+            if (!File.Exists(CombinedWhitelistFile))
+                return false;
+
+            var lines = File.ReadAllLines(CombinedWhitelistFile);
+            return lines.Any(line =>
+                !string.IsNullOrWhiteSpace(line) &&
+                !line.StartsWith("#") &&
+                line.Contains(domain));
+        }
+
+        private static List<string> ReadUrlsFromFile(string filePath)
+        {
+            var urls = new List<string>();
+            if (!File.Exists(filePath))
+                return urls;
+
+            var lines = File.ReadAllLines(filePath);
+            foreach (var line in lines)
+            {
+                if (string.IsNullOrWhiteSpace(line) || line.StartsWith("#"))
+                    continue;
+
+                urls.Add(line.Trim());
+            }
+
+            return urls;
+        }
+
+        private static void AddToIniFile(string iniFilePath, string domain)
+        {
+            var directory = Path.GetDirectoryName(iniFilePath);
+            if (!Directory.Exists(directory))
+                Directory.CreateDirectory(directory);
+            File.AppendAllText(iniFilePath, $"{domain}{Environment.NewLine}");
+        }
+
+        private static void MergeFiles(string sourceFolder, string outputFile)
+        {
+            // Delete existing combined file, we don't want that mess to happen...
+            TraceLogger.Log($"Creating combined file: {outputFile}");
+            if (File.Exists(outputFile))
+                File.Delete(outputFile);
+
+            var files = Directory.GetFiles(sourceFolder, "*.txt");
+            if (files.Length == 0)
+            {
+                TraceLogger.Log($"No files found to merge in {sourceFolder}", Enums.StatusSeverityType.Warning);
+                return;
+            }
+
+            using var writer = new StreamWriter(outputFile);
+            foreach (var file in files)
+            {
+                TraceLogger.Log($"Merging file: {file}");
+                var lines = File.ReadAllLines(file);
+                foreach (var line in lines)
+                {
+                    if (!string.IsNullOrWhiteSpace(line) && !line.StartsWith("#"))
+                    {
+                        writer.WriteLine(line);
+                    }
+                }
+            }
+            TraceLogger.Log($"Finished merging files into: {outputFile}");
+        }
+
+        private static void ClearFiles(string folder)
+        {
+            var files = Directory.GetFiles(folder, "*.txt");
+            foreach (var file in files)
+            {
+                try
+                {
+                    File.Delete(file);
+                }
+                catch (Exception ex)
+                {
+                    TraceLogger.Log($"Error deleting file {file}: {ex.Message}", Enums.StatusSeverityType.Error);
+                }
+            }
+            TraceLogger.Log($"Cleared all files in folder: {folder}");
         }
     }
 }

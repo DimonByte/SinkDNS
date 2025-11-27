@@ -29,14 +29,14 @@ namespace SinkDNS.Modules.System
     {
         public static void CreateNecessaryDirectories()
         {
-            string[] directories = ["logs", "config", "resolvers", "blocklists", "backup"];
+            string[] directories = ["logs", "config", "resolvers", "hostfiles", "backup", "hostfiles\\blocklist", "hostfiles\\whitelist"];
             foreach (string dir in directories) {
                 if (!Directory.Exists(dir))
                 {
                     try
                     {
                         Directory.CreateDirectory(dir);
-                        TraceLogger.Log($"Created directory: {dir}", Enums.StatusSeverityType.Information);
+                        TraceLogger.Log($"Created directory: {dir}");
                     } 
                     catch (Exception ex) 
                     {
@@ -51,7 +51,7 @@ namespace SinkDNS.Modules.System
             {
                 try
                 {
-                    TraceLogger.Log($"Deleting existing output file {outputFilePath} before merging.", Enums.StatusSeverityType.Information);
+                    TraceLogger.Log($"Deleting existing output file {outputFilePath} before merging.");
                     File.Delete(outputFilePath); //Ensure that the last combined file isn't added to the merge.
                 }
                 catch (Exception ex)
@@ -64,7 +64,7 @@ namespace SinkDNS.Modules.System
             foreach (var inputFilePath in inputFilePaths)
             {
                 using var inputStream = File.OpenRead(inputFilePath);
-                TraceLogger.Log($"Merging file {inputFilePath} into {outputFilePath}", Enums.StatusSeverityType.Information);
+                TraceLogger.Log($"Merging file {inputFilePath} into {outputFilePath}");
                 inputStream.CopyTo(outputStream);
             }
         }
@@ -75,7 +75,7 @@ namespace SinkDNS.Modules.System
                 string backupFilePath = $"backup/{Path.GetFileName(filePath) + Path.GetExtension(filePath)}.bak";
                 try
                 {
-                    TraceLogger.Log($"Creating backup for file {filePath} at {backupFilePath}", Enums.StatusSeverityType.Information);
+                    TraceLogger.Log($"Creating backup for file {filePath} at {backupFilePath}");
                     File.Copy(filePath, backupFilePath, true);
                 }
                 catch (Exception ex)

@@ -51,7 +51,7 @@ namespace SinkDNS.Modules.DNSCrypt
             if (modified)
             {
                 _hasChanges = true;
-                TraceLogger.Log($"Setting '{settingName}' changed to '{value}'.", Enums.StatusSeverityType.Information);
+                TraceLogger.Log($"Setting '{settingName}' changed to '{value}'.");
             }
         }
 
@@ -62,9 +62,10 @@ namespace SinkDNS.Modules.DNSCrypt
                 TraceLogger.Log("Configuration file not found!", Enums.StatusSeverityType.Error);
                 return;
             }
-
+            TraceLogger.Log("Loading configuration file: " + _configFilePath);
             _configLines = [.. File.ReadAllLines(_configFilePath)];
             _configLoaded = true;
+            TraceLogger.Log("Configuration file loaded with " + _configLines.Count + " lines.");
         }
 
         private static bool ModifySettingInConfigFile(List<string> lines, string settingName, string value)
@@ -78,12 +79,14 @@ namespace SinkDNS.Modules.DNSCrypt
                 var line = lines[i].Trim();
                 if (line.StartsWith(settingName + "=") || line.StartsWith(settingName + " ="))
                 {
+                    TraceLogger.Log($"Found existing setting '{settingName}' at line {i + 1}. Updating value.");
                     lines[i] = $"{settingName} = {FormatValue(value)}";
                     found = true;
                     break;
                 }
                 else if (line.StartsWith(settingName + "\"") || line.StartsWith(settingName + " \""))
                 {
+                    TraceLogger.Log($"Found existing quoted setting '{settingName}' at line {i + 1}. Updating value.");
                     // Handle quoted values
                     lines[i] = $"{settingName} = \"{value}\"";
                     found = true;
@@ -196,9 +199,10 @@ namespace SinkDNS.Modules.DNSCrypt
 
             try
             {
+                TraceLogger.Log("Writing " + _configLines.Count + " lines to configuration file.");
                 File.WriteAllLines(_configFilePath, _configLines);
                 _hasChanges = false;
-                TraceLogger.Log("Configuration file updated successfully.", Enums.StatusSeverityType.Information);
+                TraceLogger.Log("Configuration file updated successfully.");
             }
             catch (Exception ex)
             {

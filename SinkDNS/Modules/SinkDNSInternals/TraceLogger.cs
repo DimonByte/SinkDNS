@@ -41,9 +41,12 @@ namespace SinkDNS.Modules.SinkDNSInternals
                     string filePath = Path.Combine(_logDirectory, $"{date}.log");
                     string timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
                     string severityText = severity.ToString().ToUpper();
-                    string callerClassName = GetCallingClassName();
-                    string logEntry = $"[{timestamp}] [{callerClassName}] [{severityText}] {message}{Environment.NewLine}";
-                    File.AppendAllText(filePath, logEntry, Encoding.UTF8); //TODO: There needs to be a setting to disable this logging if the user wants.
+
+                    // Get caller info (class + line number)
+                    var callerInfo = GetCallerInfo();
+
+                    string logEntry = $"[{timestamp}] [{severityText}] [{callerInfo.ClassName}] [Line: {callerInfo.LineNumber}]: {message}{Environment.NewLine}";
+                    File.AppendAllText(filePath, logEntry, Encoding.UTF8);
                 }
                 catch (Exception ex)
                 {
@@ -52,11 +55,11 @@ namespace SinkDNS.Modules.SinkDNSInternals
             }
         }
 
-        private static string GetCallingClassName()
+        private static (string ClassName, int LineNumber) GetCallerInfo()
         {
             try
             {
-                StackTrace stackTrace = new();
+                StackTrace stackTrace = new(true); // 'true' enables file info (line numbers)
                 for (int i = 1; i < stackTrace.FrameCount; i++)
                 {
                     StackFrame? frame = stackTrace.GetFrame(i);
@@ -71,15 +74,15 @@ namespace SinkDNS.Modules.SinkDNSInternals
                     // Skip frames from TraceLogger itself
                     if (declaringType != typeof(TraceLogger))
                     {
-                        return declaringType.Name;
+                        return (declaringType.Name, frame.GetFileLineNumber());
                     }
                 }
             }
             catch
             {
-                return "UnknownClass";
+                return ("UnknownClass", -1);
             }
-            return "NullClass";
+            return ("NullClass", -1);
         }
     }
 }
