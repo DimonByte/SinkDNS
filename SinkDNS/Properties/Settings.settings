@@ -44,5 +44,8 @@
     <Setting Name="TaskSchedulerIni" Type="System.String" Scope="Application">
       <Value Profile="(Default)">taskscheduler.ini</Value>
     </Setting>
+    <Setting Name="EnableDiskLogging" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

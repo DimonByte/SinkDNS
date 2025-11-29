@@ -148,5 +148,17 @@ namespace SinkDNS.Properties {
                 return ((string)(this["TaskSchedulerIni"]));
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool EnableDiskLogging {
+            get {
+                return ((bool)(this["EnableDiskLogging"]));
+            }
+            set {
+                this["EnableDiskLogging"] = value;
+            }
+        }
     }
 }

@@ -89,8 +89,7 @@ namespace SinkDNS.Modules.SinkDNSInternals
                         using var fileStream = new FileStream(localPath, FileMode.Create, FileAccess.Write, FileShare.None, 4096, FileOptions.Asynchronous);
                         await fileStream.WriteAsync(contentBytes, cts.Token).ConfigureAwait(false);
                     }
-
-                    TraceLogger.Log("Download completed successfully");
+                    TraceLogger.Log("Download completed successfully.");
                     return true;
                 }
                 else

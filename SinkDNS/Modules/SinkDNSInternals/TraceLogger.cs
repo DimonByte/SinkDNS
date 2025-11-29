@@ -24,67 +24,90 @@ using SinkDNS.Properties;
 using System.Diagnostics;
 using System.Text;
 using static SinkDNS.Modules.Enums;
+using System.Runtime.CompilerServices;
 
 namespace SinkDNS.Modules.SinkDNSInternals
 {
     public static class TraceLogger
     {
-        private static readonly Lock _lock = new();
-
+        private static readonly object _lock = new();
         private static readonly string _logDirectory = Settings.Default.LogsFolder;
+        private static string _currentDate = string.Empty;
+        private static DateTime _lastDateCheck = DateTime.MinValue;
 
-        public static void Log(string message, StatusSeverityType severity = StatusSeverityType.Information)
+        public static void Log(string message, StatusSeverityType severity = StatusSeverityType.Information,
+                              [CallerMemberName] string memberName = "",
+                              [CallerFilePath] string filePath = "",
+                              [CallerLineNumber] int lineNumber = 0)
         {
+            if (!Settings.Default.EnableDiskLogging && severity != StatusSeverityType.Error)
+            {
+                Debug.WriteLine($"[DEBUG] {message}");
+                return;
+            }
+
             lock (_lock)
             {
                 try
                 {
-                    string date = DateTime.Now.ToString("dd-MM-yyyy");
-                    string filePath = Path.Combine(_logDirectory, $"{date}.log");
-                    string timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
+                    var now = DateTime.Now;
+                    var currentDate = now.ToString("dd-MM-yyyy");
+                    if (now.Subtract(_lastDateCheck).TotalSeconds > 10)
+                    {
+                        _currentDate = currentDate;
+                        _lastDateCheck = now;
+                    }
+                    string filePathLog = Path.Combine(_logDirectory, $"{_currentDate}.log");
+                    string timestamp = now.ToString("yyyy-MM-dd HH:mm:ss.fff");
                     string severityText = severity.ToString().ToUpper();
+                    string className = ExtractClassName(filePath);
+                    string logEntry = $"[{timestamp}] [{severityText}] [{className}] [{memberName}] [Line: {lineNumber}]: {message}";
 
-                    // Get caller info (class + line number)
-                    var callerInfo = GetCallerInfo();
+                    if (Settings.Default.EnableDiskLogging)
+                    {
+                        File.AppendAllText(filePathLog, $"{logEntry}{Environment.NewLine}", Encoding.UTF8);
+                    }
 
-                    string logEntry = $"[{timestamp}] [{severityText}] [{callerInfo.ClassName}] [Line: {callerInfo.LineNumber}]: {message}{Environment.NewLine}";
-                    File.AppendAllText(filePath, logEntry, Encoding.UTF8);
+                    Debug.WriteLine(logEntry);
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Failed to write to log: {ex.Message}");
+                    Debug.WriteLine($"Failed to write to log: {ex.Message}");
                 }
             }
         }
 
-        private static (string ClassName, int LineNumber) GetCallerInfo()
+        private static string ExtractClassName(string filePath)
         {
+            if (string.IsNullOrEmpty(filePath))
+                return "UnknownClass";
+
             try
             {
-                StackTrace stackTrace = new(true); // 'true' enables file info (line numbers)
-                for (int i = 1; i < stackTrace.FrameCount; i++)
+                string fileName = Path.GetFileName(filePath);
+
+                int lastDot = fileName.LastIndexOf('.');
+                if (lastDot > 0)
+                    fileName = fileName.Substring(0, lastDot);
+
+                int lastDotInPath = filePath.LastIndexOf(Path.DirectorySeparatorChar);
+                if (lastDotInPath > 0)
                 {
-                    StackFrame? frame = stackTrace.GetFrame(i);
-                    if (frame == null) continue;
-
-                    var method = frame.GetMethod();
-                    if (method == null) continue;
-
-                    var declaringType = method.DeclaringType;
-                    if (declaringType == null) continue;
-
-                    // Skip frames from TraceLogger itself
-                    if (declaringType != typeof(TraceLogger))
+                    string directoryPath = filePath.Substring(0, lastDotInPath);
+                    int lastDirectorySeparator = directoryPath.LastIndexOf(Path.DirectorySeparatorChar);
+                    if (lastDirectorySeparator > 0)
                     {
-                        return (declaringType.Name, frame.GetFileLineNumber());
+                        string className = fileName;
+                        return className;
                     }
                 }
+
+                return fileName;
             }
             catch
             {
-                return ("UnknownClass", -1);
+                return "UnknownClass";
             }
-            return ("NullClass", -1);
         }
     }
 }

@@ -22,12 +22,18 @@
 
 using SinkDNS.Modules.SinkDNSInternals;
 using static SinkDNS.Modules.Enums;
-
+using System.Windows.Forms;
 namespace SinkDNS.Modules.System
 {
     internal class NotificationManager
     {
-        // This will handle notifications to the user via the Notification Area (System Tray).
+        private static NotifyIcon _notifyIcon;
+
+        public static void SetNotifyIcon(NotifyIcon notifyIcon)
+        {
+            _notifyIcon = notifyIcon;
+        }
+
         public static void ShowNotification(string title, string message, StatusSeverityType messageType, int duration = 5000)
         {
             ShowSystemTrayNotification(title, message, messageType, duration);
@@ -37,56 +43,26 @@ namespace SinkDNS.Modules.System
         {
             try
             {
-                var notifyIcon = new NotifyIcon
+                if (_notifyIcon == null)
                 {
-                    Icon = GetNotificationIcon(messageType),
-                    Visible = true,
-                    Text = title
-                };
+                    TraceLogger.Log("NotifyIcon not initialized in NotificationManager", StatusSeverityType.Warning);
+                    return;
+                }
 
-                notifyIcon.ShowBalloonTip(
+                _notifyIcon.Text = title;
+
+                _notifyIcon.ShowBalloonTip(
                     duration,
                     title,
                     message,
                     GetBalloonTipIcon(messageType)
                 );
-
-                Task.Delay(duration).ContinueWith(_ =>
-                {
-                    try
-                    {
-                        notifyIcon.Visible = false;
-                        notifyIcon.Dispose();
-                    }
-                    catch
-                    {
-                    }
-                });
             }
             catch (Exception ex)
             {
                 TraceLogger.Log($"Failed to show system tray notification: {ex.Message}", StatusSeverityType.Error);
             }
         }
-
-        private static Icon GetNotificationIcon(StatusSeverityType messageType)
-        {
-            try
-            {
-                return messageType switch
-                {
-                    StatusSeverityType.Error => SystemIcons.Error,
-                    StatusSeverityType.Warning => SystemIcons.Warning,
-                    StatusSeverityType.Information => SystemIcons.Information,
-                    _ => SystemIcons.Information,
-                };
-            }
-            catch
-            {
-                return SystemIcons.Information;
-            }
-        }
-
         private static ToolTipIcon GetBalloonTipIcon(StatusSeverityType messageType)
         {
             return messageType switch

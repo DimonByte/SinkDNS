@@ -22,6 +22,7 @@
 
 namespace SinkDNS.Modules.SinkDNSInternals
 {
+    using SinkDNS.Modules.System;
     using SinkDNS.Properties;
 
     //This will manage the block lists for SinkDNS, including downloading, updating, and parsing them.
@@ -46,6 +47,9 @@ namespace SinkDNS.Modules.SinkDNSInternals
                 await DownloadManager.DownloadFileAsync(url, filePath).ConfigureAwait(false);
             }
             TraceLogger.Log("Finished downloading blocklists.");
+            IOManager.MergeFiles(Settings.Default.BlocklistFolder, Settings.Default.CombinedBlocklistFile);
+            IOManager.RemoveDuplicates(Settings.Default.CombinedBlocklistFile);
+            TraceLogger.Log("Blocklist update complete.");
         }
 
         public static async Task DownloadWhitelistsAsync()
@@ -70,37 +74,37 @@ namespace SinkDNS.Modules.SinkDNSInternals
         public static void AddToUserBlocklist(string domain)
         {
             TraceLogger.Log($"Adding domain to user blocklist: {domain}");
-            AddToIniFile(Settings.Default.UserBlocklistIni, domain);
+            IOManager.AddToIniFile(Settings.Default.UserBlocklistIni, domain);
         }
 
         public static void AddToUserWhitelist(string domain)
         {
             TraceLogger.Log($"Adding domain to user whitelist: {domain}");
-            AddToIniFile(Settings.Default.UserWhitelistIni, domain);
+            IOManager.AddToIniFile(Settings.Default.UserWhitelistIni, domain);
         }
 
         public static void MergeBlocklists()
         {
             TraceLogger.Log("Merging blocklist files...");
-            MergeFiles(Settings.Default.BlocklistFolder, Settings.Default.CombinedBlocklistFile);
+            IOManager.MergeFiles(Settings.Default.BlocklistFolder, Settings.Default.CombinedBlocklistFile);
         }
 
         public static void MergeWhitelists()
         {
             TraceLogger.Log("Merging whitelist files...");
-            MergeFiles(Settings.Default.WhitelistFolder, Settings.Default.CombinedWhitelistFile);
+            IOManager.MergeFiles(Settings.Default.WhitelistFolder, Settings.Default.CombinedWhitelistFile);
         }
 
         public static void ClearBlocklists()
         {
             TraceLogger.Log("Clearing blocklist files...");
-            ClearFiles(Settings.Default.BlocklistFolder);
+            IOManager.ClearFiles(Settings.Default.BlocklistFolder);
         }
 
         public static void ClearWhitelists()
         {
             TraceLogger.Log("Clearing whitelist files...");
-            ClearFiles(Settings.Default.WhitelistFolder);
+            IOManager.ClearFiles(Settings.Default.WhitelistFolder);
         }
 
         public static bool IsBlocked(string domain)
@@ -143,61 +147,6 @@ namespace SinkDNS.Modules.SinkDNSInternals
             }
 
             return urls;
-        }
-
-        private static void AddToIniFile(string iniFilePath, string domain)
-        {
-            var directory = Path.GetDirectoryName(iniFilePath);
-            if (!Directory.Exists(directory))
-                Directory.CreateDirectory(directory);
-            File.AppendAllText(iniFilePath, $"{domain}{Environment.NewLine}");
-        }
-
-        private static void MergeFiles(string sourceFolder, string outputFile)
-        {
-            // Delete existing combined file, we don't want that mess to happen...
-            TraceLogger.Log($"Creating combined file: {outputFile}");
-            if (File.Exists(outputFile))
-                File.Delete(outputFile);
-
-            var files = Directory.GetFiles(sourceFolder, "*.txt");
-            if (files.Length == 0)
-            {
-                TraceLogger.Log($"No files found to merge in {sourceFolder}", Enums.StatusSeverityType.Warning);
-                return;
-            }
-
-            using var writer = new StreamWriter(outputFile);
-            foreach (var file in files)
-            {
-                TraceLogger.Log($"Merging file: {file}");
-                var lines = File.ReadAllLines(file);
-                foreach (var line in lines)
-                {
-                    if (!string.IsNullOrWhiteSpace(line) && !line.StartsWith("#"))
-                    {
-                        writer.WriteLine(line);
-                    }
-                }
-            }
-            TraceLogger.Log($"Finished merging files into: {outputFile}");
-        }
-
-        private static void ClearFiles(string folder)
-        {
-            var files = Directory.GetFiles(folder, "*.txt");
-            foreach (var file in files)
-            {
-                try
-                {
-                    File.Delete(file);
-                }
-                catch (Exception ex)
-                {
-                    TraceLogger.Log($"Error deleting file {file}: {ex.Message}", Enums.StatusSeverityType.Error);
-                }
-            }
-            TraceLogger.Log($"Cleared all files in folder: {folder}");
         }
     }
 }

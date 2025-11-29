@@ -48,30 +48,6 @@ namespace SinkDNS.Modules.System
             }
         }
 
-        public static void MergeMultipleFiles(string outputFilePath, List<string> inputFilePaths)
-        {
-            if (File.Exists(outputFilePath))
-            {
-                try
-                {
-                    TraceLogger.Log($"Deleting existing output file {outputFilePath} before merging.");
-                    File.Delete(outputFilePath); //Ensure that the last combined file isn't added to the merge.
-                }
-                catch (Exception ex)
-                {
-                    TraceLogger.Log($"Error deleting existing output file {outputFilePath}: {ex.Message}", Enums.StatusSeverityType.Error);
-                    return;
-                }
-            }
-            using var outputStream = File.Create(outputFilePath);
-            foreach (var inputFilePath in inputFilePaths)
-            {
-                using var inputStream = File.OpenRead(inputFilePath);
-                TraceLogger.Log($"Merging file {inputFilePath} into {outputFilePath}");
-                inputStream.CopyTo(outputStream);
-            }
-        }
-
         public static void BackupFile(string filePath)
         {
             if (File.Exists(filePath))
@@ -87,6 +63,79 @@ namespace SinkDNS.Modules.System
                     TraceLogger.Log($"Error creating backup for file {filePath}: {ex.Message}", Enums.StatusSeverityType.Error);
                 }
             }
+        }
+
+        public static void AddToIniFile(string iniFilePath, string domain)
+        {
+            var directory = Path.GetDirectoryName(iniFilePath);
+            if (!Directory.Exists(directory))
+                Directory.CreateDirectory(directory);
+            File.AppendAllText(iniFilePath, $"{domain}{Environment.NewLine}");
+        }
+
+        public static void MergeFiles(string sourceFolder, string outputFile)
+        {
+            // Delete existing combined file, we don't want that mess to happen...
+            TraceLogger.Log($"Creating combined file: {outputFile}");
+            if (File.Exists(outputFile))
+                File.Delete(outputFile);
+
+            var files = Directory.GetFiles(sourceFolder, "*.txt");
+            if (files.Length == 0)
+            {
+                TraceLogger.Log($"No files found to merge in {sourceFolder}", Enums.StatusSeverityType.Warning);
+                return;
+            }
+
+            using var writer = new StreamWriter(outputFile);
+            foreach (var file in files)
+            {
+                TraceLogger.Log($"Merging file: {file}");
+                var lines = File.ReadAllLines(file);
+                foreach (var line in lines)
+                {
+                    if (!string.IsNullOrWhiteSpace(line) && !line.StartsWith("#"))
+                    {
+                        writer.WriteLine(line);
+                    }
+                }
+            }
+            writer.Flush();
+            writer.Dispose();
+            TraceLogger.Log($"Total entries in {outputFile}: {File.ReadAllLines(outputFile).Length}");
+        }
+
+        public static void ClearFiles(string folder)
+        {
+            var files = Directory.GetFiles(folder, "*.txt");
+            foreach (var file in files)
+            {
+                try
+                {
+                    File.Delete(file);
+                }
+                catch (Exception ex)
+                {
+                    TraceLogger.Log($"Error deleting file {file}: {ex.Message}", Enums.StatusSeverityType.Error);
+                }
+            }
+            TraceLogger.Log($"Cleared all files in folder: {folder}");
+        }
+
+        public static void RemoveDuplicates(string MergedFileLoc)
+        {
+            TraceLogger.Log("Removing duplicates from merge...");
+            TraceLogger.Log($"Total lines in {MergedFileLoc} before removing duplicates: {File.ReadAllLines(MergedFileLoc).Length}");
+            if (!File.Exists(MergedFileLoc))
+            {
+                TraceLogger.Log($"File not found: {MergedFileLoc}", Enums.StatusSeverityType.Warning);
+                return;
+            }
+            var lines = File.ReadAllLines(MergedFileLoc);
+            var uniqueLines = new HashSet<string>(lines);
+            File.WriteAllLines(MergedFileLoc, uniqueLines);
+            TraceLogger.Log($"Removed {lines.Length - uniqueLines.Count} duplicate entries.");
+            TraceLogger.Log($"Total lines in {MergedFileLoc} after removing duplicates: {File.ReadAllLines(MergedFileLoc).Length}");
         }
     }
 }
