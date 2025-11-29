@@ -20,8 +20,9 @@
 //OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //SOFTWARE.
 
-using System.Text;
+using SinkDNS.Properties;
 using System.Diagnostics;
+using System.Text;
 using static SinkDNS.Modules.Enums;
 
 namespace SinkDNS.Modules.SinkDNSInternals
@@ -29,7 +30,8 @@ namespace SinkDNS.Modules.SinkDNSInternals
     public static class TraceLogger
     {
         private static readonly Lock _lock = new();
-        private static readonly string _logDirectory = "logs";
+
+        private static readonly string _logDirectory = Settings.Default.LogsFolder;
 
         public static void Log(string message, StatusSeverityType severity = StatusSeverityType.Information)
         {

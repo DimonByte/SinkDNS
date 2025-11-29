@@ -20,14 +20,16 @@
 //OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //SOFTWARE.
 
-using SinkDNS.Modules.SinkDNSInternals;
-
 namespace SinkDNS.Modules.DNSCrypt
 {
+    using SinkDNS.Modules.SinkDNSInternals;
+
     public class DNSCryptConfigParser(string SinkDNSconfigFilePath, string DNSCryptConfigPath)
     {
         private readonly string _SinkDNSconfigFilePath = SinkDNSconfigFilePath ?? throw new ArgumentNullException(nameof(SinkDNSconfigFilePath));
+
         private readonly DNSCryptConfigurationWriter _DNSCryptConfigWriter = new(DNSCryptConfigPath);
+
         private static readonly char[] separator = ['='];
 
         public void ParseAndApplySettings()

@@ -28,5 +28,5 @@ namespace SinkDNS.Modules.System
     internal class SystemNetworkManager
     {
 
-    }   
+    }
 }

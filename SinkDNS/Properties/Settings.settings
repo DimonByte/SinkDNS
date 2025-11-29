@@ -1,0 +1,48 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="SinkDNS.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="BlocklistFolder" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">hostfiles/blocklist</Value>
+    </Setting>
+    <Setting Name="WhitelistFolder" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">hostfiles/whitelist</Value>
+    </Setting>
+    <Setting Name="BlocklistIni" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">config/blocklist.ini</Value>
+    </Setting>
+    <Setting Name="WhitelistIni" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">config/whitelist.ini</Value>
+    </Setting>
+    <Setting Name="UserBlocklistIni" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">config/userblocklist.ini</Value>
+    </Setting>
+    <Setting Name="UserWhitelistIni" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">config/userwhitelist.ini</Value>
+    </Setting>
+    <Setting Name="CombinedBlocklistFile" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">hostfiles/blocklist/combined-blocklist.txt</Value>
+    </Setting>
+    <Setting Name="CombinedWhitelistFile" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">hostfiles/blocklist/combined-whitelist.txt</Value>
+    </Setting>
+    <Setting Name="LogsFolder" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">logs</Value>
+    </Setting>
+    <Setting Name="ConfigFolder" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">config</Value>
+    </Setting>
+    <Setting Name="ResolversFolder" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">resolvers</Value>
+    </Setting>
+    <Setting Name="HostFilesFolder" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">hostfiles</Value>
+    </Setting>
+    <Setting Name="BackupFolder" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">backup</Value>
+    </Setting>
+    <Setting Name="TaskSchedulerIni" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">taskscheduler.ini</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

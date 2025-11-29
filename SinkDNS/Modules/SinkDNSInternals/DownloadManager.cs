@@ -19,7 +19,6 @@
 //LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 //OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //SOFTWARE.
-
 using System.IO.Compression;
 using System.Net.Http.Headers;
 
@@ -29,6 +28,7 @@ namespace SinkDNS.Modules.SinkDNSInternals
     internal class DownloadManager
     {
         private static readonly HttpClient httpClient = new();
+
         private static readonly TimeSpan DefaultTimeout = TimeSpan.FromSeconds(30);
 
         static DownloadManager()

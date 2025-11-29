@@ -22,52 +22,46 @@
 
 namespace SinkDNS.Modules.SinkDNSInternals
 {
+    using SinkDNS.Properties;
+
     //This will manage the block lists for SinkDNS, including downloading, updating, and parsing them.
     //There will be a list of the block lists that are the most popular on this repo that SinkDNS references.
     //BlockListCompression as well, that will remove any # comments and blank lines from the block lists to reduce their size.
     public static class BlocklistManager
     {
-        private static readonly string BlocklistFolder = "hostfiles/blocklist";
-        private static readonly string WhitelistFolder = "hostfiles/whitelist";
-        private static readonly string BlocklistIni = "config/blocklist.ini";
-        private static readonly string WhitelistIni = "config/whitelist.ini";
-        private static readonly string UserBlocklistIni = "config/userblocklist.ini";
-        private static readonly string UserWhitelistIni = "config/userwhitelist.ini";
-        private static readonly string CombinedBlocklistFile = "hostfiles/blocklist/combined-blocklist.txt";
-        private static readonly string CombinedWhitelistFile = "hostfiles/whitelist/combined-whitelist.txt";
-
         public static async Task DownloadBlocklistsAsync()
         {
-            if (!File.Exists(BlocklistIni))
+            if (!File.Exists(Settings.Default.BlocklistIni))
             {
-                TraceLogger.Log($"Blocklist configuration file not found: {BlocklistIni}", Enums.StatusSeverityType.Warning);
+                TraceLogger.Log($"Blocklist configuration file not found: {Settings.Default.BlocklistIni}", Enums.StatusSeverityType.Warning);
                 return;
             }
 
-            var urls = ReadUrlsFromFile(BlocklistIni);
+            var urls = ReadUrlsFromFile(Settings.Default.BlocklistIni);
             foreach (var url in urls)
             {
                 TraceLogger.Log($"Downloading blocklist from: {url}");
                 var fileName = Path.GetFileName(url);
-                var filePath = Path.Combine(BlocklistFolder, fileName);
+                var filePath = Path.Combine(Settings.Default.BlocklistFolder, fileName);
                 await DownloadManager.DownloadFileAsync(url, filePath).ConfigureAwait(false);
             }
             TraceLogger.Log("Finished downloading blocklists.");
         }
+
         public static async Task DownloadWhitelistsAsync()
         {
-            if (!File.Exists(WhitelistIni))
+            if (!File.Exists(Settings.Default.WhitelistIni))
             {
-                TraceLogger.Log($"Whitelist configuration file not found: {WhitelistIni}", Enums.StatusSeverityType.Warning);
+                TraceLogger.Log($"Whitelist configuration file not found: {Settings.Default.WhitelistIni}", Enums.StatusSeverityType.Warning);
                 return;
             }
 
-            var urls = ReadUrlsFromFile(WhitelistIni);
+            var urls = ReadUrlsFromFile(Settings.Default.WhitelistIni);
             foreach (var url in urls)
             {
                 TraceLogger.Log($"Downloading whitelist from: {url}");
                 var fileName = Path.GetFileName(url);
-                var filePath = Path.Combine(WhitelistFolder, fileName);
+                var filePath = Path.Combine(Settings.Default.WhitelistFolder, fileName);
                 await DownloadManager.DownloadFileAsync(url, filePath);
             }
             TraceLogger.Log("Finished downloading whitelists.");
@@ -76,44 +70,45 @@ namespace SinkDNS.Modules.SinkDNSInternals
         public static void AddToUserBlocklist(string domain)
         {
             TraceLogger.Log($"Adding domain to user blocklist: {domain}");
-            AddToIniFile(UserBlocklistIni, domain);
+            AddToIniFile(Settings.Default.UserBlocklistIni, domain);
         }
 
         public static void AddToUserWhitelist(string domain)
         {
             TraceLogger.Log($"Adding domain to user whitelist: {domain}");
-            AddToIniFile(UserWhitelistIni, domain);
+            AddToIniFile(Settings.Default.UserWhitelistIni, domain);
         }
 
         public static void MergeBlocklists()
         {
             TraceLogger.Log("Merging blocklist files...");
-            MergeFiles(BlocklistFolder, CombinedBlocklistFile);
+            MergeFiles(Settings.Default.BlocklistFolder, Settings.Default.CombinedBlocklistFile);
         }
 
         public static void MergeWhitelists()
         {
             TraceLogger.Log("Merging whitelist files...");
-            MergeFiles(WhitelistFolder, CombinedWhitelistFile);
+            MergeFiles(Settings.Default.WhitelistFolder, Settings.Default.CombinedWhitelistFile);
         }
+
         public static void ClearBlocklists()
         {
             TraceLogger.Log("Clearing blocklist files...");
-            ClearFiles(BlocklistFolder);
+            ClearFiles(Settings.Default.BlocklistFolder);
         }
 
         public static void ClearWhitelists()
         {
             TraceLogger.Log("Clearing whitelist files...");
-            ClearFiles(WhitelistFolder);
+            ClearFiles(Settings.Default.WhitelistFolder);
         }
 
         public static bool IsBlocked(string domain)
         {
-            if (!File.Exists(CombinedBlocklistFile))
+            if (!File.Exists(Settings.Default.CombinedBlocklistFile))
                 return false;
 
-            var lines = File.ReadAllLines(CombinedBlocklistFile);
+            var lines = File.ReadAllLines(Settings.Default.CombinedBlocklistFile);
             return lines.Any(line =>
                 !string.IsNullOrWhiteSpace(line) &&
                 !line.StartsWith("#") &&
@@ -122,10 +117,10 @@ namespace SinkDNS.Modules.SinkDNSInternals
 
         public static bool IsWhitelisted(string domain)
         {
-            if (!File.Exists(CombinedWhitelistFile))
+            if (!File.Exists(Settings.Default.CombinedWhitelistFile))
                 return false;
 
-            var lines = File.ReadAllLines(CombinedWhitelistFile);
+            var lines = File.ReadAllLines(Settings.Default.CombinedWhitelistFile);
             return lines.Any(line =>
                 !string.IsNullOrWhiteSpace(line) &&
                 !line.StartsWith("#") &&

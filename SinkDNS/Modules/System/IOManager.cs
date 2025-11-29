@@ -20,31 +20,34 @@
 //OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //SOFTWARE.
 
-using SinkDNS.Modules.SinkDNSInternals;
-
 namespace SinkDNS.Modules.System
 {
+    using SinkDNS.Modules.SinkDNSInternals;
+    using SinkDNS.Properties;
+
     //This will handle folder and file management for SinkDNS, like creating necessary directories.
     internal class IOManager
     {
         public static void CreateNecessaryDirectories()
         {
-            string[] directories = ["logs", "config", "resolvers", "hostfiles", "backup", "hostfiles\\blocklist", "hostfiles\\whitelist"];
-            foreach (string dir in directories) {
+            string[] directories = [Settings.Default.LogsFolder, Settings.Default.ConfigFolder, Settings.Default.ResolversFolder, Settings.Default.HostFilesFolder, Settings.Default.BackupFolder, Settings.Default.BlocklistFolder, Settings.Default.WhitelistFolder];
+            foreach (string dir in directories)
+            {
                 if (!Directory.Exists(dir))
                 {
                     try
                     {
                         Directory.CreateDirectory(dir);
                         TraceLogger.Log($"Created directory: {dir}");
-                    } 
-                    catch (Exception ex) 
+                    }
+                    catch (Exception ex)
                     {
                         TraceLogger.Log($"Error creating directory {dir}: {ex.Message}", Enums.StatusSeverityType.Error);
                     }
                 }
             }
         }
+
         public static void MergeMultipleFiles(string outputFilePath, List<string> inputFilePaths)
         {
             if (File.Exists(outputFilePath))
@@ -68,11 +71,12 @@ namespace SinkDNS.Modules.System
                 inputStream.CopyTo(outputStream);
             }
         }
+
         public static void BackupFile(string filePath)
         {
             if (File.Exists(filePath))
             {
-                string backupFilePath = $"backup/{Path.GetFileName(filePath) + Path.GetExtension(filePath)}.bak";
+                string backupFilePath = $"{Settings.Default.BackupFolder}/{Path.GetFileName(filePath) + Path.GetExtension(filePath)}.bak";
                 try
                 {
                     TraceLogger.Log($"Creating backup for file {filePath} at {backupFilePath}");

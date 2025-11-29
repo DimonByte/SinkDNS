@@ -70,6 +70,7 @@ namespace SinkDNS.Modules.DNSCrypt
 
         private static bool ModifySettingInConfigFile(List<string> lines, string settingName, string value)
         {
+            //TODO: abort if multiple settings with the same name exist?
             bool found = false;
             int startLine = 0;
             int endLine = lines.Count;

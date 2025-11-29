@@ -20,13 +20,15 @@
 //OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //SOFTWARE.
 
-using static SinkDNS.Modules.Enums;
-
 namespace SinkDNS.Modules.SinkDNSInternals
 {
+    using SinkDNS.Properties;
+    using static SinkDNS.Modules.Enums;
+
     public class TaskScheduler
     {
-        private static readonly string ConfigPath = Path.Combine("config", "taskschedules.ini");
+        private static readonly string ConfigPath = Path.Combine(Settings.Default.ConfigFolder, Settings.Default.TaskSchedulerIni);
+
         private static readonly Lock LockObject = new();
 
         public enum TaskType
@@ -47,10 +49,15 @@ namespace SinkDNS.Modules.SinkDNSInternals
         public class ScheduledTask
         {
             public TaskType Type { get; set; }
+
             public TaskAction Action { get; set; }
+
             public required string Name { get; set; }
+
             public DateTime? ScheduledTime { get; set; }
+
             public TimeSpan? Interval { get; set; }
+
             public bool IsEnabled { get; set; } = true;
         }
 

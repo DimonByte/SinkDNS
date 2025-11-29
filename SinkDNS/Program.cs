@@ -1,4 +1,3 @@
-using SinkDNS.Modules;
 using SinkDNS.Modules.SinkDNSInternals;
 
 namespace SinkDNS
