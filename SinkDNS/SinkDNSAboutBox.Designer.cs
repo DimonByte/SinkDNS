@@ -54,7 +54,7 @@
             tableLayoutPanel.Controls.Add(okButton, 1, 5);
             tableLayoutPanel.Dock = DockStyle.Fill;
             tableLayoutPanel.Location = new Point(10, 10);
-            tableLayoutPanel.Margin = new Padding(4, 4, 4, 4);
+            tableLayoutPanel.Margin = new Padding(4);
             tableLayoutPanel.Name = "tableLayoutPanel";
             tableLayoutPanel.RowCount = 6;
             tableLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 10F));
@@ -71,7 +71,7 @@
             logoPictureBox.Dock = DockStyle.Fill;
             logoPictureBox.Image = (Image)resources.GetObject("logoPictureBox.Image");
             logoPictureBox.Location = new Point(4, 4);
-            logoPictureBox.Margin = new Padding(4, 4, 4, 4);
+            logoPictureBox.Margin = new Padding(4);
             logoPictureBox.Name = "logoPictureBox";
             tableLayoutPanel.SetRowSpan(logoPictureBox, 6);
             logoPictureBox.Size = new Size(153, 298);
@@ -146,7 +146,7 @@
             okButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             okButton.DialogResult = DialogResult.Cancel;
             okButton.Location = new Point(396, 277);
-            okButton.Margin = new Padding(4, 4, 4, 4);
+            okButton.Margin = new Padding(4);
             okButton.Name = "okButton";
             okButton.Size = new Size(88, 25);
             okButton.TabIndex = 24;
@@ -160,11 +160,11 @@
             ClientSize = new Size(508, 326);
             Controls.Add(tableLayoutPanel);
             FormBorderStyle = FormBorderStyle.FixedDialog;
-            Margin = new Padding(4, 4, 4, 4);
+            Margin = new Padding(4);
             MaximizeBox = false;
             MinimizeBox = false;
             Name = "SinkDNSAboutBox";
-            Padding = new Padding(10, 10, 10, 10);
+            Padding = new Padding(10);
             ShowIcon = false;
             ShowInTaskbar = false;
             StartPosition = FormStartPosition.CenterParent;

@@ -38,7 +38,9 @@ namespace SinkDNS
         private void SinkDNSMainForm_Load(object sender, EventArgs e)
         {
             IOManager.CreateNecessaryDirectories();
-            NotificationManager.SetNotifyIcon(SinkDNSSystemTray);
+            NotificationManager.SetContextMenu(MainContextMenuStrip);
+            GlobalNotifyIcon.Instance.SetIcon(Properties.Resources.SinkDNSIcon);
+            GlobalNotifyIcon.Instance.SetMainForm(this);
             if (ServiceManager.IsDNSCryptRunning())
             {
                 //Since DNSCrypt is running, don't show this manager, since this program couldve been started at startup.
@@ -46,9 +48,11 @@ namespace SinkDNS
                 {
                     Hide();
                 }));
+                GlobalNotifyIcon.Instance.SetText("SinkDNS - DNSCrypt Running");
             }
             else
             {
+                GlobalNotifyIcon.Instance.SetText("SinkDNS - DNSCrypt Stopped");
                 Show();
                 MessageBox.Show("DNSCrypt is not running. Please start DNSCrypt to use SinkDNS features.", "DNSCrypt Not Running", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 TraceLogger.Log("DNSCrypt is not running. Showing the manager form.");
@@ -59,7 +63,8 @@ namespace SinkDNS
         {
             //NotificationManager.ShowNotification("Updating Blocklists", "Downloading and updating blocklists...", Enums.StatusSeverityType.Information);
             //BlocklistManager.DownloadBlocklistsAsync().GetAwaiter().GetResult();
-            ServiceManager.StopDnsCrypt();
+            NotificationManager.ShowNotification("Stopping DNSCrypt", "Attempting to stop DNSCrypt...", Enums.StatusSeverityType.Information);
+            //ServiceManager.StopDnsCrypt();
         }
 
         private void SinkDNSManagerForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -71,7 +76,6 @@ namespace SinkDNS
             }
             else
             {
-                SinkDNSSystemTray.Dispose();
                 TraceLogger.Log("SinkDNS Manager Form is closing.");
             }
         }
@@ -113,21 +117,6 @@ namespace SinkDNS
         {
             Show();
             WindowState = FormWindowState.Normal;
-        }
-
-        private void SinkDNSSystemTray_DoubleClick(object sender, EventArgs e)
-        {
-            //If the window is already open, hide it.
-            if (Visible)
-            {
-                Hide();
-                return;
-            }
-            else
-            {
-                Show();
-                WindowState = FormWindowState.Normal;
-            }
         }
     }
 }

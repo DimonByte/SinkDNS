@@ -29,13 +29,11 @@
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SinkDNSManagerForm));
             panel1 = new Panel();
             pictureBox1 = new PictureBox();
             SinkDNSDesignLabel = new Label();
             DNSCryptStatusLabel = new Label();
             button1 = new Button();
-            SinkDNSSystemTray = new NotifyIcon(components);
             MainContextMenuStrip = new ContextMenuStrip(components);
             openManagerToolStripMenuItem = new ToolStripMenuItem();
             toolStripSeparator3 = new ToolStripSeparator();
@@ -68,7 +66,7 @@
             // 
             // pictureBox1
             // 
-            pictureBox1.Image = Properties.Resources.SinkDNSIcon;
+            pictureBox1.Image = Properties.Resources.SinkDNSIconImage;
             pictureBox1.Location = new Point(4, 5);
             pictureBox1.Name = "pictureBox1";
             pictureBox1.Size = new Size(32, 32);
@@ -107,19 +105,11 @@
             button1.UseVisualStyleBackColor = true;
             button1.Click += button1_Click;
             // 
-            // SinkDNSSystemTray
-            // 
-            SinkDNSSystemTray.ContextMenuStrip = MainContextMenuStrip;
-            SinkDNSSystemTray.Icon = (Icon)resources.GetObject("SinkDNSSystemTray.Icon");
-            SinkDNSSystemTray.Text = "SinkDNS";
-            SinkDNSSystemTray.Visible = true;
-            SinkDNSSystemTray.DoubleClick += SinkDNSSystemTray_DoubleClick;
-            // 
             // MainContextMenuStrip
             // 
             MainContextMenuStrip.Items.AddRange(new ToolStripItem[] { openManagerToolStripMenuItem, toolStripSeparator3, addURLToBlocklistToolStripMenuItem, addNewBlocklistToolStripMenuItem, addURLToWhitelistToolStripMenuItem, addNewWhitelistToolStripMenuItem, toolStripSeparator2, updateBlocklistsToolStripMenuItem, bypassFilteringToolStripMenuItem, restartDNSCryptToolStripMenuItem, toolStripSeparator1, exitSinkDNSToolStripMenuItem });
             MainContextMenuStrip.Name = "MainContextMenuStrip";
-            MainContextMenuStrip.Size = new Size(202, 220);
+            MainContextMenuStrip.Size = new Size(202, 242);
             // 
             // openManagerToolStripMenuItem
             // 
@@ -224,7 +214,6 @@
         private Label DNSCryptStatusLabel;
         private Label SinkDNSDesignLabel;
         private Button button1;
-        private NotifyIcon SinkDNSSystemTray;
         private PictureBox pictureBox1;
         private ContextMenuStrip MainContextMenuStrip;
         private ToolStripSeparator toolStripSeparator1;

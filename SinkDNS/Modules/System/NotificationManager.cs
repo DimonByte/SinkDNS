@@ -30,11 +30,13 @@ namespace SinkDNS.Modules.System
 
         public static void SetNotifyIcon(NotifyIcon notifyIcon)
         {
+            TraceLogger.Log($"NotifyIcon set in NotificationManager {notifyIcon.Text}", StatusSeverityType.Information);
             _notifyIcon = notifyIcon;
         }
 
         public static void ShowNotification(string title, string message, StatusSeverityType messageType, int duration = 5000)
         {
+            TraceLogger.Log($"Showing notification: Title='{title}', Message='{message}', Type='{messageType}', Duration='{duration}'", StatusSeverityType.Information);
             ShowSystemTrayNotification(title, message, messageType, duration);
         }
 
@@ -48,8 +50,6 @@ namespace SinkDNS.Modules.System
                     return;
                 }
 
-                _notifyIcon.Text = title;
-
                 _notifyIcon.ShowBalloonTip(
                     duration,
                     title,
@@ -62,6 +62,7 @@ namespace SinkDNS.Modules.System
                 TraceLogger.Log($"Failed to show system tray notification: {ex.Message}", StatusSeverityType.Error);
             }
         }
+
         private static ToolTipIcon GetBalloonTipIcon(StatusSeverityType messageType)
         {
             return messageType switch
@@ -71,6 +72,19 @@ namespace SinkDNS.Modules.System
                 StatusSeverityType.Information => ToolTipIcon.Info,
                 _ => ToolTipIcon.Info,
             };
+        }
+
+        public static void SetContextMenu(ContextMenuStrip contextMenu)
+        {
+            if (_notifyIcon != null)
+            {
+                TraceLogger.Log($"Setting context menu for NotifyIcon in NotificationManager {contextMenu}", StatusSeverityType.Information);
+                _notifyIcon.ContextMenuStrip = contextMenu;
+            }
+            else
+            {
+                TraceLogger.Log("NotifyIcon not initialized in NotificationManager when setting context menu", StatusSeverityType.Warning);
+            }
         }
     }
 }
