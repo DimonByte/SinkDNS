@@ -23,8 +23,6 @@
 using SinkDNS.Modules.SinkDNSInternals;
 using System.Diagnostics;
 using System.Security.Principal;
-using System.IO;
-using System.Text;
 
 namespace SinkDNS.Modules.System
 {
@@ -72,12 +70,12 @@ namespace SinkDNS.Modules.System
 
                 if (process.ExitCode != 0)
                 {
-                    TraceLogger.Log($"Elevated commands exited with code: {process.ExitCode}", Enums.StatusSeverityType.Error);
+                    TraceLogger.Log($"Command failure! Elevated commands exited with exit code: {process.ExitCode}", Enums.StatusSeverityType.Error);
                     return false;
                 }
                 else
                 {
-                    TraceLogger.Log("Elevated commands executed successfully.");
+                    TraceLogger.Log("Elevated commands executed successfully. Returned exit code 0.");
                     return true;
                 }
             }

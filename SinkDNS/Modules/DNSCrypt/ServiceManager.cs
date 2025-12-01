@@ -118,7 +118,32 @@ namespace SinkDNS.Modules.DNSCrypt
                 return false;
             }
         }
-
+        //Monitor the service and alert globalnotifyicon if it stops unexpectedly.
+        public static void MonitorDnsCryptService()
+        {
+            Task.Run(() =>
+            {
+                TraceLogger.Log("Starting DNSCrypt service monitor...");
+                while (true)
+                {
+                    try
+                    {
+                        using var service = new ServiceController(DnsCryptServiceName);
+                        if (service.Status != ServiceControllerStatus.Running)
+                        {
+                            TraceLogger.Log("DNSCrypt service is not running!");
+                            GlobalNotifyIcon.Instance.SetText("SinkDNS - DNSCrypt Stopped!");
+                            //StartDnsCrypt();
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        TraceLogger.Log($"Error monitoring DNSCrypt service: {ex.Message}", Enums.StatusSeverityType.Error);
+                    }
+                    Task.Delay(10000).Wait(); // Check every 10 seconds
+                }
+            });
+        }
         public static bool RestartDnsCrypt()
         {
             TraceLogger.Log("Attempting restart of DNSCrypt service...");

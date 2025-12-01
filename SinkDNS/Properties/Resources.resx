@@ -118,10 +118,19 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="DownloadingIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\DownloadingIcon.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="SinkDNSIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\SinkDNSIcon.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="SinkDNSIconImage" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\SinkDNSIconImage.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="UpdateAvailableIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\UpdateAvailableIcon.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="WarningIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\WarningIcon.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>

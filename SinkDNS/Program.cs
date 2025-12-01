@@ -17,7 +17,15 @@ namespace SinkDNS
             TraceLogger.Log("Application Starting...");
             Application.SetCompatibleTextRenderingDefault(false);
             ApplicationConfiguration.Initialize();
-            NotificationManager.SetNotifyIcon(GlobalNotifyIcon.Instance.NotifyIcon);
+            var notifyIcon = GlobalNotifyIcon.Instance.NotifyIcon;
+            if (notifyIcon is not null)
+            {
+                NotificationManager.SetNotifyIcon(notifyIcon);
+            }
+            else
+            {
+                TraceLogger.Log("NotifyIcon is null. NotificationManager.SetNotifyIcon was not called. Notifications calls may fail!", Modules.Enums.StatusSeverityType.Warning);
+            }
             GlobalNotifyIcon.Instance.SetIcon(Resources.SinkDNSIcon);
             if (!Settings.Default.EnableDiskLogging)
             {

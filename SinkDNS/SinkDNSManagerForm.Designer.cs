@@ -57,7 +57,6 @@
             panel1.BackColor = Color.FromArgb(46, 140, 148);
             panel1.Controls.Add(pictureBox1);
             panel1.Controls.Add(SinkDNSDesignLabel);
-            panel1.Controls.Add(DNSCryptStatusLabel);
             panel1.Dock = DockStyle.Top;
             panel1.Location = new Point(0, 0);
             panel1.Name = "panel1";
@@ -89,7 +88,7 @@
             // 
             DNSCryptStatusLabel.AutoSize = true;
             DNSCryptStatusLabel.ForeColor = Color.White;
-            DNSCryptStatusLabel.Location = new Point(178, 12);
+            DNSCryptStatusLabel.Location = new Point(12, 41);
             DNSCryptStatusLabel.Name = "DNSCryptStatusLabel";
             DNSCryptStatusLabel.Size = new Size(124, 15);
             DNSCryptStatusLabel.TabIndex = 0;
@@ -97,7 +96,7 @@
             // 
             // button1
             // 
-            button1.Location = new Point(547, 335);
+            button1.Location = new Point(12, 335);
             button1.Name = "button1";
             button1.Size = new Size(95, 26);
             button1.TabIndex = 1;
@@ -109,7 +108,7 @@
             // 
             MainContextMenuStrip.Items.AddRange(new ToolStripItem[] { openManagerToolStripMenuItem, toolStripSeparator3, addURLToBlocklistToolStripMenuItem, addNewBlocklistToolStripMenuItem, addURLToWhitelistToolStripMenuItem, addNewWhitelistToolStripMenuItem, toolStripSeparator2, updateBlocklistsToolStripMenuItem, bypassFilteringToolStripMenuItem, restartDNSCryptToolStripMenuItem, toolStripSeparator1, exitSinkDNSToolStripMenuItem });
             MainContextMenuStrip.Name = "MainContextMenuStrip";
-            MainContextMenuStrip.Size = new Size(202, 242);
+            MainContextMenuStrip.Size = new Size(202, 220);
             // 
             // openManagerToolStripMenuItem
             // 
@@ -192,6 +191,7 @@
             BackColor = Color.FromArgb(48, 68, 97);
             ClientSize = new Size(654, 373);
             Controls.Add(button1);
+            Controls.Add(DNSCryptStatusLabel);
             Controls.Add(panel1);
             Font = new Font("Arial", 9F);
             Margin = new Padding(3, 2, 3, 2);
@@ -206,6 +206,7 @@
             ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             MainContextMenuStrip.ResumeLayout(false);
             ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion

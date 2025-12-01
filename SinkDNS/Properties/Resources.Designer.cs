@@ -63,6 +63,16 @@ namespace SinkDNS.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
+        public static System.Drawing.Icon DownloadingIcon {
+            get {
+                object obj = ResourceManager.GetObject("DownloadingIcon", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
         public static System.Drawing.Icon SinkDNSIcon {
             get {
                 object obj = ResourceManager.GetObject("SinkDNSIcon", resourceCulture);
@@ -77,6 +87,26 @@ namespace SinkDNS.Properties {
             get {
                 object obj = ResourceManager.GetObject("SinkDNSIconImage", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        public static System.Drawing.Icon UpdateAvailableIcon {
+            get {
+                object obj = ResourceManager.GetObject("UpdateAvailableIcon", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        public static System.Drawing.Icon WarningIcon {
+            get {
+                object obj = ResourceManager.GetObject("WarningIcon", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
             }
         }
     }

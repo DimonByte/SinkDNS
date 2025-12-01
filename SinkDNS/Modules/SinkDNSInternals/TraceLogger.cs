@@ -32,7 +32,7 @@ namespace SinkDNS.Modules.SinkDNSInternals
     {
         private static readonly Lock _lock = new();
         private static readonly string _logDirectory = Settings.Default.LogsFolder;
-        private static string _currentDate = string.Empty;
+        private static string _currentDate = DateTime.Now.ToString("dd-MM-yyyy");
         private static DateTime _lastDateCheck = DateTime.MinValue;
 
         public static void Log(string message, StatusSeverityType severity = StatusSeverityType.Information,

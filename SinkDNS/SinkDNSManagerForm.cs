@@ -62,6 +62,7 @@ namespace SinkDNS
         {
             //NotificationManager.ShowNotification("Updating Blocklists", "Downloading and updating blocklists...", Enums.StatusSeverityType.Information);
             //BlocklistManager.DownloadBlocklistsAsync().GetAwaiter().GetResult();
+            //GlobalNotifyIcon.Instance.SetIcon(Properties.Resources.WarningIcon);
             NotificationManager.ShowNotification("Stopping DNSCrypt", "Attempting to stop DNSCrypt...", Enums.StatusSeverityType.Information);
             //ServiceManager.StopDnsCrypt();
         }
@@ -101,7 +102,9 @@ namespace SinkDNS
         private void updateBlocklistsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             NotificationManager.ShowNotification("Updating Blocklists", "Downloading and updating blocklists...", Enums.StatusSeverityType.Information);
+            GlobalNotifyIcon.Instance.SetIcon(Properties.Resources.DownloadingIcon);
             BlocklistManager.DownloadBlocklistsAsync().GetAwaiter().GetResult();
+            GlobalNotifyIcon.Instance.SetIcon(Properties.Resources.UpdateAvailableIcon);
             if (ServiceManager.RestartDnsCrypt())
             {
                 NotificationManager.ShowNotification("Blocklists Updated", "Blocklists have been updated and DNSCrypt restarted successfully.", Enums.StatusSeverityType.Information);
@@ -110,6 +113,7 @@ namespace SinkDNS
             {
                 NotificationManager.ShowNotification("Blocklists Updated", "Blocklists have been updated, but DNSCrypt restart failed.", Enums.StatusSeverityType.Warning);
             }
+            GlobalNotifyIcon.Instance.SetIcon(Properties.Resources.SinkDNSIcon);
         }
 
         private void openManagerToolStripMenuItem_Click(object sender, EventArgs e)
