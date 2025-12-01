@@ -142,7 +142,7 @@ namespace SinkDNS.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("taskscheduler.ini")]
+        [global::System.Configuration.DefaultSettingValueAttribute("taskschedules/taskscheduler.ini")]
         public string TaskSchedulerIni {
             get {
                 return ((string)(this["TaskSchedulerIni"]));
@@ -158,6 +158,15 @@ namespace SinkDNS.Properties {
             }
             set {
                 this["EnableDiskLogging"] = value;
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("taskschedules")]
+        public string TaskScheduleFolder {
+            get {
+                return ((string)(this["TaskScheduleFolder"]));
             }
         }
     }

@@ -57,8 +57,9 @@ namespace SinkDNS
 
         private void button1_Click(object sender, EventArgs e)
         {
-            NotificationManager.ShowNotification("Updating Blocklists", "Downloading and updating blocklists...", Enums.StatusSeverityType.Information);
-            BlocklistManager.DownloadBlocklistsAsync().GetAwaiter().GetResult();
+            //NotificationManager.ShowNotification("Updating Blocklists", "Downloading and updating blocklists...", Enums.StatusSeverityType.Information);
+            //BlocklistManager.DownloadBlocklistsAsync().GetAwaiter().GetResult();
+            ServiceManager.StopDnsCrypt();
         }
 
         private void SinkDNSManagerForm_FormClosing(object sender, FormClosingEventArgs e)

@@ -21,22 +21,22 @@
 //SOFTWARE.
 
 using SinkDNS.Modules.SinkDNSInternals;
+using SinkDNS.Modules.System;
 using System.ServiceProcess;
 
 namespace SinkDNS.Modules.DNSCrypt
 {
     //This will manage and monitor DNSCrypt as a service. It will start, stop, and restart the service as needed. Including checking its status.
-    //This will also handle the installation of DNSCrypt if the user hasn't installed it yet.
     internal class ServiceManager
     {
         private const string DnsCryptServiceName = "dnscrypt-proxy";
+
         public static bool IsDNSCryptRunning()
         {
             try
             {
                 using var serviceController = new ServiceController(DnsCryptServiceName);
                 return serviceController.Status == ServiceControllerStatus.Running;
-
             }
             catch (Exception ex)
             {
@@ -44,6 +44,7 @@ namespace SinkDNS.Modules.DNSCrypt
                 return false;
             }
         }
+
         public static bool IsDnsCryptInstalled()
         {
             try
@@ -66,15 +67,22 @@ namespace SinkDNS.Modules.DNSCrypt
         {
             try
             {
-                using var service = new ServiceController(DnsCryptServiceName);
-                if (service.Status != ServiceControllerStatus.Running)
+                if (!ElevatedProcessHelper.IsRunAsAdmin())
                 {
-                    TraceLogger.Log("Starting DNSCrypt service...");
-                    service.Start();
-                    service.WaitForStatus(ServiceControllerStatus.Running, TimeSpan.FromSeconds(30));
+                    return ElevatedProcessHelper.RunElevatedCommand("net", $"start {DnsCryptServiceName}");
+                }
+                else
+                {
+                    using var service = new ServiceController(DnsCryptServiceName);
+                    if (service.Status != ServiceControllerStatus.Running)
+                    {
+                        TraceLogger.Log("Starting DNSCrypt service...");
+                        service.Start();
+                        service.WaitForStatus(ServiceControllerStatus.Running, TimeSpan.FromSeconds(30));
+                        return true;
+                    }
                     return true;
                 }
-                return true;
             }
             catch (Exception ex)
             {
@@ -87,15 +95,22 @@ namespace SinkDNS.Modules.DNSCrypt
         {
             try
             {
-                using var service = new ServiceController(DnsCryptServiceName);
-                if (service.Status == ServiceControllerStatus.Running)
+                if (!ElevatedProcessHelper.IsRunAsAdmin())
                 {
-                    TraceLogger.Log("Stopping DNSCrypt service...");
-                    service.Stop();
-                    service.WaitForStatus(ServiceControllerStatus.Stopped, TimeSpan.FromSeconds(30));
+                    return ElevatedProcessHelper.RunElevatedCommand("net", $"stop {DnsCryptServiceName}");
+                }
+                else
+                {
+                    using var service = new ServiceController(DnsCryptServiceName);
+                    if (service.Status == ServiceControllerStatus.Running)
+                    {
+                        TraceLogger.Log("Stopping DNSCrypt service...");
+                        service.Stop();
+                        service.WaitForStatus(ServiceControllerStatus.Stopped, TimeSpan.FromSeconds(30));
+                        return true;
+                    }
                     return true;
                 }
-                return true;
             }
             catch (Exception ex)
             {
@@ -103,19 +118,50 @@ namespace SinkDNS.Modules.DNSCrypt
                 return false;
             }
         }
+
         public static bool RestartDnsCrypt()
         {
             TraceLogger.Log("Attempting restart of DNSCrypt service...");
             try
             {
-                if (!StopDnsCrypt())
+                if (!ElevatedProcessHelper.IsRunAsAdmin())
                 {
-                    TraceLogger.Log("Failed to stop DNSCrypt service during restart.", Enums.StatusSeverityType.Error);
-                    return false; //Failed to stop service, bail.
-                }
-                Task.Delay(1000).Wait();
+                    TraceLogger.Log("User is not admin. Restarting DNSCrypt service with elevated commands...");
 
-                return StartDnsCrypt();
+                    // Create array of commands to run in sequence
+                    string[] commands = [
+                        $"net stop \"{DnsCryptServiceName}\"",
+                        $"net start \"{DnsCryptServiceName}\"",
+                        "ipconfig /flushdns"
+                    ];
+
+                    // Run all commands in a single elevated process
+                    bool result = ElevatedProcessHelper.RunElevatedCommands(commands);
+
+                    if (!result)
+                    {
+                        TraceLogger.Log("Failed to restart DNSCrypt service during restart.", Enums.StatusSeverityType.Error);
+                        return false;
+                    }
+
+                    return true;
+                }
+                else
+                {
+                    if (!StopDnsCrypt())
+                    {
+                        TraceLogger.Log("Failed to stop DNSCrypt service during restart.", Enums.StatusSeverityType.Error);
+                        return false;
+                    }
+                    Task.Delay(1000).Wait();
+                    if (!StartDnsCrypt())
+                    {
+                        TraceLogger.Log("Failed to start DNSCrypt service during restart.", Enums.StatusSeverityType.Error);
+                        return false;
+                    }
+                    // Flush DNS cache
+                    return ElevatedProcessHelper.RunElevatedCommand("ipconfig", "/flushdns");
+                }
             }
             catch (Exception ex)
             {

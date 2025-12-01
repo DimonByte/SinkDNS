@@ -30,7 +30,7 @@ namespace SinkDNS.Modules.System
     {
         public static void CreateNecessaryDirectories()
         {
-            string[] directories = [Settings.Default.LogsFolder, Settings.Default.ConfigFolder, Settings.Default.ResolversFolder, Settings.Default.HostFilesFolder, Settings.Default.BackupFolder, Settings.Default.BlocklistFolder, Settings.Default.WhitelistFolder];
+            string[] directories = [Settings.Default.LogsFolder, Settings.Default.ConfigFolder, Settings.Default.ResolversFolder, Settings.Default.HostFilesFolder, Settings.Default.BackupFolder, Settings.Default.BlocklistFolder, Settings.Default.WhitelistFolder, Settings.Default.TaskScheduleFolder];
             foreach (string dir in directories)
             {
                 if (!Directory.Exists(dir))
@@ -68,7 +68,7 @@ namespace SinkDNS.Modules.System
         public static void AddToIniFile(string iniFilePath, string domain)
         {
             var directory = Path.GetDirectoryName(iniFilePath);
-            if (!Directory.Exists(directory))
+            if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
                 Directory.CreateDirectory(directory);
             File.AppendAllText(iniFilePath, $"{domain}{Environment.NewLine}");
         }

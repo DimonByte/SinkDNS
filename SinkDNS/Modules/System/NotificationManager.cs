@@ -22,12 +22,11 @@
 
 using SinkDNS.Modules.SinkDNSInternals;
 using static SinkDNS.Modules.Enums;
-using System.Windows.Forms;
 namespace SinkDNS.Modules.System
 {
     internal class NotificationManager
     {
-        private static NotifyIcon _notifyIcon;
+        private static NotifyIcon? _notifyIcon;
 
         public static void SetNotifyIcon(NotifyIcon notifyIcon)
         {
