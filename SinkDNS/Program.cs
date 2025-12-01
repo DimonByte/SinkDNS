@@ -1,5 +1,6 @@
 using SinkDNS.Modules.SinkDNSInternals;
 using SinkDNS.Modules.System;
+using SinkDNS.Properties;
 
 namespace SinkDNS
 {
@@ -17,6 +18,11 @@ namespace SinkDNS
             Application.SetCompatibleTextRenderingDefault(false);
             ApplicationConfiguration.Initialize();
             NotificationManager.SetNotifyIcon(GlobalNotifyIcon.Instance.NotifyIcon);
+            GlobalNotifyIcon.Instance.SetIcon(Resources.SinkDNSIcon);
+            if (!Settings.Default.EnableDiskLogging)
+            {
+                TraceLogger.Log("Disk logging is disabled in settings by user.");
+            }
             Application.Run(new SinkDNSManagerForm());
             TraceLogger.Log("Application Exiting...");
         }

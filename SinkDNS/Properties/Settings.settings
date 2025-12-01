@@ -45,7 +45,7 @@
       <Value Profile="(Default)">taskschedules/taskscheduler.ini</Value>
     </Setting>
     <Setting Name="EnableDiskLogging" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
+      <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="TaskScheduleFolder" Type="System.String" Scope="Application">
       <Value Profile="(Default)">taskschedules</Value>

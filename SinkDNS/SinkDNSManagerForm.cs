@@ -39,7 +39,6 @@ namespace SinkDNS
         {
             IOManager.CreateNecessaryDirectories();
             NotificationManager.SetContextMenu(MainContextMenuStrip);
-            GlobalNotifyIcon.Instance.SetIcon(Properties.Resources.SinkDNSIcon);
             GlobalNotifyIcon.Instance.SetMainForm(this);
             if (ServiceManager.IsDNSCryptRunning())
             {

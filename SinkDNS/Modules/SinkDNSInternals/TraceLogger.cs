@@ -30,7 +30,7 @@ namespace SinkDNS.Modules.SinkDNSInternals
 {
     public static class TraceLogger
     {
-        private static readonly object _lock = new();
+        private static readonly Lock _lock = new();
         private static readonly string _logDirectory = Settings.Default.LogsFolder;
         private static string _currentDate = string.Empty;
         private static DateTime _lastDateCheck = DateTime.MinValue;
@@ -40,35 +40,35 @@ namespace SinkDNS.Modules.SinkDNSInternals
                               [CallerFilePath] string filePath = "",
                               [CallerLineNumber] int lineNumber = 0)
         {
-            if (!Settings.Default.EnableDiskLogging && severity != StatusSeverityType.Error)
+            string logEntry = string.Empty;
+            string filePathLog = Path.Combine(_logDirectory, $"{_currentDate}.log");
+            try
             {
-                Debug.WriteLine($"[DEBUG] {message}");
-                return;
+                var now = DateTime.Now;
+                var currentDate = now.ToString("dd-MM-yyyy");
+                if (now.Subtract(_lastDateCheck).TotalSeconds > 10)
+                {
+                    _currentDate = currentDate;
+                    _lastDateCheck = now;
+                }
+                string timestamp = now.ToString("yyyy-MM-dd HH:mm:ss.fff");
+                string severityText = severity.ToString().ToUpper();
+                string className = ExtractClassName(filePath);
+                logEntry = $"[{timestamp}] [{severityText}] [{className}] [{memberName}] [Line: {lineNumber}]: {message}";
             }
-
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Failed to prepare log entry: {ex.Message}");
+            }
+            Debug.WriteLine(logEntry);
             lock (_lock)
             {
                 try
                 {
-                    var now = DateTime.Now;
-                    var currentDate = now.ToString("dd-MM-yyyy");
-                    if (now.Subtract(_lastDateCheck).TotalSeconds > 10)
-                    {
-                        _currentDate = currentDate;
-                        _lastDateCheck = now;
-                    }
-                    string filePathLog = Path.Combine(_logDirectory, $"{_currentDate}.log");
-                    string timestamp = now.ToString("yyyy-MM-dd HH:mm:ss.fff");
-                    string severityText = severity.ToString().ToUpper();
-                    string className = ExtractClassName(filePath);
-                    string logEntry = $"[{timestamp}] [{severityText}] [{className}] [{memberName}] [Line: {lineNumber}]: {message}";
-
                     if (Settings.Default.EnableDiskLogging)
                     {
                         File.AppendAllText(filePathLog, $"{logEntry}{Environment.NewLine}", Encoding.UTF8);
                     }
-
-                    Debug.WriteLine(logEntry);
                 }
                 catch (Exception ex)
                 {
@@ -88,12 +88,12 @@ namespace SinkDNS.Modules.SinkDNSInternals
 
                 int lastDot = fileName.LastIndexOf('.');
                 if (lastDot > 0)
-                    fileName = fileName.Substring(0, lastDot);
+                    fileName = fileName[..lastDot];
 
                 int lastDotInPath = filePath.LastIndexOf(Path.DirectorySeparatorChar);
                 if (lastDotInPath > 0)
                 {
-                    string directoryPath = filePath.Substring(0, lastDotInPath);
+                    string directoryPath = filePath[..lastDotInPath];
                     int lastDirectorySeparator = directoryPath.LastIndexOf(Path.DirectorySeparatorChar);
                     if (lastDirectorySeparator > 0)
                     {
