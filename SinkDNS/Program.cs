@@ -14,9 +14,10 @@ namespace SinkDNS
         {
             // To customize application configuration such as set high DPI settings or default font,
             // see https://aka.ms/applicationconfiguration.
-            TraceLogger.Log("Application Starting...");
+            TraceLogger.Log("SinkDNS Starting...");
             Application.SetCompatibleTextRenderingDefault(false);
             ApplicationConfiguration.Initialize();
+            TraceLogger.ClearExpiredLogs();
             var notifyIcon = GlobalNotifyIcon.Instance.NotifyIcon;
             if (notifyIcon is not null)
             {
@@ -32,7 +33,7 @@ namespace SinkDNS
                 TraceLogger.Log("Disk logging is disabled in settings by user.");
             }
             Application.Run(new SinkDNSManagerForm());
-            TraceLogger.Log("Application Exiting...");
+            TraceLogger.Log("SinkDNS Exiting...");
         }
     }
 }

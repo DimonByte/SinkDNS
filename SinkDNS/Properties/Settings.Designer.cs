@@ -169,5 +169,17 @@ namespace SinkDNS.Properties {
                 return ((string)(this["TaskScheduleFolder"]));
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("30")]
+        public int LogExpiryInDays {
+            get {
+                return ((int)(this["LogExpiryInDays"]));
+            }
+            set {
+                this["LogExpiryInDays"] = value;
+            }
+        }
     }
 }

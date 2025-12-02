@@ -103,7 +103,7 @@ namespace SinkDNS
         {
             NotificationManager.ShowNotification("Updating Blocklists", "Downloading and updating blocklists...", Enums.StatusSeverityType.Information);
             GlobalNotifyIcon.Instance.SetIcon(Properties.Resources.DownloadingIcon);
-            BlocklistManager.DownloadBlocklistsAsync().GetAwaiter().GetResult();
+            HostListManager.DownloadBlocklistsAsync().GetAwaiter().GetResult();
             GlobalNotifyIcon.Instance.SetIcon(Properties.Resources.UpdateAvailableIcon);
             if (ServiceManager.RestartDnsCrypt())
             {

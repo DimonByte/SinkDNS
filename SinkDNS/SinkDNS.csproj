@@ -12,6 +12,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="HostsDirectory\**" />
+    <EmbeddedResource Remove="HostsDirectory\**" />
+    <None Remove="HostsDirectory\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Include="Resources\SinkDNSIcon.ico" />
   </ItemGroup>
 

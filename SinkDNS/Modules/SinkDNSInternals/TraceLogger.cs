@@ -35,6 +35,36 @@ namespace SinkDNS.Modules.SinkDNSInternals
         private static string _currentDate = DateTime.Now.ToString("dd-MM-yyyy");
         private static DateTime _lastDateCheck = DateTime.MinValue;
 
+        public static void ClearExpiredLogs()
+        {
+            lock (_lock)
+            {
+                _lastDateCheck = DateTime.MinValue;
+                try
+                {
+                    if (!Directory.Exists(_logDirectory))
+                        return;
+                    var logFiles = Directory.GetFiles(_logDirectory, "*.log");
+                    var expiryDate = DateTime.Now.AddDays(-Settings.Default.LogExpiryInDays);
+                    foreach (var logFile in logFiles)
+                    {
+                        var fileInfo = new FileInfo(logFile);
+                        if (fileInfo.CreationTime < expiryDate)
+                        {
+                            fileInfo.Delete();
+                            Log($"Deleted expired log file: {fileInfo.Name}");
+                            Debug.WriteLine($"Deleted expired log file: {fileInfo.Name}");
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Log($"Failed to clear expired logs: {ex.Message}", StatusSeverityType.Error);
+                    Debug.WriteLine($"Failed to clear expired logs: {ex.Message}");
+                }
+            }
+        }
+
         public static void Log(string message, StatusSeverityType severity = StatusSeverityType.Information,
                               [CallerMemberName] string memberName = "",
                               [CallerFilePath] string filePath = "",

@@ -28,7 +28,7 @@ namespace SinkDNS.Modules.SinkDNSInternals
     //This will manage the block lists for SinkDNS, including downloading, updating, and parsing them.
     //There will be a list of the block lists that are the most popular on this repo that SinkDNS references.
     //BlockListCompression as well, that will remove any # comments and blank lines from the block lists to reduce their size.
-    public static class BlocklistManager
+    public static class HostListManager
     {
         public static async Task DownloadBlocklistsAsync()
         {
@@ -115,7 +115,7 @@ namespace SinkDNS.Modules.SinkDNSInternals
             var lines = File.ReadAllLines(Settings.Default.CombinedBlocklistFile);
             return lines.Any(line =>
                 !string.IsNullOrWhiteSpace(line) &&
-                !line.StartsWith("#") &&
+                !line.StartsWith('#') &&
                 line.Contains(domain));
         }
 
@@ -127,7 +127,7 @@ namespace SinkDNS.Modules.SinkDNSInternals
             var lines = File.ReadAllLines(Settings.Default.CombinedWhitelistFile);
             return lines.Any(line =>
                 !string.IsNullOrWhiteSpace(line) &&
-                !line.StartsWith("#") &&
+                !line.StartsWith('#') &&
                 line.Contains(domain));
         }
 
@@ -140,7 +140,7 @@ namespace SinkDNS.Modules.SinkDNSInternals
             var lines = File.ReadAllLines(filePath);
             foreach (var line in lines)
             {
-                if (string.IsNullOrWhiteSpace(line) || line.StartsWith("#"))
+                if (string.IsNullOrWhiteSpace(line) || line.StartsWith('#'))
                     continue;
 
                 urls.Add(line.Trim());
