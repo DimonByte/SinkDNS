@@ -6,7 +6,8 @@
         {
             Information,
             Warning,
-            Error
+            Error,
+            Debug
         }
     }
 }

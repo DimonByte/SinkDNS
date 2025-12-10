@@ -27,7 +27,7 @@ namespace SinkDNS.Modules.DNSCrypt
 {
     //This class is responsible for parsing and writing configuration data to and from DNSCrypt.
     //It handles reading configuration files, interpreting settings, and converting them into usable formats for the application.
-    internal class DNSCryptConfigurationWriter(string configFilePath)
+    public class DNSCryptConfigurationManager(string configFilePath)
     {
         private readonly string _configFilePath = configFilePath ?? throw new ArgumentNullException(nameof(configFilePath));
         private List<string> _configLines = [];
@@ -43,7 +43,8 @@ namespace SinkDNS.Modules.DNSCrypt
 
             if (!File.Exists(_configFilePath))
             {
-                TraceLogger.Log("Configuration file not found!", Enums.StatusSeverityType.Error);
+                TraceLogger.Log($"Configuration file not found {_configFilePath}", Enums.StatusSeverityType.Error);
+                MessageBox.Show("A SinkDNS module error has occurred. Configuration file not found!\n" + _configFilePath, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
@@ -59,7 +60,8 @@ namespace SinkDNS.Modules.DNSCrypt
         {
             if (!File.Exists(_configFilePath))
             {
-                TraceLogger.Log("Configuration file not found!", Enums.StatusSeverityType.Error);
+                TraceLogger.Log($"Configuration file not found {_configFilePath}", Enums.StatusSeverityType.Error);
+                MessageBox.Show("A SinkDNS module error has occurred. Configuration file not found!\n" + _configFilePath, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
             TraceLogger.Log("Loading configuration file: " + _configFilePath);
@@ -127,66 +129,94 @@ namespace SinkDNS.Modules.DNSCrypt
 
         public string? GetSetting(string section, string settingName)
         {
+            //does the config file exists? check.
             if (!File.Exists(_configFilePath))
-                throw new FileNotFoundException("Configuration file not found", _configFilePath);
-
+            {
+                TraceLogger.Log($"Configuration file not found {_configFilePath}", Enums.StatusSeverityType.Error);
+                MessageBox.Show("A SinkDNS module error has occurred. Configuration file not found!\n" + _configFilePath, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return null;
+            }
             if (!_configLoaded)
             {
                 LoadConfiguration();
             }
-
             int startLine = -1;
             int endLine = -1;
-
             // Find section if specified
             if (!string.IsNullOrEmpty(section))
             {
+                TraceLogger.Log($"Searching for section '{section}' in configuration.");
                 for (int i = 0; i < _configLines.Count; i++)
                 {
                     if (_configLines[i].Trim() == section)
                     {
+                        TraceLogger.Log($"Section '{section}' found at line {i + 1}.");
                         startLine = i;
                         break;
                     }
                 }
+                TraceLogger.Log($"Section '{section}' search completed. STARTLINE: {startLine}");
                 if (startLine == -1)
                     return null; // Section not found
-
+                TraceLogger.Log($"Locating end of section '{section}'.");
                 // Find end of section (next section or end of file)
                 for (int i = startLine + 1; i < _configLines.Count; i++)
                 {
                     if (_configLines[i].Trim().StartsWith("[") && _configLines[i].Trim().EndsWith("]"))
                     {
+                        TraceLogger.Log($"End of section '{section}' found at line {i + 1}.");
                         endLine = i;
                         break;
                     }
                 }
+                TraceLogger.Log($"End of section '{section}' search completed. ENDLINE: {endLine}");
                 if (endLine == -1)
                     endLine = _configLines.Count;
             }
             else
             {
+                TraceLogger.Log("No section specified. Searching entire configuration.");
                 startLine = 0;
                 endLine = _configLines.Count;
             }
-
             // Search for setting within section
             for (int i = startLine; i < endLine; i++)
             {
                 var line = _configLines[i].Trim();
                 if (line.StartsWith(settingName + "=") || line.StartsWith(settingName + " ="))
                 {
-                    var value = line[(settingName.Length + 1)..].Trim();
+                    TraceLogger.Log($"Setting '{settingName}' found at line {i + 1}. Extracting value.");
+                    // Extract everything after the equals sign
+                    var value = line.Substring(settingName.Length + 1).Trim();
+
+                    // Remove leading spaces and equals sign if present
+                    while (value.StartsWith("=") || value.StartsWith(" "))
+                    {
+                        value = value.Substring(1).Trim();
+                    }
+
                     // Remove quotes if present
                     if (value.StartsWith("\"") && value.EndsWith("\""))
                     {
+                        TraceLogger.Log($"Value for setting '{settingName}' is quoted. Removing quotes.");
                         return value[1..^1];
                     }
+
+                    // Remove any trailing comments
+                    int commentIndex = value.IndexOf('#');
+                    if (commentIndex >= 0)
+                    {
+                        value = value.Substring(0, commentIndex).Trim();
+                    }
+                    value = value.Replace("'", "");
+                    TraceLogger.Log($"Value for setting '{settingName}' extracted: {value}");
                     return value;
                 }
             }
+            TraceLogger.Log($"Setting '{settingName}' not found in the specified section.");
             return null;
         }
+
         public void WriteToConfigFile()
         {
             if (!_configLoaded || !_hasChanges)
@@ -194,7 +224,8 @@ namespace SinkDNS.Modules.DNSCrypt
 
             if (!File.Exists(_configFilePath))
             {
-                TraceLogger.Log("Configuration file not found!", Enums.StatusSeverityType.Error);
+                TraceLogger.Log($"Configuration file not found {_configFilePath}", Enums.StatusSeverityType.Error);
+                MessageBox.Show("A SinkDNS module error has occurred. Configuration file not found!\n" + _configFilePath, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 

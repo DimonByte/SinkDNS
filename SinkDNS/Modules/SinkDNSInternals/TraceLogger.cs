@@ -22,9 +22,10 @@
 
 using SinkDNS.Properties;
 using System.Diagnostics;
+using System.IO;
+using System.Runtime.CompilerServices;
 using System.Text;
 using static SinkDNS.Modules.Enums;
-using System.Runtime.CompilerServices;
 
 namespace SinkDNS.Modules.SinkDNSInternals
 {
@@ -35,6 +36,14 @@ namespace SinkDNS.Modules.SinkDNSInternals
         private static string _currentDate = DateTime.Now.ToString("dd-MM-yyyy");
         private static DateTime _lastDateCheck = DateTime.MinValue;
 
+        public static void PurgeAllLogs()
+        {
+            foreach (string file in Directory.GetFiles(_logDirectory))
+            {
+                Console.WriteLine($"Deleting all logs. Currently deleting: {file}");
+                File.Delete(file);
+            }
+        }
         public static void ClearExpiredLogs()
         {
             lock (_lock)
@@ -70,6 +79,11 @@ namespace SinkDNS.Modules.SinkDNSInternals
                               [CallerFilePath] string filePath = "",
                               [CallerLineNumber] int lineNumber = 0)
         {
+            string className = ExtractClassName(filePath);
+            if (string.IsNullOrEmpty(message))
+            {
+                Log($"The function {memberName} in {className} class has called the TraceLogger.Log at line {lineNumber} but hasn't defined any of the log variables! That class may be malfunctioning.", StatusSeverityType.Warning);
+            }
             string logEntry = string.Empty;
             string filePathLog = Path.Combine(_logDirectory, $"{_currentDate}.log");
             try
@@ -83,7 +97,6 @@ namespace SinkDNS.Modules.SinkDNSInternals
                 }
                 string timestamp = now.ToString("yyyy-MM-dd HH:mm:ss.fff");
                 string severityText = severity.ToString().ToUpper();
-                string className = ExtractClassName(filePath);
                 logEntry = $"[{timestamp}] [{severityText}] [{className}] [{memberName}] [Line: {lineNumber}]: {message}";
             }
             catch (Exception ex)
@@ -103,6 +116,34 @@ namespace SinkDNS.Modules.SinkDNSInternals
                 catch (Exception ex)
                 {
                     Debug.WriteLine($"Failed to write to log: {ex.Message}");
+                }
+            }
+        }
+
+        public static void LogAndThrowMsgBox(string message, StatusSeverityType severity = StatusSeverityType.Information, string title = "",
+                              [CallerMemberName] string memberName = "",
+                              [CallerFilePath] string filePath = "",
+                              [CallerLineNumber] int lineNumber = 0)
+        {
+            Log(message, severity);
+            string className = ExtractClassName(filePath);
+            //Depending on the severity, show the right msgbox
+            if (!string.IsNullOrEmpty(message))
+            {
+                switch (severity)
+                {
+                    case StatusSeverityType.Information:
+                        MessageBox.Show($"SinkDNS Information Trace Details: {className} {memberName} {lineNumber} : {message}", "SinkDNS Trace Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        break;
+                    case StatusSeverityType.Warning:
+                        MessageBox.Show($"Warning, SinkDNS is reporting a possible problem. The {memberName} has reported a warning at line {lineNumber}: {message}", "SinkDNS Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        break;
+                    case StatusSeverityType.Error:
+                        MessageBox.Show($"Error! SinkDNS is having trouble. The {memberName} class has reported a problem at line {lineNumber}: {message}", "SinkDNS Error!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        break;
+                    case StatusSeverityType.Debug:
+                        MessageBox.Show($"SinkDNS DEBUG Trace Details: {className} {memberName} {lineNumber} : {message}", "SinkDNS DEBUG Trace Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        break;
                 }
             }
         }

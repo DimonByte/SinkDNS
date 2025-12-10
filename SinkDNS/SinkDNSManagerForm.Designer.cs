@@ -47,6 +47,7 @@
             restartDNSCryptToolStripMenuItem = new ToolStripMenuItem();
             toolStripSeparator1 = new ToolStripSeparator();
             exitSinkDNSToolStripMenuItem = new ToolStripMenuItem();
+            DomainBlockHistoryListBox = new ListBox();
             panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             MainContextMenuStrip.SuspendLayout();
@@ -102,7 +103,7 @@
             button1.TabIndex = 1;
             button1.Text = "button1";
             button1.UseVisualStyleBackColor = true;
-            button1.Click += button1_Click;
+            button1.Click += button1_ClickAsync;
             // 
             // MainContextMenuStrip
             // 
@@ -184,12 +185,21 @@
             exitSinkDNSToolStripMenuItem.Text = "Exit SinkDNS";
             exitSinkDNSToolStripMenuItem.Click += exitSinkDNSToolStripMenuItem_Click;
             // 
+            // DomainBlockHistoryListBox
+            // 
+            DomainBlockHistoryListBox.FormattingEnabled = true;
+            DomainBlockHistoryListBox.Location = new Point(349, 77);
+            DomainBlockHistoryListBox.Name = "DomainBlockHistoryListBox";
+            DomainBlockHistoryListBox.Size = new Size(203, 199);
+            DomainBlockHistoryListBox.TabIndex = 2;
+            // 
             // SinkDNSManagerForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.FromArgb(48, 68, 97);
             ClientSize = new Size(654, 373);
+            Controls.Add(DomainBlockHistoryListBox);
             Controls.Add(button1);
             Controls.Add(DNSCryptStatusLabel);
             Controls.Add(panel1);
@@ -229,5 +239,6 @@
         private ToolStripSeparator toolStripSeparator2;
         private ToolStripMenuItem restartDNSCryptToolStripMenuItem;
         private ToolStripMenuItem updateBlocklistsToolStripMenuItem;
+        private ListBox DomainBlockHistoryListBox;
     }
 }

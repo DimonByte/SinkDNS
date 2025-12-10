@@ -26,6 +26,7 @@ using SinkDNS.Modules;
 using SinkDNS.Modules.DNSCrypt;
 using SinkDNS.Modules.SinkDNSInternals;
 using SinkDNS.Modules.System;
+using System.Threading.Tasks;
 
 namespace SinkDNS
 {
@@ -58,13 +59,20 @@ namespace SinkDNS
             }
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private async void button1_ClickAsync(object sender, EventArgs e)
         {
             //NotificationManager.ShowNotification("Updating Blocklists", "Downloading and updating blocklists...", Enums.StatusSeverityType.Information);
             //BlocklistManager.DownloadBlocklistsAsync().GetAwaiter().GetResult();
             //GlobalNotifyIcon.Instance.SetIcon(Properties.Resources.WarningIcon);
-            NotificationManager.ShowNotification("Stopping DNSCrypt", "Attempting to stop DNSCrypt...", Enums.StatusSeverityType.Information);
+            //NotificationManager.ShowNotification("Stopping DNSCrypt", "Attempting to stop DNSCrypt...", Enums.StatusSeverityType.Information);
             //ServiceManager.StopDnsCrypt();
+            //DNSCryptConfigurationManager dNSCryptConfigurationManager = new DNSCryptConfigurationManager(ServiceManager.GetDnsCryptInstallationPath() + "\\dnscrypt-proxy.toml");
+            //TraceLogger.Log(ServiceManager.GetDNSCryptInstallationDirectory());
+            string dnscryptpath = ServiceManager.GetDNSCryptInstallationDirectory();
+            DNSCryptConfigurationManager dNSCryptConfigurationManager = new DNSCryptConfigurationManager(dnscryptpath + "\\dnscrypt-proxy.toml");
+            DNSCryptQueryMonitor monitor = new DNSCryptQueryMonitor($"{dnscryptpath}\\{dNSCryptConfigurationManager.GetSetting("[query_log]", "file")}");
+            await monitor.StartMonitoringAsync();
+            //MessageBox.Show(monitor.isMonitoring.ToString());
         }
 
         private void SinkDNSManagerForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -87,8 +95,11 @@ namespace SinkDNS
 
         private void restartDNSCryptToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            GlobalNotifyIcon.Instance.SetIcon(Properties.Resources.WarningIcon);
+            NotificationManager.ShowNotification("Restarting DNSCrypt", "Attempting to restart DNSCrypt...", Enums.StatusSeverityType.Information);
             if (ServiceManager.RestartDnsCrypt())
             {
+                GlobalNotifyIcon.Instance.SetIcon(Properties.Resources.SinkDNSIcon);
                 NotificationManager.ShowNotification("DNSCrypt Restarted", "DNSCrypt has been restarted successfully.", Enums.StatusSeverityType.Information);
                 TraceLogger.Log("DNSCrypt restarted successfully.");
             }

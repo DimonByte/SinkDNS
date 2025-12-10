@@ -28,7 +28,7 @@ namespace SinkDNS.Modules.DNSCrypt
     {
         private readonly string _SinkDNSconfigFilePath = SinkDNSconfigFilePath ?? throw new ArgumentNullException(nameof(SinkDNSconfigFilePath));
 
-        private readonly DNSCryptConfigurationWriter _DNSCryptConfigWriter = new(DNSCryptConfigPath);
+        private readonly DNSCryptConfigurationManager _DNSCryptConfigWriter = new(DNSCryptConfigPath);
 
         private static readonly char[] separator = ['='];
 

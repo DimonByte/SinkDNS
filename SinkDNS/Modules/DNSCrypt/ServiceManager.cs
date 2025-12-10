@@ -20,8 +20,10 @@
 //OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //SOFTWARE.
 
+using Microsoft.Win32;
 using SinkDNS.Modules.SinkDNSInternals;
 using SinkDNS.Modules.System;
+using System.Diagnostics;
 using System.ServiceProcess;
 
 namespace SinkDNS.Modules.DNSCrypt
@@ -45,6 +47,83 @@ namespace SinkDNS.Modules.DNSCrypt
             }
         }
 
+        public static string GetDNSCryptInstallationDirectory()
+        {
+            TraceLogger.Log("Attempting to get DNSCrypt installation directory from registry...");
+            try
+            {
+                using (var key = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Services\dnscrypt-proxy"))
+                {
+                    if (key != null)
+                    {
+                        TraceLogger.Log("Found DNSCrypt service registry key.");
+                        var imagePath = key.GetValue("ImagePath") as string;
+                        if (!string.IsNullOrEmpty(imagePath))
+                        {
+                            TraceLogger.Log($"Found DNSCrypt ImagePath in registry: {imagePath}");
+                            // Extract the directory from the image path
+                            // ImagePath is typically something like: "C:\Program Files\DNSCrypt\dnscrypt-proxy.exe" -config "C:\Program Files\DNSCrypt\config.toml"
+                            if (imagePath.StartsWith("\"") && imagePath.Contains("\""))
+                            {
+                                int start = imagePath.IndexOf('"') + 1;
+                                int end = imagePath.IndexOf('"', start);
+                                if (end > start)
+                                {
+                                    string exePath = imagePath.Substring(start, end - start);
+                                    TraceLogger.Log($"Found DNSCrypt executable path: {exePath}");
+                                    return Path.GetDirectoryName(exePath);
+                                }
+                            }
+                            else
+                            {
+                                if (imagePath.Contains("\\"))
+                                {
+                                    string[] parts = imagePath.Split('\\');
+                                    if (parts.Length >= 2)
+                                    {
+                                        Array.Resize(ref parts, parts.Length - 1);
+                                        TraceLogger.Log($"Found DNSCrypt installation directory: {string.Join("\\", parts)}");
+                                        return string.Join("\\", parts);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                TraceLogger.Log("Could not find DNSCrypt installation directory from registry. Trying common paths...", Enums.StatusSeverityType.Warning);
+
+                string[] commonPaths = {
+                @"C:\Program Files\DNSCrypt",
+                @"C:\Program Files (x86)\DNSCrypt",
+                @"C:\Program Files\dnscrypt-proxy",
+                @"C:\Program Files (x86)\dnscrypt-proxy"
+            };
+
+                foreach (string path in commonPaths)
+                {
+                    if (Directory.Exists(path))
+                    {
+                        TraceLogger.Log($"Found DNSCrypt installation directory at: {path}");
+                        return path;
+                    }
+                }
+
+                string programDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "DNSCrypt");
+                if (Directory.Exists(programDataPath))
+                {
+                    TraceLogger.Log($"Found DNSCrypt installation directory at: {programDataPath}");
+                    return programDataPath;
+                }
+                TraceLogger.Log("DNSCrypt installation directory not found in common paths.", Enums.StatusSeverityType.Error);
+                return null;
+            }
+            catch (Exception ex)
+            {
+                TraceLogger.Log($"Error getting DNSCrypt installation directory: {ex.Message}", Enums.StatusSeverityType.Error);
+                return null;
+            }
+        }
+
         public static bool IsDnsCryptInstalled()
         {
             try
@@ -61,7 +140,7 @@ namespace SinkDNS.Modules.DNSCrypt
                 TraceLogger.Log($"Error checking DNSCrypt service installation: {ex.Message}", Enums.StatusSeverityType.Error);
                 return false;
             }
-        }
+        }        
 
         public static bool StartDnsCrypt()
         {
