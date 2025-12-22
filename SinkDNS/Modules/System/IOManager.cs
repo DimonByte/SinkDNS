@@ -28,9 +28,10 @@ namespace SinkDNS.Modules.System
     //This will handle folder and file management for SinkDNS, like creating necessary directories.
     internal class IOManager
     {
-        public static void CreateNecessaryDirectories()
+        public static void CreateNecessaryDirectoriesAndFiles()
         {
             string[] directories = [Settings.Default.LogsFolder, Settings.Default.ConfigFolder, Settings.Default.ResolversFolder, Settings.Default.HostFilesFolder, Settings.Default.BackupFolder, Settings.Default.BlocklistFolder, Settings.Default.WhitelistFolder, Settings.Default.TaskScheduleFolder];
+            bool checkForCorruption = false;
             foreach (string dir in directories)
             {
                 if (!Directory.Exists(dir))
@@ -46,6 +47,86 @@ namespace SinkDNS.Modules.System
                     }
                 }
             }
+            string[] files = [Settings.Default.UserBlocklistIni, Settings.Default.UserWhitelistIni, Settings.Default.CombinedBlocklistFile, Settings.Default.CombinedWhitelistFile, Settings.Default.BlocklistIni, Settings.Default.WhitelistIni, Settings.Default.TaskSchedulerIni];
+            foreach (string file in files)
+            {
+                if (!File.Exists(file))
+                {
+                    try
+                    {
+                        var directory = Path.GetDirectoryName(file);
+                        if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
+                            Directory.CreateDirectory(directory);
+                        File.Create(file).Dispose();
+                        TraceLogger.Log($"Created file: {file}");
+                    }
+                    catch (Exception ex)
+                    {
+                        TraceLogger.Log($"Error creating file {file}: {ex.Message}", Enums.StatusSeverityType.Error);
+                    }
+                }
+                else
+                {
+                    checkForCorruption = true; //For checking if the sinkdns config has been changed before running.
+                }
+            }
+            if (checkForCorruption)
+            {
+                CheckForInvalidConfig();
+            }
+        }
+
+        public static void CheckForInvalidConfig()
+        {
+            //Stage 1: Check blocklist and whitelist INI files for corruption (invalid entries)
+            string[] configFiles = [Settings.Default.BlocklistIni, Settings.Default.WhitelistIni];
+            foreach (string configFile in configFiles)
+            {
+                if (File.Exists(configFile))
+                {
+                    var lines = File.ReadAllLines(configFile);
+                    TraceLogger.Log($"Checking {configFile} for corruption. Total lines: {lines.Length}");
+                    var validLines = new List<string>();
+                    foreach (var line in lines)
+                    {
+                        if (Uri.IsWellFormedUriString(line, UriKind.Absolute))
+                        {
+                            validLines.Add(line);
+                        }
+                        else
+                        {
+                            TraceLogger.Log($"Corruption detected: Removed invalid line from {configFile}: {line}", Enums.StatusSeverityType.Warning);
+                        }
+                    }
+                    File.WriteAllLines(configFile, validLines);
+                    TraceLogger.Log($"Checked {configFile} for corruption. Valid lines retained: {validLines.Count}");
+                }
+            }
+            //Stage 2: Check user blocklist and whitelist INI files for corruption (invalid entries), they should only contain domain names, not full URLs. So google.com is valid, but http://google.com is not.
+            string[] userConfigFiles = [Settings.Default.UserBlocklistIni, Settings.Default.UserWhitelistIni];
+            foreach (string userConfigFile in userConfigFiles)
+            {
+                if (File.Exists(userConfigFile))
+                {
+                    var lines = File.ReadAllLines(userConfigFile);
+                    TraceLogger.Log($"Checking {userConfigFile} for corruption. Total lines: {lines.Length}");
+                    var validLines = new List<string>();
+                    foreach (var line in lines)
+                    {
+                        if (Uri.CheckHostName(line) != UriHostNameType.Unknown)
+                        {
+                            validLines.Add(line);
+                        }
+                        else
+                        {
+                            TraceLogger.Log($"Corruption detected: Removed corrupt line from {userConfigFile}: {line}", Enums.StatusSeverityType.Warning);
+                        }
+                    }
+                    File.WriteAllLines(userConfigFile, validLines);
+                    TraceLogger.Log($"Checked {userConfigFile} for corruption. Valid lines retained: {validLines.Count}");
+                }
+            }
+            TraceLogger.Log("Configuration corruption check completed.");
         }
 
         public static void BackupFile(string filePath)

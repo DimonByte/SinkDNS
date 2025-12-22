@@ -61,7 +61,7 @@ namespace SinkDNS.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("config/userblocklist.ini")]
+        [global::System.Configuration.DefaultSettingValueAttribute("hostfiles/userblocklist.txt")]
         public string UserBlocklistIni {
             get {
                 return ((string)(this["UserBlocklistIni"]));
@@ -70,7 +70,7 @@ namespace SinkDNS.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("config/userwhitelist.ini")]
+        [global::System.Configuration.DefaultSettingValueAttribute("hostfiles/userwhitelist.txt")]
         public string UserWhitelistIni {
             get {
                 return ((string)(this["UserWhitelistIni"]));
@@ -179,6 +179,15 @@ namespace SinkDNS.Properties {
             }
             set {
                 this["LogExpiryInDays"] = value;
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool PendingDNSRestart {
+            get {
+                return ((bool)(this["PendingDNSRestart"]));
             }
         }
     }

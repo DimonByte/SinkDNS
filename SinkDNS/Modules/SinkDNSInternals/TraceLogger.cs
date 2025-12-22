@@ -22,7 +22,6 @@
 
 using SinkDNS.Properties;
 using System.Diagnostics;
-using System.IO;
 using System.Runtime.CompilerServices;
 using System.Text;
 using static SinkDNS.Modules.Enums;
@@ -127,7 +126,6 @@ namespace SinkDNS.Modules.SinkDNSInternals
         {
             Log(message, severity);
             string className = ExtractClassName(filePath);
-            //Depending on the severity, show the right msgbox
             if (!string.IsNullOrEmpty(message))
             {
                 switch (severity)
