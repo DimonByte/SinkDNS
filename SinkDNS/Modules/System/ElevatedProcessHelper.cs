@@ -79,6 +79,11 @@ namespace SinkDNS.Modules.System
                     return true;
                 }
             }
+            catch (OperationCanceledException ex1)
+            {
+                TraceLogger.Log($"The elevated command was cancelled by the user. Command run failed! {ex1.Message}", Enums.StatusSeverityType.Error);
+                return false;
+            }
             catch (Exception ex)
             {
                 TraceLogger.Log($"Failed to run elevated commands: {ex.Message}", Enums.StatusSeverityType.Error);

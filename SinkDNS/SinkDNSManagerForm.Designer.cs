@@ -37,10 +37,10 @@
             MainContextMenuStrip = new ContextMenuStrip(components);
             openManagerToolStripMenuItem = new ToolStripMenuItem();
             toolStripSeparator3 = new ToolStripSeparator();
-            addURLToBlocklistToolStripMenuItem = new ToolStripMenuItem();
             addNewBlocklistToolStripMenuItem = new ToolStripMenuItem();
-            addURLToWhitelistToolStripMenuItem = new ToolStripMenuItem();
             addNewWhitelistToolStripMenuItem = new ToolStripMenuItem();
+            addURLToBlocklistToolStripMenuItem = new ToolStripMenuItem();
+            addURLToWhitelistToolStripMenuItem = new ToolStripMenuItem();
             toolStripSeparator2 = new ToolStripSeparator();
             updateBlocklistsToolStripMenuItem = new ToolStripMenuItem();
             bypassFilteringToolStripMenuItem = new ToolStripMenuItem();
@@ -107,9 +107,9 @@
             // 
             // MainContextMenuStrip
             // 
-            MainContextMenuStrip.Items.AddRange(new ToolStripItem[] { openManagerToolStripMenuItem, toolStripSeparator3, addURLToBlocklistToolStripMenuItem, addNewBlocklistToolStripMenuItem, addURLToWhitelistToolStripMenuItem, addNewWhitelistToolStripMenuItem, toolStripSeparator2, updateBlocklistsToolStripMenuItem, bypassFilteringToolStripMenuItem, restartDNSCryptToolStripMenuItem, toolStripSeparator1, exitSinkDNSToolStripMenuItem });
+            MainContextMenuStrip.Items.AddRange(new ToolStripItem[] { openManagerToolStripMenuItem, toolStripSeparator3, addNewBlocklistToolStripMenuItem, addNewWhitelistToolStripMenuItem, addURLToBlocklistToolStripMenuItem, addURLToWhitelistToolStripMenuItem, toolStripSeparator2, updateBlocklistsToolStripMenuItem, bypassFilteringToolStripMenuItem, restartDNSCryptToolStripMenuItem, toolStripSeparator1, exitSinkDNSToolStripMenuItem });
             MainContextMenuStrip.Name = "MainContextMenuStrip";
-            MainContextMenuStrip.Size = new Size(202, 220);
+            MainContextMenuStrip.Size = new Size(202, 242);
             // 
             // openManagerToolStripMenuItem
             // 
@@ -123,29 +123,31 @@
             toolStripSeparator3.Name = "toolStripSeparator3";
             toolStripSeparator3.Size = new Size(198, 6);
             // 
-            // addURLToBlocklistToolStripMenuItem
-            // 
-            addURLToBlocklistToolStripMenuItem.Name = "addURLToBlocklistToolStripMenuItem";
-            addURLToBlocklistToolStripMenuItem.Size = new Size(201, 22);
-            addURLToBlocklistToolStripMenuItem.Text = "Add URL to Blocklist";
-            // 
             // addNewBlocklistToolStripMenuItem
             // 
             addNewBlocklistToolStripMenuItem.Name = "addNewBlocklistToolStripMenuItem";
             addNewBlocklistToolStripMenuItem.Size = new Size(201, 22);
             addNewBlocklistToolStripMenuItem.Text = "Add New Blocklist";
-            // 
-            // addURLToWhitelistToolStripMenuItem
-            // 
-            addURLToWhitelistToolStripMenuItem.Name = "addURLToWhitelistToolStripMenuItem";
-            addURLToWhitelistToolStripMenuItem.Size = new Size(201, 22);
-            addURLToWhitelistToolStripMenuItem.Text = "Add URL to Whitelist";
+            addNewBlocklistToolStripMenuItem.ToolTipText = "Add a new blocklist that contains a list of urls from a repository.";
             // 
             // addNewWhitelistToolStripMenuItem
             // 
             addNewWhitelistToolStripMenuItem.Name = "addNewWhitelistToolStripMenuItem";
             addNewWhitelistToolStripMenuItem.Size = new Size(201, 22);
             addNewWhitelistToolStripMenuItem.Text = "Add New Whitelist";
+            addNewWhitelistToolStripMenuItem.ToolTipText = "Add a new whitelist that contains a list of urls from a repository.";
+            // 
+            // addURLToBlocklistToolStripMenuItem
+            // 
+            addURLToBlocklistToolStripMenuItem.Name = "addURLToBlocklistToolStripMenuItem";
+            addURLToBlocklistToolStripMenuItem.Size = new Size(201, 22);
+            addURLToBlocklistToolStripMenuItem.Text = "Add URL to Blocklist";
+            // 
+            // addURLToWhitelistToolStripMenuItem
+            // 
+            addURLToWhitelistToolStripMenuItem.Name = "addURLToWhitelistToolStripMenuItem";
+            addURLToWhitelistToolStripMenuItem.Size = new Size(201, 22);
+            addURLToWhitelistToolStripMenuItem.Text = "Add URL to Whitelist";
             // 
             // toolStripSeparator2
             // 
@@ -157,6 +159,7 @@
             updateBlocklistsToolStripMenuItem.Name = "updateBlocklistsToolStripMenuItem";
             updateBlocklistsToolStripMenuItem.Size = new Size(201, 22);
             updateBlocklistsToolStripMenuItem.Text = "Update all lists";
+            updateBlocklistsToolStripMenuItem.ToolTipText = "Manually updates the blocklist and whitelist for the latest updates.";
             updateBlocklistsToolStripMenuItem.Click += updateBlocklistsToolStripMenuItem_Click;
             // 
             // bypassFilteringToolStripMenuItem
@@ -165,6 +168,7 @@
             bypassFilteringToolStripMenuItem.Name = "bypassFilteringToolStripMenuItem";
             bypassFilteringToolStripMenuItem.Size = new Size(201, 22);
             bypassFilteringToolStripMenuItem.Text = "Bypass Filtering";
+            bypassFilteringToolStripMenuItem.ToolTipText = "Turns off DNSCrypt and reverts to the DNS settings that was set before installing SinkDNS. If no setting is found, the DNS will be set to 1.1.1.1.";
             // 
             // restartDNSCryptToolStripMenuItem
             // 

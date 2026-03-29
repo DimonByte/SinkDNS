@@ -7,7 +7,8 @@
             Information,
             Warning,
             Error,
-            Debug
+            Debug,
+            Fatal
         }
     }
 }

@@ -43,8 +43,8 @@ namespace SinkDNS.Modules.DNSCrypt
 
             if (!File.Exists(_configFilePath))
             {
-                TraceLogger.Log($"Configuration file not found {_configFilePath}", Enums.StatusSeverityType.Error);
-                MessageBox.Show("A SinkDNS module error has occurred. Configuration file not found!\n" + _configFilePath, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                TraceLogger.LogAndThrowMsgBox($"Configuration file not found {_configFilePath}", Enums.StatusSeverityType.Error);
+                //MessageBox.Show("A SinkDNS module error has occurred. Configuration file not found!\n" + _configFilePath, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
@@ -60,8 +60,8 @@ namespace SinkDNS.Modules.DNSCrypt
         {
             if (!File.Exists(_configFilePath))
             {
-                TraceLogger.Log($"Configuration file not found {_configFilePath}", Enums.StatusSeverityType.Error);
-                MessageBox.Show("A SinkDNS module error has occurred. Configuration file not found!\n" + _configFilePath, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                TraceLogger.LogAndThrowMsgBox($"Configuration file not found {_configFilePath}", Enums.StatusSeverityType.Error);
+                //MessageBox.Show("A SinkDNS module error has occurred. Configuration file not found!\n" + _configFilePath, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
             TraceLogger.Log("Loading configuration file: " + _configFilePath);
@@ -132,8 +132,8 @@ namespace SinkDNS.Modules.DNSCrypt
             //does the config file exists? check.
             if (!File.Exists(_configFilePath))
             {
-                TraceLogger.Log($"Configuration file not found {_configFilePath}", Enums.StatusSeverityType.Error);
-                MessageBox.Show("A SinkDNS module error has occurred. Configuration file not found!\n" + _configFilePath, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                TraceLogger.LogAndThrowMsgBox($"Configuration file not found {_configFilePath}", Enums.StatusSeverityType.Error);
+                //MessageBox.Show("A SinkDNS module error has occurred. Configuration file not found!\n" + _configFilePath, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return null;
             }
             if (!_configLoaded)
@@ -213,7 +213,7 @@ namespace SinkDNS.Modules.DNSCrypt
                     return value;
                 }
             }
-            TraceLogger.Log($"Setting '{settingName}' not found in the specified section.");
+            TraceLogger.Log($"Setting '{settingName}' not found in the specified section.",Enums.StatusSeverityType.Error);
             return null;
         }
 
@@ -224,8 +224,8 @@ namespace SinkDNS.Modules.DNSCrypt
 
             if (!File.Exists(_configFilePath))
             {
-                TraceLogger.Log($"Configuration file not found {_configFilePath}", Enums.StatusSeverityType.Error);
-                MessageBox.Show("A SinkDNS module error has occurred. Configuration file not found!\n" + _configFilePath, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                TraceLogger.LogAndThrowMsgBox($"Configuration file not found {_configFilePath}", Enums.StatusSeverityType.Error);
+                //MessageBox.Show("A SinkDNS module error has occurred. Configuration file not found!\n" + _configFilePath, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
@@ -238,7 +238,7 @@ namespace SinkDNS.Modules.DNSCrypt
             }
             catch (Exception ex)
             {
-                TraceLogger.Log($"Failed to write configuration file: {ex.Message}", Enums.StatusSeverityType.Error);
+                TraceLogger.LogAndThrowMsgBox($"Failed to write configuration file: {ex.Message}", Enums.StatusSeverityType.Error);
             }
         }
 

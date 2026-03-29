@@ -120,14 +120,16 @@ public class DNSCryptQueryMonitor
     }
     private void SetupFileWatcher()
     {
-        fileWatcher = new FileSystemWatcher();
-        fileWatcher.Path = Path.GetDirectoryName(logFilePath);
-        fileWatcher.Filter = Path.GetFileName(logFilePath);
+        fileWatcher = new FileSystemWatcher
+        {
+            Path = Path.GetDirectoryName(logFilePath),
+            Filter = Path.GetFileName(logFilePath),
 
-        fileWatcher.NotifyFilter = NotifyFilters.LastWrite |
-                                  NotifyFilters.Size |
-                                  NotifyFilters.CreationTime |
-                                  NotifyFilters.LastAccess;
+            NotifyFilter = NotifyFilters.LastWrite |
+                                      NotifyFilters.Size |
+                                      NotifyFilters.CreationTime |
+                                      NotifyFilters.LastAccess
+        };
 
         fileWatcher.Changed += OnLogChanged;
         fileWatcher.Created += OnLogChanged; // Also watch for new files

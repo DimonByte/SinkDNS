@@ -26,7 +26,6 @@ using SinkDNS.Modules;
 using SinkDNS.Modules.DNSCrypt;
 using SinkDNS.Modules.SinkDNSInternals;
 using SinkDNS.Modules.System;
-using System.Threading.Tasks;
 
 namespace SinkDNS
 {
@@ -38,7 +37,6 @@ namespace SinkDNS
         }
         private void SinkDNSMainForm_Load(object sender, EventArgs e)
         {
-            IOManager.CreateNecessaryDirectoriesAndFiles();
             NotificationManager.SetContextMenu(MainContextMenuStrip);
             GlobalNotifyIcon.Instance.SetMainForm(this);
             if (ServiceManager.IsDNSCryptRunning())
@@ -53,9 +51,10 @@ namespace SinkDNS
             else
             {
                 GlobalNotifyIcon.Instance.SetText("SinkDNS - DNSCrypt Stopped");
-                Show();
-                MessageBox.Show("DNSCrypt is not running. Please start DNSCrypt to use SinkDNS features.", "DNSCrypt Not Running", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                TraceLogger.Log("DNSCrypt is not running. Showing the manager form.");
+                GlobalNotifyIcon.Instance.SetIcon(Properties.Resources.WarningIcon);
+                //Since this program is likely set to start at startup, and DNSCrypt is not running, maybe check after a minute or so if DNSCrypt is running. This is because DNSCrypt might take a while to start up, and we don't want to show this manager form unnecessarily.
+                NotificationManager.ShowNotification("DNSCrypt Not Running", "DNSCrypt is not running. Please start DNSCrypt to use SinkDNS features.", Enums.StatusSeverityType.Warning);
+                TraceLogger.Log("DNSCrypt is not running.", Enums.StatusSeverityType.Warning);
             }
         }
 

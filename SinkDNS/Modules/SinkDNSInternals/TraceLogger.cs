@@ -122,7 +122,8 @@ namespace SinkDNS.Modules.SinkDNSInternals
         public static void LogAndThrowMsgBox(string message, StatusSeverityType severity = StatusSeverityType.Information, string title = "",
                               [CallerMemberName] string memberName = "",
                               [CallerFilePath] string filePath = "",
-                              [CallerLineNumber] int lineNumber = 0)
+                              [CallerLineNumber] int lineNumber = 0
+            )
         {
             Log(message, severity);
             string className = ExtractClassName(filePath);
@@ -141,6 +142,10 @@ namespace SinkDNS.Modules.SinkDNSInternals
                         break;
                     case StatusSeverityType.Debug:
                         MessageBox.Show($"SinkDNS DEBUG Trace Details: {className} {memberName} {lineNumber} : {message}", "SinkDNS DEBUG Trace Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        break;
+                    case StatusSeverityType.Fatal:
+                        MessageBox.Show($"Fatal Error! SinkDNS has detected a fatal error and must close. The {memberName} class has reported a critical problem at line {lineNumber}: {message}", "SinkDNS Critical Error!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        Environment.FailFast($"Fatal Error! SinkDNS has detected a fatal error and must close. The {memberName} class has reported a critical problem at line {lineNumber}: {message}");
                         break;
                 }
             }

@@ -32,10 +32,25 @@ namespace SinkDNS.Modules.SinkDNSInternals
     {
         public static async Task DownloadBlocklistsAsync()
         {
+            DateTime StartOfBlockList = DateTime.Now;
             if (!File.Exists(Settings.Default.BlocklistIni))
             {
-                TraceLogger.Log($"Blocklist configuration file not found: {Settings.Default.BlocklistIni}", Enums.StatusSeverityType.Warning);
+                TraceLogger.LogAndThrowMsgBox($"Blocklist configuration file not found: {Settings.Default.BlocklistIni}", Enums.StatusSeverityType.Warning);
                 return;
+            }
+            //Delete all blocklist files in the blocklist folder before downloading new ones to ensure we don't have any old blocklists lying around.
+            foreach (var file in Directory.GetFiles(Settings.Default.BlocklistFolder))
+            {
+                try
+                {
+                    File.Delete(file);
+                }
+                catch (Exception ex)
+                {
+                    //We can't continue if we can't delete blocklists, since it failed here it might be permissions. And we don't want to merge old blocklists with new ones.
+                    TraceLogger.Log($"Failed to delete old blocklist file: {file}. Download halted. Exception: {ex.Message}", Enums.StatusSeverityType.Error);
+                    return;
+                }
             }
 
             var urls = ReadUrlsFromFile(Settings.Default.BlocklistIni);
@@ -49,14 +64,23 @@ namespace SinkDNS.Modules.SinkDNSInternals
             TraceLogger.Log("Finished downloading blocklists.");
             IOManager.MergeFiles(Settings.Default.BlocklistFolder, Settings.Default.CombinedBlocklistFile);
             IOManager.RemoveDuplicates(Settings.Default.CombinedBlocklistFile);
-            TraceLogger.Log("Blocklist update complete.");
+            TraceLogger.Log("Blocklist update complete. Checking if all files have been updated recently");
+            //Check if the files in the blocklist have a update date via using the StartOfBlockList, if the file has been modified before the StartOfBlockList, then it means the file was not updated during this download process, and we should log a warning about it.
+            foreach (var file in Directory.GetFiles(Settings.Default.BlocklistFolder))
+            {
+                var lastWriteTime = File.GetLastWriteTime(file);
+                if (lastWriteTime < StartOfBlockList)
+                {
+                    TraceLogger.Log($"Warning: Blocklist file {file} was not updated during this download process. Check logs if the download process failed on this file. Last write time: {lastWriteTime}", Enums.StatusSeverityType.Warning);
+                }
+            }
         }
 
         public static async Task DownloadWhitelistsAsync()
         {
             if (!File.Exists(Settings.Default.WhitelistIni))
             {
-                TraceLogger.Log($"Whitelist configuration file not found: {Settings.Default.WhitelistIni}", Enums.StatusSeverityType.Warning);
+                TraceLogger.LogAndThrowMsgBox($"Whitelist configuration file not found: {Settings.Default.WhitelistIni}", Enums.StatusSeverityType.Warning);
                 return;
             }
 

@@ -77,7 +77,7 @@ namespace SinkDNS.Modules.SinkDNSInternals
                     bool isGzipped = response.Content.Headers.ContentEncoding?.Any(e => e.Contains("gzip")) ?? false;
                     if (isGzipped)
                     {
-                        TraceLogger.Log("Content is gzipped, decompressing...");
+                        TraceLogger.Log("Decompressing GZip...");
                         using var compressedStream = new MemoryStream(contentBytes);
                         using var decompressedStream = new GZipStream(compressedStream, CompressionMode.Decompress);
                         using var fileStream = new FileStream(localPath, FileMode.Create, FileAccess.Write, FileShare.None, 4096, FileOptions.Asynchronous);
@@ -111,52 +111,52 @@ namespace SinkDNS.Modules.SinkDNSInternals
             }
         }
 
-        public static async Task<string?> DownloadStringAsync(string url)
-        {
-            try
-            {
-                TraceLogger.Log($"Downloading string from {url}");
-                HttpResponseMessage response = await httpClient.GetAsync(url);
+        //public static async Task<string?> DownloadStringAsync(string url)
+        //{
+        //    try
+        //    {
+        //        TraceLogger.Log($"Downloading string from {url}");
+        //        HttpResponseMessage response = await httpClient.GetAsync(url);
 
-                if (response.IsSuccessStatusCode)
-                {
-                    return await response.Content.ReadAsStringAsync();
-                }
-                else
-                {
-                    TraceLogger.Log($"Download failed with status code: {response.StatusCode}", Enums.StatusSeverityType.Error);
-                    return null;
-                }
-            }
-            catch (Exception ex)
-            {
-                TraceLogger.Log($"Error downloading string: {ex.Message}", Enums.StatusSeverityType.Error);
-                return null;
-            }
-        }
+        //        if (response.IsSuccessStatusCode)
+        //        {
+        //            return await response.Content.ReadAsStringAsync();
+        //        }
+        //        else
+        //        {
+        //            TraceLogger.Log($"Download failed with status code: {response.StatusCode}", Enums.StatusSeverityType.Error);
+        //            return null;
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        TraceLogger.Log($"Error downloading string: {ex.Message}", Enums.StatusSeverityType.Error);
+        //        return null;
+        //    }
+        //}
 
-        public static async Task<Dictionary<string, string>?> GetHttpHeadersAsync(string url)
-        {
-            try
-            {
-                TraceLogger.Log($"Getting HTTP headers from {url}");
-                var request = new HttpRequestMessage(HttpMethod.Head, url);
-                HttpResponseMessage response = await httpClient.SendAsync(request);
+        //public static async Task<Dictionary<string, string>?> GetHttpHeadersAsync(string url)
+        //{
+        //    try
+        //    {
+        //        TraceLogger.Log($"Getting HTTP headers from {url}");
+        //        var request = new HttpRequestMessage(HttpMethod.Head, url);
+        //        HttpResponseMessage response = await httpClient.SendAsync(request);
 
-                var headers = new Dictionary<string, string>();
-                foreach (var header in response.Content.Headers)
-                {
-                    headers[header.Key] = string.Join(",", header.Value);
-                }
+        //        var headers = new Dictionary<string, string>();
+        //        foreach (var header in response.Content.Headers)
+        //        {
+        //            headers[header.Key] = string.Join(",", header.Value);
+        //        }
 
-                return headers;
-            }
-            catch (Exception ex)
-            {
-                TraceLogger.Log($"Error getting HTTP headers: {ex.Message}", Enums.StatusSeverityType.Error);
-                return null;
-            }
-        }
+        //        return headers;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        TraceLogger.Log($"Error getting HTTP headers: {ex.Message}", Enums.StatusSeverityType.Error);
+        //        return null;
+        //    }
+        //}
 
         public static async Task<bool> IsUrlAccessibleAsync(string url)
         {

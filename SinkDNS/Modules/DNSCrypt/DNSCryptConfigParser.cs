@@ -36,7 +36,7 @@ namespace SinkDNS.Modules.DNSCrypt
         {
             if (!File.Exists(_SinkDNSconfigFilePath))
             {
-                TraceLogger.Log("Configuration file not found!", Enums.StatusSeverityType.Error);
+                TraceLogger.LogAndThrowMsgBox("Configuration file not found!", Enums.StatusSeverityType.Error);
                 return;
             }
             TraceLogger.Log($"Reading configuration from {_SinkDNSconfigFilePath}");

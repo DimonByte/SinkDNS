@@ -23,7 +23,6 @@
 using Microsoft.Win32;
 using SinkDNS.Modules.SinkDNSInternals;
 using SinkDNS.Modules.System;
-using System.Diagnostics;
 using System.ServiceProcess;
 
 namespace SinkDNS.Modules.DNSCrypt
@@ -35,15 +34,28 @@ namespace SinkDNS.Modules.DNSCrypt
 
         public static bool IsDNSCryptRunning()
         {
+            ServiceController serviceController = null;
+
             try
             {
-                using var serviceController = new ServiceController(DnsCryptServiceName);
+                serviceController = new ServiceController(DnsCryptServiceName);
                 return serviceController.Status == ServiceControllerStatus.Running;
             }
             catch (Exception ex)
             {
                 TraceLogger.Log($"Error checking DNSCrypt service status: {ex.Message}", Enums.StatusSeverityType.Error);
                 return false;
+            }
+            finally
+            {
+                try
+                {
+                    serviceController?.Dispose();
+                }
+                catch (Exception disposeEx)
+                {
+                    TraceLogger.Log($"Dispose failed: {disposeEx.Message}", Enums.StatusSeverityType.Error);
+                }
             }
         }
 
@@ -119,7 +131,7 @@ namespace SinkDNS.Modules.DNSCrypt
             }
             catch (Exception ex)
             {
-                TraceLogger.Log($"Error getting DNSCrypt installation directory: {ex.Message}", Enums.StatusSeverityType.Error);
+                TraceLogger.LogAndThrowMsgBox($"Error getting DNSCrypt installation directory: {ex.Message}", Enums.StatusSeverityType.Error);
                 return null;
             }
         }
@@ -165,7 +177,7 @@ namespace SinkDNS.Modules.DNSCrypt
             }
             catch (Exception ex)
             {
-                TraceLogger.Log($"Error starting DNSCrypt service: {ex.Message}", Enums.StatusSeverityType.Error);
+                TraceLogger.LogAndThrowMsgBox($"Error starting DNSCrypt service: {ex.Message}", Enums.StatusSeverityType.Error);
                 return false;
             }
         }
@@ -193,7 +205,7 @@ namespace SinkDNS.Modules.DNSCrypt
             }
             catch (Exception ex)
             {
-                TraceLogger.Log($"Error stopping DNSCrypt service: {ex.Message}", Enums.StatusSeverityType.Error);
+                TraceLogger.LogAndThrowMsgBox($"Error stopping DNSCrypt service: {ex.Message}", Enums.StatusSeverityType.Error);
                 return false;
             }
         }
@@ -244,7 +256,7 @@ namespace SinkDNS.Modules.DNSCrypt
 
                     if (!result)
                     {
-                        TraceLogger.Log("Failed to restart DNSCrypt service during restart.", Enums.StatusSeverityType.Error);
+                        TraceLogger.LogAndThrowMsgBox("Failed to restart DNSCrypt service during restart.", Enums.StatusSeverityType.Error);
                         return false;
                     }
 
@@ -254,13 +266,13 @@ namespace SinkDNS.Modules.DNSCrypt
                 {
                     if (!StopDnsCrypt())
                     {
-                        TraceLogger.Log("Failed to stop DNSCrypt service during restart.", Enums.StatusSeverityType.Error);
+                        TraceLogger.LogAndThrowMsgBox("Failed to stop DNSCrypt service during restart.", Enums.StatusSeverityType.Error);
                         return false;
                     }
                     Task.Delay(1000).Wait();
                     if (!StartDnsCrypt())
                     {
-                        TraceLogger.Log("Failed to start DNSCrypt service during restart.", Enums.StatusSeverityType.Error);
+                        TraceLogger.LogAndThrowMsgBox("Failed to start DNSCrypt service during restart.", Enums.StatusSeverityType.Error);
                         return false;
                     }
                     // Flush DNS cache
@@ -269,7 +281,7 @@ namespace SinkDNS.Modules.DNSCrypt
             }
             catch (Exception ex)
             {
-                TraceLogger.Log($"Error restarting DNSCrypt service: {ex.Message}", Enums.StatusSeverityType.Error);
+                TraceLogger.LogAndThrowMsgBox($"Error restarting DNSCrypt service: {ex.Message}", Enums.StatusSeverityType.Error);
                 return false;
             }
         }

@@ -14,7 +14,8 @@ namespace SinkDNS
         {
             // To customize application configuration such as set high DPI settings or default font,
             // see https://aka.ms/applicationconfiguration.
-            TraceLogger.Log("SinkDNS Starting...");
+            IOManager.CreateNecessaryDirectoriesAndFiles();
+            TraceLogger.Log("SinkDNS Program Starting...");
             Application.SetCompatibleTextRenderingDefault(false);
             ApplicationConfiguration.Initialize();
             TraceLogger.ClearExpiredLogs();

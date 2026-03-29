@@ -43,7 +43,8 @@ namespace SinkDNS.Modules.System
                     }
                     catch (Exception ex)
                     {
-                        TraceLogger.Log($"Error creating directory {dir}: {ex.Message}", Enums.StatusSeverityType.Error);
+                        //Since we failed here, we can't continue since it might be missing required configuration files for SinkDNS.
+                        TraceLogger.LogAndThrowMsgBox($"Error creating directory {dir}: {ex.Message}", Enums.StatusSeverityType.Fatal);
                     }
                 }
             }
@@ -78,55 +79,62 @@ namespace SinkDNS.Modules.System
 
         public static void CheckForInvalidConfig()
         {
-            //Stage 1: Check blocklist and whitelist INI files for corruption (invalid entries)
-            string[] configFiles = [Settings.Default.BlocklistIni, Settings.Default.WhitelistIni];
-            foreach (string configFile in configFiles)
+            try
             {
-                if (File.Exists(configFile))
+                //Stage 1: Check blocklist and whitelist INI files for corruption (invalid entries)
+                string[] configFiles = [Settings.Default.BlocklistIni, Settings.Default.WhitelistIni];
+                foreach (string configFile in configFiles)
                 {
-                    var lines = File.ReadAllLines(configFile);
-                    TraceLogger.Log($"Checking {configFile} for corruption. Total lines: {lines.Length}");
-                    var validLines = new List<string>();
-                    foreach (var line in lines)
+                    if (File.Exists(configFile))
                     {
-                        if (Uri.IsWellFormedUriString(line, UriKind.Absolute))
+                        var lines = File.ReadAllLines(configFile);
+                        TraceLogger.Log($"Checking {configFile} for corruption. Total lines: {lines.Length}");
+                        var validLines = new List<string>();
+                        foreach (var line in lines)
                         {
-                            validLines.Add(line);
+                            if (Uri.IsWellFormedUriString(line, UriKind.Absolute))
+                            {
+                                validLines.Add(line);
+                            }
+                            else
+                            {
+                                TraceLogger.Log($"Corruption detected: Removed invalid line from {configFile}: {line}", Enums.StatusSeverityType.Warning);
+                            }
                         }
-                        else
-                        {
-                            TraceLogger.Log($"Corruption detected: Removed invalid line from {configFile}: {line}", Enums.StatusSeverityType.Warning);
-                        }
+                        File.WriteAllLines(configFile, validLines);
+                        TraceLogger.Log($"Checked {configFile} for corruption. Valid lines retained: {validLines.Count}");
                     }
-                    File.WriteAllLines(configFile, validLines);
-                    TraceLogger.Log($"Checked {configFile} for corruption. Valid lines retained: {validLines.Count}");
                 }
+                //Stage 2: Check user blocklist and whitelist INI files for corruption (invalid entries), they should only contain domain names, not full URLs. So google.com is valid, but http://google.com is not.
+                string[] userConfigFiles = [Settings.Default.UserBlocklistIni, Settings.Default.UserWhitelistIni];
+                foreach (string userConfigFile in userConfigFiles)
+                {
+                    if (File.Exists(userConfigFile))
+                    {
+                        var lines = File.ReadAllLines(userConfigFile);
+                        TraceLogger.Log($"Checking {userConfigFile} for corruption. Total lines: {lines.Length}");
+                        var validLines = new List<string>();
+                        foreach (var line in lines)
+                        {
+                            if (Uri.CheckHostName(line) != UriHostNameType.Unknown)
+                            {
+                                validLines.Add(line);
+                            }
+                            else
+                            {
+                                TraceLogger.Log($"Corruption detected: Removed corrupt line from {userConfigFile}: {line}", Enums.StatusSeverityType.Warning);
+                            }
+                        }
+                        File.WriteAllLines(userConfigFile, validLines);
+                        TraceLogger.Log($"Checked {userConfigFile} for corruption. Valid lines retained: {validLines.Count}");
+                    }
+                }
+                TraceLogger.Log("Configuration corruption check completed.");
             }
-            //Stage 2: Check user blocklist and whitelist INI files for corruption (invalid entries), they should only contain domain names, not full URLs. So google.com is valid, but http://google.com is not.
-            string[] userConfigFiles = [Settings.Default.UserBlocklistIni, Settings.Default.UserWhitelistIni];
-            foreach (string userConfigFile in userConfigFiles)
+            catch (Exception ex)
             {
-                if (File.Exists(userConfigFile))
-                {
-                    var lines = File.ReadAllLines(userConfigFile);
-                    TraceLogger.Log($"Checking {userConfigFile} for corruption. Total lines: {lines.Length}");
-                    var validLines = new List<string>();
-                    foreach (var line in lines)
-                    {
-                        if (Uri.CheckHostName(line) != UriHostNameType.Unknown)
-                        {
-                            validLines.Add(line);
-                        }
-                        else
-                        {
-                            TraceLogger.Log($"Corruption detected: Removed corrupt line from {userConfigFile}: {line}", Enums.StatusSeverityType.Warning);
-                        }
-                    }
-                    File.WriteAllLines(userConfigFile, validLines);
-                    TraceLogger.Log($"Checked {userConfigFile} for corruption. Valid lines retained: {validLines.Count}");
-                }
+                TraceLogger.LogAndThrowMsgBox($"Configuration corruption check failure, SinkDNS cannot continue. {ex.Message}", Enums.StatusSeverityType.Fatal);
             }
-            TraceLogger.Log("Configuration corruption check completed.");
         }
 
         public static void BackupFile(string filePath)
@@ -157,9 +165,10 @@ namespace SinkDNS.Modules.System
         public static void MergeFiles(string sourceFolder, string outputFile)
         {
             // Delete existing combined file, we don't want that mess to happen...
-            TraceLogger.Log($"Creating combined file: {outputFile}");
-            if (File.Exists(outputFile))
-                File.Delete(outputFile);
+            //TraceLogger.Log($"Creating combined file: {outputFile}");
+            //if (File.Exists(outputFile))
+            //    File.Delete(outputFile);
+            //    TraceLogger.Log($"Deleted existing combined file: {outputFile}");
 
             var files = Directory.GetFiles(sourceFolder, "*.txt");
             if (files.Length == 0)
@@ -168,21 +177,32 @@ namespace SinkDNS.Modules.System
                 return;
             }
 
-            using var writer = new StreamWriter(outputFile);
-            foreach (var file in files)
+            try
             {
-                TraceLogger.Log($"Merging file: {file}");
-                var lines = File.ReadAllLines(file);
-                foreach (var line in lines)
+                using var writer = new StreamWriter(outputFile);
+                foreach (var file in files)
                 {
-                    if (!string.IsNullOrWhiteSpace(line) && !line.StartsWith("#"))
+                    TraceLogger.Log($"Merging file: {file}");
+                    var lines = File.ReadAllLines(file);
+                    foreach (var line in lines)
                     {
-                        writer.WriteLine(line);
+                        if (!string.IsNullOrWhiteSpace(line) && !line.StartsWith("#"))
+                        {
+                            writer.WriteLine(line);
+                        }
                     }
                 }
+                writer.Flush();
+                writer.Dispose();
             }
-            writer.Flush();
-            writer.Dispose();
+            catch (UnauthorizedAccessException ex1)
+            {
+                TraceLogger.Log($"Access denied when trying to merge files into {outputFile}: {ex1.Message}", Enums.StatusSeverityType.Error);
+            }
+            catch (Exception ex)
+            {
+                TraceLogger.Log($"Error merging files into {outputFile}: {ex.Message}", Enums.StatusSeverityType.Error);
+            }
             TraceLogger.Log($"Total entries in {outputFile}: {File.ReadAllLines(outputFile).Length}");
         }
 
@@ -205,18 +225,25 @@ namespace SinkDNS.Modules.System
 
         public static void RemoveDuplicates(string MergedFileLoc)
         {
-            TraceLogger.Log("Removing duplicates from merge...");
-            TraceLogger.Log($"Total lines in {MergedFileLoc} before removing duplicates: {File.ReadAllLines(MergedFileLoc).Length}");
-            if (!File.Exists(MergedFileLoc))
+            try
             {
-                TraceLogger.Log($"File not found: {MergedFileLoc}", Enums.StatusSeverityType.Warning);
-                return;
+                TraceLogger.Log("Removing duplicates from merge...");
+                TraceLogger.Log($"Total lines in {MergedFileLoc} before removing duplicates: {File.ReadAllLines(MergedFileLoc).Length}");
+                if (!File.Exists(MergedFileLoc))
+                {
+                    TraceLogger.Log($"File not found: {MergedFileLoc}", Enums.StatusSeverityType.Warning);
+                    return;
+                }
+                var lines = File.ReadAllLines(MergedFileLoc);
+                var uniqueLines = new HashSet<string>(lines);
+                File.WriteAllLines(MergedFileLoc, uniqueLines);
+                TraceLogger.Log($"Removed {lines.Length - uniqueLines.Count} duplicate entries.");
+                TraceLogger.Log($"Total lines in {MergedFileLoc} after removing duplicates: {File.ReadAllLines(MergedFileLoc).Length}");
             }
-            var lines = File.ReadAllLines(MergedFileLoc);
-            var uniqueLines = new HashSet<string>(lines);
-            File.WriteAllLines(MergedFileLoc, uniqueLines);
-            TraceLogger.Log($"Removed {lines.Length - uniqueLines.Count} duplicate entries.");
-            TraceLogger.Log($"Total lines in {MergedFileLoc} after removing duplicates: {File.ReadAllLines(MergedFileLoc).Length}");
+            catch(Exception ex)
+            {
+                TraceLogger.Log($"Error removing duplicates from {MergedFileLoc}: {ex.Message}", Enums.StatusSeverityType.Error);
+            }
         }
     }
 }
