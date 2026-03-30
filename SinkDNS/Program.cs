@@ -33,6 +33,7 @@ namespace SinkDNS
             {
                 TraceLogger.Log("Disk logging is disabled in settings by user.");
             }
+            TraceLogger.Log("Creating application main form...");
             Application.Run(new SinkDNSManagerForm());
             TraceLogger.Log("SinkDNS Exiting...");
         }

@@ -81,6 +81,7 @@ namespace SinkDNS.Modules.System
         {
             try
             {
+                bool corruptionDetected = false;
                 //Stage 1: Check blocklist and whitelist INI files for corruption (invalid entries)
                 string[] configFiles = [Settings.Default.BlocklistIni, Settings.Default.WhitelistIni];
                 foreach (string configFile in configFiles)
@@ -98,6 +99,7 @@ namespace SinkDNS.Modules.System
                             }
                             else
                             {
+                                corruptionDetected = true;
                                 TraceLogger.Log($"Corruption detected: Removed invalid line from {configFile}: {line}", Enums.StatusSeverityType.Warning);
                             }
                         }
@@ -122,6 +124,7 @@ namespace SinkDNS.Modules.System
                             }
                             else
                             {
+                                corruptionDetected |= true;
                                 TraceLogger.Log($"Corruption detected: Removed corrupt line from {userConfigFile}: {line}", Enums.StatusSeverityType.Warning);
                             }
                         }
@@ -130,10 +133,50 @@ namespace SinkDNS.Modules.System
                     }
                 }
                 TraceLogger.Log("Configuration corruption check completed.");
+                if (corruptionDetected)
+                {
+                    TraceLogger.LogAndThrowMsgBox("Corruption was detected during startup and was removed from the affected configuration files. Please review the logs for details.", Enums.StatusSeverityType.Warning);
+                }
             }
             catch (Exception ex)
             {
-                TraceLogger.LogAndThrowMsgBox($"Configuration corruption check failure, SinkDNS cannot continue. {ex.Message}", Enums.StatusSeverityType.Fatal);
+                //TraceLogger.LogAndThrowMsgBox($"Configuration corruption check failure, SinkDNS cannot continue. {ex.Message}", Enums.StatusSeverityType.Fatal);
+                TraceLogger.Log($"Configuration corruption check failure: {ex.Message}", Enums.StatusSeverityType.Error);
+                DialogResult diagresult = MessageBox.Show($"SinkDNS - Configuration corruption check failed and is unable to confirm validity of config files. Do you want to reset all configuration folders and files to fix SinkDNS? This will delete all your custom blocklists, whitelists, resolvers, host files, and task schedules.\nMake sure to backup any important data before proceeding.\n\nYes to reset, No to attempt to run SinkDNS with existing configs, Cancel to exit SinkDNS.\n\n Error details: {ex.Message}", "SinkDNS - Configuration Corruption Detected", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning);
+                if (diagresult == DialogResult.Yes)
+                {
+                    TraceLogger.Log("User chose to reset configuration folders and files to fix corruption.");
+                    ResetConfigFoldersAndFiles();
+                }
+                else if (diagresult == DialogResult.Cancel)
+                {
+                    TraceLogger.Log("SinkDNS terminated due to configuration corruption.", Enums.StatusSeverityType.Fatal);
+                    Environment.FailFast($"SinkDNS terminated due to configuration corruption. Error details: {ex.ToString()}");
+                }
+                else
+                {
+                    TraceLogger.Log("User chose not to reset configuration folders and files. SinkDNS will continue to run but may encounter issues due to the detected corruption.", Enums.StatusSeverityType.Warning);
+                }
+            }
+        }
+
+        public static void ResetConfigFoldersAndFiles()
+        {
+            try
+            {
+                TraceLogger.Log("Resetting configuration folders and files...");
+                ClearFiles(Settings.Default.ConfigFolder);
+                ClearFiles(Settings.Default.ResolversFolder);
+                ClearFiles(Settings.Default.HostFilesFolder);
+                File.WriteAllText(Settings.Default.BlocklistIni, string.Empty);
+                File.WriteAllText(Settings.Default.WhitelistIni, string.Empty);
+                File.WriteAllText(Settings.Default.UserBlocklistIni, string.Empty);
+                File.WriteAllText(Settings.Default.UserWhitelistIni, string.Empty);
+                TraceLogger.Log("Configuration folders and files reset successfully.");
+            }
+            catch (Exception ex)
+            {
+                TraceLogger.Log($"Error resetting configuration folders and files: {ex.Message}", Enums.StatusSeverityType.Error);
             }
         }
 

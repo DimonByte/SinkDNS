@@ -46,6 +46,7 @@
             bypassFilteringToolStripMenuItem = new ToolStripMenuItem();
             restartDNSCryptToolStripMenuItem = new ToolStripMenuItem();
             toolStripSeparator1 = new ToolStripSeparator();
+            aboutSinkDNSToolStripMenuItem = new ToolStripMenuItem();
             exitSinkDNSToolStripMenuItem = new ToolStripMenuItem();
             DomainBlockHistoryListBox = new ListBox();
             panel1.SuspendLayout();
@@ -107,12 +108,13 @@
             // 
             // MainContextMenuStrip
             // 
-            MainContextMenuStrip.Items.AddRange(new ToolStripItem[] { openManagerToolStripMenuItem, toolStripSeparator3, addNewBlocklistToolStripMenuItem, addNewWhitelistToolStripMenuItem, addURLToBlocklistToolStripMenuItem, addURLToWhitelistToolStripMenuItem, toolStripSeparator2, updateBlocklistsToolStripMenuItem, bypassFilteringToolStripMenuItem, restartDNSCryptToolStripMenuItem, toolStripSeparator1, exitSinkDNSToolStripMenuItem });
+            MainContextMenuStrip.Items.AddRange(new ToolStripItem[] { openManagerToolStripMenuItem, toolStripSeparator3, addNewBlocklistToolStripMenuItem, addNewWhitelistToolStripMenuItem, addURLToBlocklistToolStripMenuItem, addURLToWhitelistToolStripMenuItem, toolStripSeparator2, updateBlocklistsToolStripMenuItem, bypassFilteringToolStripMenuItem, restartDNSCryptToolStripMenuItem, toolStripSeparator1, aboutSinkDNSToolStripMenuItem, exitSinkDNSToolStripMenuItem });
             MainContextMenuStrip.Name = "MainContextMenuStrip";
-            MainContextMenuStrip.Size = new Size(202, 242);
+            MainContextMenuStrip.Size = new Size(202, 264);
             // 
             // openManagerToolStripMenuItem
             // 
+            openManagerToolStripMenuItem.Image = Properties.Resources.SinkDNSDarkIcon;
             openManagerToolStripMenuItem.Name = "openManagerToolStripMenuItem";
             openManagerToolStripMenuItem.Size = new Size(201, 22);
             openManagerToolStripMenuItem.Text = "Open SinkDNS Manager";
@@ -125,6 +127,7 @@
             // 
             // addNewBlocklistToolStripMenuItem
             // 
+            addNewBlocklistToolStripMenuItem.Image = Properties.Resources.wifi_off;
             addNewBlocklistToolStripMenuItem.Name = "addNewBlocklistToolStripMenuItem";
             addNewBlocklistToolStripMenuItem.Size = new Size(201, 22);
             addNewBlocklistToolStripMenuItem.Text = "Add New Blocklist";
@@ -132,6 +135,7 @@
             // 
             // addNewWhitelistToolStripMenuItem
             // 
+            addNewWhitelistToolStripMenuItem.Image = Properties.Resources.wifi_signal_none_solid;
             addNewWhitelistToolStripMenuItem.Name = "addNewWhitelistToolStripMenuItem";
             addNewWhitelistToolStripMenuItem.Size = new Size(201, 22);
             addNewWhitelistToolStripMenuItem.Text = "Add New Whitelist";
@@ -139,12 +143,14 @@
             // 
             // addURLToBlocklistToolStripMenuItem
             // 
+            addURLToBlocklistToolStripMenuItem.Image = Properties.Resources.wifi_off;
             addURLToBlocklistToolStripMenuItem.Name = "addURLToBlocklistToolStripMenuItem";
             addURLToBlocklistToolStripMenuItem.Size = new Size(201, 22);
             addURLToBlocklistToolStripMenuItem.Text = "Add URL to Blocklist";
             // 
             // addURLToWhitelistToolStripMenuItem
             // 
+            addURLToWhitelistToolStripMenuItem.Image = Properties.Resources.wifi_signal_none_solid;
             addURLToWhitelistToolStripMenuItem.Name = "addURLToWhitelistToolStripMenuItem";
             addURLToWhitelistToolStripMenuItem.Size = new Size(201, 22);
             addURLToWhitelistToolStripMenuItem.Text = "Add URL to Whitelist";
@@ -156,6 +162,7 @@
             // 
             // updateBlocklistsToolStripMenuItem
             // 
+            updateBlocklistsToolStripMenuItem.Image = Properties.Resources.database_backup;
             updateBlocklistsToolStripMenuItem.Name = "updateBlocklistsToolStripMenuItem";
             updateBlocklistsToolStripMenuItem.Size = new Size(201, 22);
             updateBlocklistsToolStripMenuItem.Text = "Update all lists";
@@ -165,6 +172,7 @@
             // bypassFilteringToolStripMenuItem
             // 
             bypassFilteringToolStripMenuItem.CheckOnClick = true;
+            bypassFilteringToolStripMenuItem.Image = Properties.Resources.BypassFilter;
             bypassFilteringToolStripMenuItem.Name = "bypassFilteringToolStripMenuItem";
             bypassFilteringToolStripMenuItem.Size = new Size(201, 22);
             bypassFilteringToolStripMenuItem.Text = "Bypass Filtering";
@@ -172,6 +180,7 @@
             // 
             // restartDNSCryptToolStripMenuItem
             // 
+            restartDNSCryptToolStripMenuItem.Image = Properties.Resources.restart;
             restartDNSCryptToolStripMenuItem.Name = "restartDNSCryptToolStripMenuItem";
             restartDNSCryptToolStripMenuItem.Size = new Size(201, 22);
             restartDNSCryptToolStripMenuItem.Text = "Restart DNSCrypt";
@@ -181,6 +190,14 @@
             // 
             toolStripSeparator1.Name = "toolStripSeparator1";
             toolStripSeparator1.Size = new Size(198, 6);
+            // 
+            // aboutSinkDNSToolStripMenuItem
+            // 
+            aboutSinkDNSToolStripMenuItem.Image = Properties.Resources.info_circle;
+            aboutSinkDNSToolStripMenuItem.Name = "aboutSinkDNSToolStripMenuItem";
+            aboutSinkDNSToolStripMenuItem.Size = new Size(201, 22);
+            aboutSinkDNSToolStripMenuItem.Text = "About SinkDNS...";
+            aboutSinkDNSToolStripMenuItem.Click += aboutSinkDNSToolStripMenuItem_Click;
             // 
             // exitSinkDNSToolStripMenuItem
             // 
@@ -244,5 +261,6 @@
         private ToolStripMenuItem restartDNSCryptToolStripMenuItem;
         private ToolStripMenuItem updateBlocklistsToolStripMenuItem;
         private ListBox DomainBlockHistoryListBox;
+        private ToolStripMenuItem aboutSinkDNSToolStripMenuItem;
     }
 }

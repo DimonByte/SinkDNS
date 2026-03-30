@@ -131,5 +131,11 @@ namespace SinkDNS
             Show();
             WindowState = FormWindowState.Normal;
         }
+
+        private void aboutSinkDNSToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            About aboutForm = new About();
+            aboutForm.ShowDialog();
+        }
     }
 }
