@@ -26,8 +26,39 @@ using System.Security.Principal;
 
 namespace SinkDNS.Modules.System
 {
-    public static class ElevatedProcessHelper
+    public static class CommandRunner
     {
+        public static string RunCommand(string command)
+        {
+            try
+            {
+                TraceLogger.Log($"Running command: {command}");
+                var processInfo = new ProcessStartInfo("cmd.exe", "/c " + command)
+                {
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                };
+                using var process = Process.Start(processInfo);
+                if (process == null)
+                    throw new InvalidOperationException("Failed to start process for command execution.");
+                string output = process.StandardOutput.ReadToEnd();
+                string error = process.StandardError.ReadToEnd();
+                TraceLogger.Log("Waiting for command to exit...");
+                process.WaitForExit();
+                TraceLogger.Log($"Command exited with code: {process.ExitCode}");
+                if (process.ExitCode != 0)
+                    throw new InvalidOperationException($"Command execution failed with exit code {process.ExitCode}: {error}");
+                TraceLogger.Log($"Command output: {output}");
+                return output;
+            }
+            catch (Exception ex)
+            {
+                TraceLogger.Log($"Error running command '{command}': {ex.Message}", Enums.StatusSeverityType.Error);
+                return string.Empty;
+            }
+        }
         public static bool IsRunAsAdmin()
         {
             try

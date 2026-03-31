@@ -22,13 +22,13 @@
 
 using Microsoft.Win32;
 using SinkDNS.Modules.SinkDNSInternals;
-using SinkDNS.Modules.System;
+using SinkDNS.Properties;
 using System.ServiceProcess;
 
-namespace SinkDNS.Modules.DNSCrypt
+namespace SinkDNS.Modules.System
 {
     //This will manage and monitor DNSCrypt as a service. It will start, stop, and restart the service as needed. Including checking its status.
-    internal class ServiceManager
+    internal class LocalSystemManager
     {
         private const string DnsCryptServiceName = "dnscrypt-proxy";
 
@@ -59,9 +59,22 @@ namespace SinkDNS.Modules.DNSCrypt
             }
         }
 
-        public static string GetDNSCryptInstallationDirectory()
+        public static string GetDNSCryptInstallationDirectory(bool includeExecutablePath = false)
         {
-            TraceLogger.Log("Attempting to get DNSCrypt installation directory from registry...");
+            TraceLogger.Log("Getting DNSCrypt installation directory...");
+            if (Settings.Default.DNSCryptInstallationPath != null && Directory.Exists(Settings.Default.DNSCryptInstallationPath))
+            {
+                TraceLogger.Log($"Found DNSCrypt installation directory in settings: {Settings.Default.DNSCryptInstallationPath}");
+                if (includeExecutablePath)
+                {
+                    return GetDNSCryptExecutablePath(Settings.Default.DNSCryptInstallationPath);
+                }
+                else
+                {
+                    return Settings.Default.DNSCryptInstallationPath;
+                }
+            }
+            TraceLogger.Log("DNSCrypt installation location not saved in settings - Attempting to get DNSCrypt installation directory from registry...");
             try
             {
                 using (var key = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Services\dnscrypt-proxy"))
@@ -83,7 +96,15 @@ namespace SinkDNS.Modules.DNSCrypt
                                 {
                                     string exePath = imagePath.Substring(start, end - start);
                                     TraceLogger.Log($"Found DNSCrypt executable path: {exePath}");
-                                    return Path.GetDirectoryName(exePath);
+                                    Settings.Default.DNSCryptInstallationPath = Path.GetDirectoryName(exePath);
+                                    if (includeExecutablePath)
+                                    {
+                                        return exePath;
+                                    }
+                                    else
+                                    {
+                                        return Path.GetDirectoryName(exePath);
+                                    }
                                 }
                             }
                             else
@@ -95,45 +116,78 @@ namespace SinkDNS.Modules.DNSCrypt
                                     {
                                         Array.Resize(ref parts, parts.Length - 1);
                                         TraceLogger.Log($"Found DNSCrypt installation directory: {string.Join("\\", parts)}");
-                                        return string.Join("\\", parts);
                                     }
                                 }
                             }
                         }
                     }
-                }
-                TraceLogger.Log("Could not find DNSCrypt installation directory from registry. Trying common paths...", Enums.StatusSeverityType.Warning);
+                    TraceLogger.Log("Could not find DNSCrypt installation directory from registry. Trying common paths...", Enums.StatusSeverityType.Warning);
 
-                string[] commonPaths = {
-                @"C:\Program Files\DNSCrypt",
-                @"C:\Program Files (x86)\DNSCrypt",
-                @"C:\Program Files\dnscrypt-proxy",
-                @"C:\Program Files (x86)\dnscrypt-proxy"
-            };
+                    string[] commonPaths = {
+                        @"C:\Program Files\DNSCrypt",
+                        @"C:\Program Files (x86)\DNSCrypt",
+                        @"C:\Program Files\dnscrypt-proxy",
+                        @"C:\Program Files (x86)\dnscrypt-proxy"
+                    };
 
-                foreach (string path in commonPaths)
-                {
-                    if (Directory.Exists(path))
+                    foreach (string path in commonPaths)
                     {
-                        TraceLogger.Log($"Found DNSCrypt installation directory at: {path}");
-                        return path;
+                        if (Directory.Exists(path))
+                        {
+                            Settings.Default.DNSCryptInstallationPath = path;
+                            TraceLogger.Log($"Found DNSCrypt installation directory at: {path}");
+                            return path;
+                        }
                     }
-                }
 
-                string programDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "DNSCrypt");
-                if (Directory.Exists(programDataPath))
-                {
-                    TraceLogger.Log($"Found DNSCrypt installation directory at: {programDataPath}");
-                    return programDataPath;
+                    string programDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "DNSCrypt");
+                    if (Directory.Exists(programDataPath))
+                    {
+                        Settings.Default.DNSCryptInstallationPath = programDataPath;
+                        TraceLogger.Log($"Found DNSCrypt installation directory at: {programDataPath}");
+                        return programDataPath;
+                    }
+                    TraceLogger.Log("DNSCrypt installation directory not found!", Enums.StatusSeverityType.Error);
+                    return null;
                 }
-                TraceLogger.Log("DNSCrypt installation directory not found in common paths.", Enums.StatusSeverityType.Error);
-                return null;
             }
             catch (Exception ex)
             {
                 TraceLogger.LogAndThrowMsgBox($"Error getting DNSCrypt installation directory: {ex.Message}", Enums.StatusSeverityType.Error);
                 return null;
             }
+        }
+        private static string GetDNSCryptExecutablePath(string installDir)
+        {
+            if (installDir != null)
+            {
+                string exePath = Path.Combine(installDir, "dnscrypt-proxy.exe");
+                if (File.Exists(exePath))
+                {
+                    return exePath;
+                }
+                else
+                {
+                    //Search for any .exe in the directory that contains "dnscrypt" in the name, just in case.
+                    foreach (string file in Directory.GetFiles(installDir, "*.exe"))
+                    {
+                        if (Path.GetFileName(file).ToLower().Contains("dnscrypt"))
+                        {
+                            TraceLogger.Log($"Found executable at: {file}");
+                            //Run version command check to confirm it's the correct executable, if exits wrongly then skip it.
+                            string commandResult = CommandRunner.RunCommand($"{file} --version");
+                            if (commandResult == null | commandResult == String.Empty)
+                            {
+                                TraceLogger.Log($"Executable at {file} did not return version info, skipping.", Enums.StatusSeverityType.Warning);
+                                continue;
+                            }
+                            return file;
+                        }
+                    }
+                    TraceLogger.Log($"Could not find dnscrypt-proxy.exe in installation directory: {installDir}", Enums.StatusSeverityType.Error);
+                }
+            }
+            return null;
         }
 
         public static bool IsDnsCryptInstalled()
@@ -158,9 +212,9 @@ namespace SinkDNS.Modules.DNSCrypt
         {
             try
             {
-                if (!ElevatedProcessHelper.IsRunAsAdmin())
+                if (!CommandRunner.IsRunAsAdmin())
                 {
-                    return ElevatedProcessHelper.RunElevatedCommand("net", $"start {DnsCryptServiceName}");
+                    return CommandRunner.RunElevatedCommand("net", $"start {DnsCryptServiceName}");
                 }
                 else
                 {
@@ -186,9 +240,9 @@ namespace SinkDNS.Modules.DNSCrypt
         {
             try
             {
-                if (!ElevatedProcessHelper.IsRunAsAdmin())
+                if (!CommandRunner.IsRunAsAdmin())
                 {
-                    return ElevatedProcessHelper.RunElevatedCommand("net", $"stop {DnsCryptServiceName}");
+                    return CommandRunner.RunElevatedCommand("net", $"stop {DnsCryptServiceName}");
                 }
                 else
                 {
@@ -240,7 +294,7 @@ namespace SinkDNS.Modules.DNSCrypt
             TraceLogger.Log("Attempting restart of DNSCrypt service...");
             try
             {
-                if (!ElevatedProcessHelper.IsRunAsAdmin())
+                if (!CommandRunner.IsRunAsAdmin())
                 {
                     TraceLogger.Log("User is not admin. Restarting DNSCrypt service with elevated commands...");
 
@@ -252,7 +306,7 @@ namespace SinkDNS.Modules.DNSCrypt
                     ];
 
                     // Run all commands in a single elevated process
-                    bool result = ElevatedProcessHelper.RunElevatedCommands(commands);
+                    bool result = CommandRunner.RunElevatedCommands(commands);
 
                     if (!result)
                     {
@@ -276,7 +330,7 @@ namespace SinkDNS.Modules.DNSCrypt
                         return false;
                     }
                     // Flush DNS cache
-                    return ElevatedProcessHelper.RunElevatedCommand("ipconfig", "/flushdns");
+                    return CommandRunner.RunElevatedCommand("ipconfig", "/flushdns");
                 }
             }
             catch (Exception ex)

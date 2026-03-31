@@ -1,6 +1,7 @@
 using SinkDNS.Modules.SinkDNSInternals;
 using SinkDNS.Modules.System;
 using SinkDNS.Properties;
+using System.Diagnostics;
 
 namespace SinkDNS
 {
@@ -14,6 +15,12 @@ namespace SinkDNS
         {
             // To customize application configuration such as set high DPI settings or default font,
             // see https://aka.ms/applicationconfiguration.
+            //Check if another instance of SinkDNS is already running, if so, exit this instance.
+            if (Process.GetProcessesByName(Process.GetCurrentProcess().ProcessName).Length > 1)
+            {
+                TraceLogger.LogAndThrowMsgBox("Another instance of SinkDNS is already running. This instance will now exit.", Modules.Enums.StatusSeverityType.Error);
+                return;
+            }
             IOManager.CreateNecessaryDirectoriesAndFiles();
             TraceLogger.Log("SinkDNS Program Starting...");
             Application.SetCompatibleTextRenderingDefault(false);

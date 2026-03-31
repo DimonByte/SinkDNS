@@ -23,9 +23,9 @@
 //TODO: SinkDNS will run from localappdata to allow non-admin writes to blocklists and such.
 
 using SinkDNS.Modules;
-using SinkDNS.Modules.DNSCrypt;
 using SinkDNS.Modules.SinkDNSInternals;
 using SinkDNS.Modules.System;
+using System.Linq.Expressions;
 
 namespace SinkDNS
 {
@@ -39,7 +39,7 @@ namespace SinkDNS
         {
             NotificationManager.SetContextMenu(MainContextMenuStrip);
             GlobalNotifyIcon.Instance.SetMainForm(this);
-            if (ServiceManager.IsDNSCryptRunning())
+            if (LocalSystemManager.IsDNSCryptRunning())
             {
                 //Since DNSCrypt is running, don't show this manager, since this program couldve been started at startup.
                 BeginInvoke(new MethodInvoker(delegate
@@ -67,11 +67,16 @@ namespace SinkDNS
             //ServiceManager.StopDnsCrypt();
             //DNSCryptConfigurationManager dNSCryptConfigurationManager = new DNSCryptConfigurationManager(ServiceManager.GetDnsCryptInstallationPath() + "\\dnscrypt-proxy.toml");
             //TraceLogger.Log(ServiceManager.GetDNSCryptInstallationDirectory());
-            string dnscryptpath = ServiceManager.GetDNSCryptInstallationDirectory();
-            DNSCryptConfigurationManager dNSCryptConfigurationManager = new DNSCryptConfigurationManager(dnscryptpath + "\\dnscrypt-proxy.toml");
-            DNSCryptQueryMonitor monitor = new DNSCryptQueryMonitor($"{dnscryptpath}\\{dNSCryptConfigurationManager.GetSetting("[query_log]", "file")}");
-            await monitor.StartMonitoringAsync();
+
+            //string dnscryptpath = ServiceManager.GetDNSCryptInstallationDirectory();
+            //DNSCryptConfigurationManager dNSCryptConfigurationManager = new DNSCryptConfigurationManager(dnscryptpath + "\\dnscrypt-proxy.toml");
+            //DNSCryptQueryMonitor monitor = new DNSCryptQueryMonitor($"{dnscryptpath}\\{dNSCryptConfigurationManager.GetSetting("[query_log]", "file")}");
+            //await monitor.StartMonitoringAsync();
+
             //MessageBox.Show(monitor.isMonitoring.ToString());
+            //NotificationManager.ShowNotification("This button does nothing", "This button is just a placeholder for now and does not do anything.", Enums.StatusSeverityType.Information);
+            //TraceLogger.Log(LocalSystemManager.GetDNSCryptInstallationDirectory(true),Enums.StatusSeverityType.Debug);
+            TraceLogger.Log(UpdateManager.IsDNSCryptProxyUpdateAvailable().ToString(), Enums.StatusSeverityType.Debug);
         }
 
         private void SinkDNSManagerForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -96,7 +101,7 @@ namespace SinkDNS
         {
             GlobalNotifyIcon.Instance.SetIcon(Properties.Resources.WarningIcon);
             NotificationManager.ShowNotification("Restarting DNSCrypt", "Attempting to restart DNSCrypt...", Enums.StatusSeverityType.Information);
-            if (ServiceManager.RestartDnsCrypt())
+            if (LocalSystemManager.RestartDnsCrypt())
             {
                 GlobalNotifyIcon.Instance.SetIcon(Properties.Resources.SinkDNSIcon);
                 NotificationManager.ShowNotification("DNSCrypt Restarted", "DNSCrypt has been restarted successfully.", Enums.StatusSeverityType.Information);
@@ -115,7 +120,7 @@ namespace SinkDNS
             GlobalNotifyIcon.Instance.SetIcon(Properties.Resources.DownloadingIcon);
             HostListManager.DownloadBlocklistsAsync().GetAwaiter().GetResult();
             GlobalNotifyIcon.Instance.SetIcon(Properties.Resources.UpdateAvailableIcon);
-            if (ServiceManager.RestartDnsCrypt())
+            if (LocalSystemManager.RestartDnsCrypt())
             {
                 NotificationManager.ShowNotification("Blocklists Updated", "Blocklists have been updated and DNSCrypt restarted successfully.", Enums.StatusSeverityType.Information);
             }

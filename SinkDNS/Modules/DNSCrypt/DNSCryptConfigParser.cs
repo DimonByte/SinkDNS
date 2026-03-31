@@ -20,62 +20,63 @@
 //OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //SOFTWARE.
 
-namespace SinkDNS.Modules.DNSCrypt
-{
-    using SinkDNS.Modules.SinkDNSInternals;
+// Leaving this out for now.
+//namespace SinkDNS.Modules.DNSCrypt
+//{
+//    using SinkDNS.Modules.SinkDNSInternals;
 
-    public class DNSCryptConfigParser(string SinkDNSconfigFilePath, string DNSCryptConfigPath)
-    {
-        private readonly string _SinkDNSconfigFilePath = SinkDNSconfigFilePath ?? throw new ArgumentNullException(nameof(SinkDNSconfigFilePath));
+//    public class DNSCryptConfigParser(string SinkDNSconfigFilePath, string DNSCryptConfigPath)
+//    {
+//        private readonly string _SinkDNSconfigFilePath = SinkDNSconfigFilePath ?? throw new ArgumentNullException(nameof(SinkDNSconfigFilePath));
 
-        private readonly DNSCryptConfigurationManager _DNSCryptConfigWriter = new(DNSCryptConfigPath);
+//        private readonly DNSCryptConfigurationManager _DNSCryptConfigWriter = new(DNSCryptConfigPath);
 
-        private static readonly char[] separator = ['='];
+//        private static readonly char[] separator = ['='];
 
-        public void ParseAndApplySettings()
-        {
-            if (!File.Exists(_SinkDNSconfigFilePath))
-            {
-                TraceLogger.LogAndThrowMsgBox("Configuration file not found!", Enums.StatusSeverityType.Error);
-                return;
-            }
-            TraceLogger.Log($"Reading configuration from {_SinkDNSconfigFilePath}");
-            var lines = File.ReadAllLines(_SinkDNSconfigFilePath);
-            TraceLogger.Log($"Read {lines.Length} lines from configuration file.");
-            var settings = ParseSettings(lines);
-            TraceLogger.Log($"Parsed {settings.Count} settings from configuration file.");
+//        public void ParseAndApplySettings()
+//        {
+//            if (!File.Exists(_SinkDNSconfigFilePath))
+//            {
+//                TraceLogger.LogAndThrowMsgBox("Configuration file not found!", Enums.StatusSeverityType.Error);
+//                return;
+//            }
+//            TraceLogger.Log($"Reading configuration from {_SinkDNSconfigFilePath}");
+//            var lines = File.ReadAllLines(_SinkDNSconfigFilePath);
+//            TraceLogger.Log($"Read {lines.Length} lines from configuration file.");
+//            var settings = ParseSettings(lines);
+//            TraceLogger.Log($"Parsed {settings.Count} settings from configuration file.");
 
-            foreach (var setting in settings)
-            {
-                TraceLogger.Log($"Applying setting: {setting.Key} = '{setting.Value}'");
-                _DNSCryptConfigWriter.ChangeSetting(setting.Key, setting.Value);
-            }
-            _DNSCryptConfigWriter.WriteToConfigFile();
-            TraceLogger.Log("All settings have been applied.");
-        }
+//            foreach (var setting in settings)
+//            {
+//                TraceLogger.Log($"Applying setting: {setting.Key} = '{setting.Value}'");
+//                _DNSCryptConfigWriter.ChangeSetting(setting.Key, setting.Value);
+//            }
+//            _DNSCryptConfigWriter.WriteToConfigFile();
+//            TraceLogger.Log("All settings have been applied.");
+//        }
 
-        private static Dictionary<string, string> ParseSettings(string[] lines)
-        {
-            var settings = new Dictionary<string, string>();
+//        private static Dictionary<string, string> ParseSettings(string[] lines)
+//        {
+//            var settings = new Dictionary<string, string>();
 
-            foreach (var line in lines)
-            {
-                // Skip empty lines and comments
-                if (string.IsNullOrWhiteSpace(line) || line.StartsWith(";") || line.StartsWith("#"))
-                    continue;
+//            foreach (var line in lines)
+//            {
+//                // Skip empty lines and comments
+//                if (string.IsNullOrWhiteSpace(line) || line.StartsWith(";") || line.StartsWith("#"))
+//                    continue;
 
-                // Split on the first '=' to separate key and value
-                var parts = line.Split(separator, 2);
-                if (parts.Length == 2)
-                {
-                    var key = parts[0].Trim();
-                    var value = parts[1].Trim();
+//                // Split on the first '=' to separate key and value
+//                var parts = line.Split(separator, 2);
+//                if (parts.Length == 2)
+//                {
+//                    var key = parts[0].Trim();
+//                    var value = parts[1].Trim();
 
-                    settings[key] = value;
-                }
-            }
+//                    settings[key] = value;
+//                }
+//            }
 
-            return settings;
-        }
-    }
-}
+//            return settings;
+//        }
+//    }
+//}

@@ -20,6 +20,7 @@
 //OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //SOFTWARE.
 
+using SinkDNS.Modules.System;
 using SinkDNS.Properties;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
@@ -96,7 +97,8 @@ namespace SinkDNS.Modules.SinkDNSInternals
                 }
                 string timestamp = now.ToString("yyyy-MM-dd HH:mm:ss.fff");
                 string severityText = severity.ToString().ToUpper();
-                logEntry = $"[{timestamp}] [{severityText}] [{className}] [{memberName}] [Line: {lineNumber}]: {message}";
+                string processID = Process.GetCurrentProcess().Id.ToString();
+                logEntry = $"[{timestamp}] [PID: {processID}] [{severityText}] [{className}] [{memberName}] [Line: {lineNumber}]: {message}";
             }
             catch (Exception ex)
             {
@@ -150,7 +152,6 @@ namespace SinkDNS.Modules.SinkDNSInternals
                 }
             }
         }
-
         private static string ExtractClassName(string filePath)
         {
             if (string.IsNullOrEmpty(filePath))

@@ -105,14 +105,22 @@ namespace SinkDNS.Modules.System
         {
             if (_mainForm != null && !_disposed && _notifyIcon != null)
             {
-                // Ensure the form is shown and brought to front
-                _mainForm.Invoke(new Action(() =>
-                {
-                    _mainForm.Show();
-                    _mainForm.BringToFront();
-                    _mainForm.WindowState = FormWindowState.Normal;
-                }));
                 TraceLogger.Log("ShowMainWindow called from GlobalNotifyIcon.");
+                try
+                {
+                    // Ensure the form is shown and brought to front
+                    _mainForm.Invoke(new Action(() =>
+                    {
+                        _mainForm.Show();
+                        _mainForm.BringToFront();
+                        _mainForm.WindowState = FormWindowState.Normal;
+                    }));
+                }
+                catch (Exception ex)
+                {
+                    TraceLogger.Log($"Error showing main window from NotifyIcon: {ex.Message}", Enums.StatusSeverityType.Error);
+                }
+
             }
         }
 
