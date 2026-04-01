@@ -202,5 +202,17 @@ namespace SinkDNS.Properties {
                 this["DNSCryptInstallationPath"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Information")]
+        public string TraceLoggerThreshold {
+            get {
+                return ((string)(this["TraceLoggerThreshold"]));
+            }
+            set {
+                this["TraceLoggerThreshold"] = value;
+            }
+        }
     }
 }

@@ -2,6 +2,7 @@ using SinkDNS.Modules.SinkDNSInternals;
 using SinkDNS.Modules.System;
 using SinkDNS.Properties;
 using System.Diagnostics;
+using static SinkDNS.Modules.Enums;
 
 namespace SinkDNS
 {
@@ -10,16 +11,24 @@ namespace SinkDNS
         /// <summary>
         ///  The main entry point for the application.
         /// </summary>
+        private static Mutex? _singleInstanceMutex;
         [STAThread]
         static void Main()
         {
             // To customize application configuration such as set high DPI settings or default font,
             // see https://aka.ms/applicationconfiguration.
             //Check if another instance of SinkDNS is already running, if so, exit this instance.
-            if (Process.GetProcessesByName(Process.GetCurrentProcess().ProcessName).Length > 1)
+            bool createdNew;
+            _singleInstanceMutex =
+                new Mutex(true, "SinkDNS_singleton_mutex", out createdNew);
+
+            if (!createdNew)
             {
-                TraceLogger.LogAndThrowMsgBox("Another instance of SinkDNS is already running. This instance will now exit.", Modules.Enums.StatusSeverityType.Error);
-                return;
+                // Another instance already holds the mutex
+                TraceLogger.LogAndThrowMsgBox(
+                    "Another instance of SinkDNS is already running. This instance will now exit.",
+                    Modules.Enums.StatusSeverityType.Error);
+                return;   // Mutex will be released automatically when process exits
             }
             IOManager.CreateNecessaryDirectoriesAndFiles();
             TraceLogger.Log("SinkDNS Program Starting...");
@@ -30,12 +39,12 @@ namespace SinkDNS
             if (notifyIcon is not null)
             {
                 NotificationManager.SetNotifyIcon(notifyIcon);
+                GlobalNotifyIcon.Instance.SetIcon(Resources.SinkDNSIcon);
             }
             else
             {
                 TraceLogger.Log("NotifyIcon is null. NotificationManager.SetNotifyIcon was not called. Notifications calls may fail!", Modules.Enums.StatusSeverityType.Warning);
             }
-            GlobalNotifyIcon.Instance.SetIcon(Resources.SinkDNSIcon);
             if (!Settings.Default.EnableDiskLogging)
             {
                 TraceLogger.Log("Disk logging is disabled in settings by user.");

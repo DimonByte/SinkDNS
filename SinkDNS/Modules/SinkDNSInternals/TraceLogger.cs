@@ -20,7 +20,6 @@
 //OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //SOFTWARE.
 
-using SinkDNS.Modules.System;
 using SinkDNS.Properties;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
@@ -35,6 +34,8 @@ namespace SinkDNS.Modules.SinkDNSInternals
         private static readonly string _logDirectory = Settings.Default.LogsFolder;
         private static string _currentDate = DateTime.Now.ToString("dd-MM-yyyy");
         private static DateTime _lastDateCheck = DateTime.MinValue;
+        private static readonly StatusSeverityType DefaultThreshold = StatusSeverityType.Information;   // fallback if the setting is wrong
+        private static readonly StatusSeverityType Threshold = ParseThreshold();
 
         public static void PurgeAllLogs()
         {
@@ -73,12 +74,33 @@ namespace SinkDNS.Modules.SinkDNSInternals
                 }
             }
         }
+        private static StatusSeverityType ParseThreshold()
+        {
+            return Enum.TryParse(
+                       Settings.Default.TraceLoggerThreshold,   // e.g. "Warning"
+                       ignoreCase: true,
+                       out StatusSeverityType parsed)
+                   ? parsed
+                   : DefaultThreshold;
+        }
+
+        private static bool ShouldLog(StatusSeverityType severity, StatusSeverityType threshold)
+        {
+            // Debug is always logged – it’s a “high‑priority” message.
+            if (severity == StatusSeverityType.Debug) return true;
+
+            // For all other severities simply compare the numeric value.
+            return severity >= threshold;
+        }
 
         public static void Log(string message, StatusSeverityType severity = StatusSeverityType.Information,
                               [CallerMemberName] string memberName = "",
                               [CallerFilePath] string filePath = "",
                               [CallerLineNumber] int lineNumber = 0)
         {
+            if (!ShouldLog(severity, Threshold))
+                return;          // drop the message
+
             string className = ExtractClassName(filePath);
             if (string.IsNullOrEmpty(message))
             {

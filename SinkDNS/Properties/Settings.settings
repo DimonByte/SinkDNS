@@ -59,5 +59,8 @@
     <Setting Name="DNSCryptInstallationPath" Type="System.String" Scope="User">
       <Value Profile="(Default)">C:\Program Files\dnscrypt-proxy</Value>
     </Setting>
+    <Setting Name="TraceLoggerThreshold" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Information</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

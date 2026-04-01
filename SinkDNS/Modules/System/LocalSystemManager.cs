@@ -34,7 +34,7 @@ namespace SinkDNS.Modules.System
 
         public static bool IsDNSCryptRunning()
         {
-            ServiceController serviceController = null;
+            ServiceController? serviceController = null;
 
             try
             {
@@ -59,7 +59,7 @@ namespace SinkDNS.Modules.System
             }
         }
 
-        public static string GetDNSCryptInstallationDirectory(bool includeExecutablePath = false)
+        public static string ?GetDNSCryptInstallationDirectory(bool includeExecutablePath = false)
         {
             TraceLogger.Log("Getting DNSCrypt installation directory...");
             if (Settings.Default.DNSCryptInstallationPath != null && Directory.Exists(Settings.Default.DNSCryptInstallationPath))
@@ -116,6 +116,7 @@ namespace SinkDNS.Modules.System
                                     {
                                         Array.Resize(ref parts, parts.Length - 1);
                                         TraceLogger.Log($"Found DNSCrypt installation directory: {string.Join("\\", parts)}");
+                                        return string.Join("\\", parts);
                                     }
                                 }
                             }
@@ -157,7 +158,7 @@ namespace SinkDNS.Modules.System
                 return null;
             }
         }
-        private static string GetDNSCryptExecutablePath(string installDir)
+        private static string? GetDNSCryptExecutablePath(string installDir)
         {
             if (installDir != null)
             {

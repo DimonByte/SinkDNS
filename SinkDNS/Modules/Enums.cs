@@ -4,11 +4,11 @@
     {
         public enum StatusSeverityType
         {
-            Information,
-            Warning,
-            Error,
-            Debug,
-            Fatal
+            Information = 0,
+            Warning = 1,
+            Error = 2,
+            Debug = 3,
+            Fatal = 4
         }
     }
 }
