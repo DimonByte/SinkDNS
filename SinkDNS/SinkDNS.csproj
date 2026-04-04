@@ -13,6 +13,7 @@
     <AssemblyVersion>0.0.0.1</AssemblyVersion>
     <Company>$(Authors)</Company>
     <PackageIcon>SinkDNSIconImage.png</PackageIcon>
+    <Platforms>AnyCPU;x64</Platforms>
   </PropertyGroup>
 
   <ItemGroup>
