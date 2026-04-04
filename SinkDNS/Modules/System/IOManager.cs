@@ -30,7 +30,7 @@ namespace SinkDNS.Modules.System
     {
         public static void CreateNecessaryDirectoriesAndFiles()
         {
-            string[] directories = [Settings.Default.LogsFolder, Settings.Default.ConfigFolder, Settings.Default.ResolversFolder, Settings.Default.HostFilesFolder, Settings.Default.BackupFolder, Settings.Default.BlocklistFolder, Settings.Default.WhitelistFolder, Settings.Default.TaskScheduleFolder];
+            string[] directories = [Settings.Default.LogsFolderLocation, Settings.Default.ConfigFolderLocation, Settings.Default.ResolversFolderLocation, Settings.Default.HostFilesFolderLocation, Settings.Default.BackupFolderLocation, Settings.Default.BlocklistFolderLocation, Settings.Default.WhitelistFolderLocation, Settings.Default.TaskScheduleFolderLocation];
             bool checkForCorruption = false;
             foreach (string dir in directories)
             {
@@ -48,7 +48,7 @@ namespace SinkDNS.Modules.System
                     }
                 }
             }
-            string[] files = [Settings.Default.UserBlocklistIni, Settings.Default.UserWhitelistIni, Settings.Default.CombinedBlocklistFile, Settings.Default.CombinedWhitelistFile, Settings.Default.BlocklistIni, Settings.Default.WhitelistIni, Settings.Default.TaskSchedulerIni];
+            string[] files = [Settings.Default.UserBlocklistIniLocation, Settings.Default.UserWhitelistIniLocation, Settings.Default.CombinedBlocklistFileLocation, Settings.Default.CombinedWhitelistFileLocation, Settings.Default.BlocklistIniLocation, Settings.Default.WhitelistIniLocation, Settings.Default.TaskSchedulerIniLocation];
             foreach (string file in files)
             {
                 if (!File.Exists(file))
@@ -83,7 +83,7 @@ namespace SinkDNS.Modules.System
             {
                 bool corruptionDetected = false;
                 //Stage 1: Check blocklist and whitelist INI files for corruption (invalid entries)
-                string[] configFiles = [Settings.Default.BlocklistIni, Settings.Default.WhitelistIni];
+                string[] configFiles = [Settings.Default.BlocklistIniLocation, Settings.Default.WhitelistIniLocation];
                 foreach (string configFile in configFiles)
                 {
                     if (File.Exists(configFile))
@@ -106,9 +106,13 @@ namespace SinkDNS.Modules.System
                         File.WriteAllLines(configFile, validLines);
                         TraceLogger.Log($"Checked {configFile} for corruption. Valid lines retained: {validLines.Count}");
                     }
+                    else
+                    {
+                        TraceLogger.LogAndThrowMsgBox($"Critical configuration file missing: {configFile}. SinkDNS cannot continue without this file. Please ensure the file exists and is accessible.", Enums.StatusSeverityType.Fatal);
+                    }
                 }
                 //Stage 2: Check user blocklist and whitelist INI files for corruption (invalid entries), they should only contain domain names, not full URLs. So google.com is valid, but http://google.com is not.
-                string[] userConfigFiles = [Settings.Default.UserBlocklistIni, Settings.Default.UserWhitelistIni];
+                string[] userConfigFiles = [Settings.Default.UserBlocklistIniLocation, Settings.Default.UserWhitelistIniLocation];
                 foreach (string userConfigFile in userConfigFiles)
                 {
                     if (File.Exists(userConfigFile))
@@ -131,6 +135,22 @@ namespace SinkDNS.Modules.System
                         File.WriteAllLines(userConfigFile, validLines);
                         TraceLogger.Log($"Checked {userConfigFile} for corruption. Valid lines retained: {validLines.Count}");
                     }
+                    else
+                    {
+                        TraceLogger.LogAndThrowMsgBox($"Critical configuration file missing: {userConfigFile}. SinkDNS cannot continue without this file. Please ensure the file exists and is accessible.", Enums.StatusSeverityType.Fatal);
+                    }
+                }
+                //Step 3: Check TraceThreshold via enum tryparse. if tryparse fails, restore to "Information".
+                if (Enum.TryParse<Enums.StatusSeverityType>(Settings.Default.TraceLoggerThreshold, out var threshold))
+                {
+                    TraceLogger.Log($"TraceThreshold is valid: {threshold}");
+                }
+                else
+                {
+                    corruptionDetected |= true;
+                    TraceLogger.Log($"Corruption detected: Invalid TraceThreshold value in settings: {Settings.Default.TraceLoggerThreshold}. Restoring to default value: Information", Enums.StatusSeverityType.Warning);
+                    Settings.Default.TraceLoggerThreshold = Enums.StatusSeverityType.Information.ToString();
+                    Settings.Default.Save();
                 }
                 TraceLogger.Log("Configuration corruption check completed.");
                 if (corruptionDetected)
@@ -165,13 +185,13 @@ namespace SinkDNS.Modules.System
             try
             {
                 TraceLogger.Log("Resetting configuration folders and files...");
-                ClearFiles(Settings.Default.ConfigFolder);
-                ClearFiles(Settings.Default.ResolversFolder);
-                ClearFiles(Settings.Default.HostFilesFolder);
-                File.WriteAllText(Settings.Default.BlocklistIni, string.Empty);
-                File.WriteAllText(Settings.Default.WhitelistIni, string.Empty);
-                File.WriteAllText(Settings.Default.UserBlocklistIni, string.Empty);
-                File.WriteAllText(Settings.Default.UserWhitelistIni, string.Empty);
+                ClearFiles(Settings.Default.ConfigFolderLocation);
+                ClearFiles(Settings.Default.ResolversFolderLocation);
+                ClearFiles(Settings.Default.HostFilesFolderLocation);
+                File.WriteAllText(Settings.Default.BlocklistIniLocation, string.Empty);
+                File.WriteAllText(Settings.Default.WhitelistIniLocation, string.Empty);
+                File.WriteAllText(Settings.Default.UserBlocklistIniLocation, string.Empty);
+                File.WriteAllText(Settings.Default.UserWhitelistIniLocation, string.Empty);
                 TraceLogger.Log("Configuration folders and files reset successfully.");
             }
             catch (Exception ex)
@@ -184,7 +204,7 @@ namespace SinkDNS.Modules.System
         {
             if (File.Exists(filePath))
             {
-                string backupFilePath = $"{Settings.Default.BackupFolder}/{Path.GetFileName(filePath) + Path.GetExtension(filePath)}.bak";
+                string backupFilePath = $"{Settings.Default.BackupFolderLocation}/{Path.GetFileName(filePath) + Path.GetExtension(filePath)}.bak";
                 try
                 {
                     TraceLogger.Log($"Creating backup for file {filePath} at {backupFilePath}");

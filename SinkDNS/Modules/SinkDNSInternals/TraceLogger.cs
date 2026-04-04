@@ -31,7 +31,7 @@ namespace SinkDNS.Modules.SinkDNSInternals
     public static class TraceLogger
     {
         private static readonly Lock _lock = new();
-        private static readonly string _logDirectory = Settings.Default.LogsFolder;
+        private static readonly string _logDirectory = Settings.Default.LogsFolderLocation;
         private static string _currentDate = DateTime.Now.ToString("dd-MM-yyyy");
         private static DateTime _lastDateCheck = DateTime.MinValue;
         private static readonly StatusSeverityType DefaultThreshold = StatusSeverityType.Information;   // fallback if the setting is wrong

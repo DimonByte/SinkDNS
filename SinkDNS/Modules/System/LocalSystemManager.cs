@@ -62,16 +62,16 @@ namespace SinkDNS.Modules.System
         public static string ?GetDNSCryptInstallationDirectory(bool includeExecutablePath = false)
         {
             TraceLogger.Log("Getting DNSCrypt installation directory...");
-            if (Settings.Default.DNSCryptInstallationPath != null && Directory.Exists(Settings.Default.DNSCryptInstallationPath))
+            if (Settings.Default.DNSCryptInstallationLocation != null && Directory.Exists(Settings.Default.DNSCryptInstallationLocation))
             {
-                TraceLogger.Log($"Found DNSCrypt installation directory in settings: {Settings.Default.DNSCryptInstallationPath}");
+                TraceLogger.Log($"Found DNSCrypt installation directory in settings: {Settings.Default.DNSCryptInstallationLocation}");
                 if (includeExecutablePath)
                 {
-                    return GetDNSCryptExecutablePath(Settings.Default.DNSCryptInstallationPath);
+                    return GetDNSCryptExecutablePath(Settings.Default.DNSCryptInstallationLocation);
                 }
                 else
                 {
-                    return Settings.Default.DNSCryptInstallationPath;
+                    return Settings.Default.DNSCryptInstallationLocation;
                 }
             }
             TraceLogger.Log("DNSCrypt installation location not saved in settings - Attempting to get DNSCrypt installation directory from registry...");
@@ -96,7 +96,7 @@ namespace SinkDNS.Modules.System
                                 {
                                     string exePath = imagePath.Substring(start, end - start);
                                     TraceLogger.Log($"Found DNSCrypt executable path: {exePath}");
-                                    Settings.Default.DNSCryptInstallationPath = Path.GetDirectoryName(exePath);
+                                    Settings.Default.DNSCryptInstallationLocation = Path.GetDirectoryName(exePath);
                                     if (includeExecutablePath)
                                     {
                                         return exePath;
@@ -135,7 +135,7 @@ namespace SinkDNS.Modules.System
                     {
                         if (Directory.Exists(path))
                         {
-                            Settings.Default.DNSCryptInstallationPath = path;
+                            Settings.Default.DNSCryptInstallationLocation = path;
                             TraceLogger.Log($"Found DNSCrypt installation directory at: {path}");
                             return path;
                         }
@@ -144,7 +144,7 @@ namespace SinkDNS.Modules.System
                     string programDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "DNSCrypt");
                     if (Directory.Exists(programDataPath))
                     {
-                        Settings.Default.DNSCryptInstallationPath = programDataPath;
+                        Settings.Default.DNSCryptInstallationLocation = programDataPath;
                         TraceLogger.Log($"Found DNSCrypt installation directory at: {programDataPath}");
                         return programDataPath;
                     }
@@ -290,8 +290,18 @@ namespace SinkDNS.Modules.System
                 }
             });
         }
-        public static bool RestartDnsCrypt()
+        public static bool RestartDnsCrypt(bool checkRestartWarning = false)
         {
+            if (checkRestartWarning)
+            { // Used for when the user enable query logging, which requires a restart of the service. This is to prevent accidental restarts without warning.
+                if (!Settings.Default.DisableDNSCryptRestartWarning)
+                {
+                    DialogResult result = MessageBox.Show("Restarting the DNSCrypt service will temporarily disrupt your internet connection. Do you want to proceed?", "Restart DNSCrypt Service", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                    if (result != DialogResult.Yes) { 
+                        return false;
+                    }
+                }
+            }
             TraceLogger.Log("Attempting restart of DNSCrypt service...");
             try
             {

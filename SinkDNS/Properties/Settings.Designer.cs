@@ -26,132 +26,132 @@ namespace SinkDNS.Properties {
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("hostfiles/blocklist")]
-        public string BlocklistFolder {
+        public string BlocklistFolderLocation {
             get {
-                return ((string)(this["BlocklistFolder"]));
+                return ((string)(this["BlocklistFolderLocation"]));
             }
         }
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("hostfiles/whitelist")]
-        public string WhitelistFolder {
+        public string WhitelistFolderLocation {
             get {
-                return ((string)(this["WhitelistFolder"]));
+                return ((string)(this["WhitelistFolderLocation"]));
             }
         }
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("config/blocklist.ini")]
-        public string BlocklistIni {
+        public string BlocklistIniLocation {
             get {
-                return ((string)(this["BlocklistIni"]));
+                return ((string)(this["BlocklistIniLocation"]));
             }
         }
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("config/whitelist.ini")]
-        public string WhitelistIni {
+        public string WhitelistIniLocation {
             get {
-                return ((string)(this["WhitelistIni"]));
+                return ((string)(this["WhitelistIniLocation"]));
             }
         }
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("hostfiles/userblocklist.txt")]
-        public string UserBlocklistIni {
+        public string UserBlocklistIniLocation {
             get {
-                return ((string)(this["UserBlocklistIni"]));
+                return ((string)(this["UserBlocklistIniLocation"]));
             }
         }
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("hostfiles/userwhitelist.txt")]
-        public string UserWhitelistIni {
+        public string UserWhitelistIniLocation {
             get {
-                return ((string)(this["UserWhitelistIni"]));
+                return ((string)(this["UserWhitelistIniLocation"]));
             }
         }
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("hostfiles/blocklist/combined-blocklist.txt")]
-        public string CombinedBlocklistFile {
+        public string CombinedBlocklistFileLocation {
             get {
-                return ((string)(this["CombinedBlocklistFile"]));
+                return ((string)(this["CombinedBlocklistFileLocation"]));
             }
         }
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("hostfiles/blocklist/combined-whitelist.txt")]
-        public string CombinedWhitelistFile {
+        public string CombinedWhitelistFileLocation {
             get {
-                return ((string)(this["CombinedWhitelistFile"]));
+                return ((string)(this["CombinedWhitelistFileLocation"]));
             }
         }
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("logs")]
-        public string LogsFolder {
+        public string LogsFolderLocation {
             get {
-                return ((string)(this["LogsFolder"]));
+                return ((string)(this["LogsFolderLocation"]));
             }
         }
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("config")]
-        public string ConfigFolder {
+        public string ConfigFolderLocation {
             get {
-                return ((string)(this["ConfigFolder"]));
+                return ((string)(this["ConfigFolderLocation"]));
             }
         }
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("resolvers")]
-        public string ResolversFolder {
+        public string ResolversFolderLocation {
             get {
-                return ((string)(this["ResolversFolder"]));
+                return ((string)(this["ResolversFolderLocation"]));
             }
         }
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("hostfiles")]
-        public string HostFilesFolder {
+        public string HostFilesFolderLocation {
             get {
-                return ((string)(this["HostFilesFolder"]));
+                return ((string)(this["HostFilesFolderLocation"]));
             }
         }
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("backup")]
-        public string BackupFolder {
+        public string BackupFolderLocation {
             get {
-                return ((string)(this["BackupFolder"]));
+                return ((string)(this["BackupFolderLocation"]));
             }
         }
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("taskschedules/taskscheduler.ini")]
-        public string TaskSchedulerIni {
+        public string TaskSchedulerIniLocation {
             get {
-                return ((string)(this["TaskSchedulerIni"]));
+                return ((string)(this["TaskSchedulerIniLocation"]));
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool EnableDiskLogging {
             get {
                 return ((bool)(this["EnableDiskLogging"]));
@@ -164,9 +164,9 @@ namespace SinkDNS.Properties {
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("taskschedules")]
-        public string TaskScheduleFolder {
+        public string TaskScheduleFolderLocation {
             get {
-                return ((string)(this["TaskScheduleFolder"]));
+                return ((string)(this["TaskScheduleFolderLocation"]));
             }
         }
         
@@ -194,12 +194,12 @@ namespace SinkDNS.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("C:\\Program Files\\dnscrypt-proxy")]
-        public string DNSCryptInstallationPath {
+        public string DNSCryptInstallationLocation {
             get {
-                return ((string)(this["DNSCryptInstallationPath"]));
+                return ((string)(this["DNSCryptInstallationLocation"]));
             }
             set {
-                this["DNSCryptInstallationPath"] = value;
+                this["DNSCryptInstallationLocation"] = value;
             }
         }
         
@@ -212,6 +212,18 @@ namespace SinkDNS.Properties {
             }
             set {
                 this["TraceLoggerThreshold"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool DisableDNSCryptRestartWarning {
+            get {
+                return ((bool)(this["DisableDNSCryptRestartWarning"]));
+            }
+            set {
+                this["DisableDNSCryptRestartWarning"] = value;
             }
         }
     }

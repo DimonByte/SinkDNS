@@ -27,7 +27,7 @@ namespace SinkDNS.Modules.SinkDNSInternals
 
     public class TaskScheduler
     {
-        private static readonly string ConfigPath = Path.Combine(Settings.Default.ConfigFolder, Settings.Default.TaskSchedulerIni);
+        private static readonly string ConfigPath = Path.Combine(Settings.Default.ConfigFolderLocation, Settings.Default.TaskSchedulerIniLocation);
 
         private static readonly Lock LockObject = new();
 

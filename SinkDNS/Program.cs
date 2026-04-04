@@ -12,6 +12,7 @@ namespace SinkDNS
         ///  The main entry point for the application.
         /// </summary>
         private static Mutex? _singleInstanceMutex;
+        public static bool ManagerFormCurrentPageHasUnsavedChanges { get; set; } = false;
         [STAThread]
         static void Main()
         {

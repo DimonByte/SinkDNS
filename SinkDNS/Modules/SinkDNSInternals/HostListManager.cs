@@ -33,13 +33,13 @@ namespace SinkDNS.Modules.SinkDNSInternals
         public static async Task DownloadBlocklistsAsync()
         {
             DateTime StartOfBlockList = DateTime.Now;
-            if (!File.Exists(Settings.Default.BlocklistIni))
+            if (!File.Exists(Settings.Default.BlocklistIniLocation))
             {
-                TraceLogger.LogAndThrowMsgBox($"Blocklist configuration file not found: {Settings.Default.BlocklistIni}", Enums.StatusSeverityType.Warning);
+                TraceLogger.LogAndThrowMsgBox($"Blocklist configuration file not found: {Settings.Default.BlocklistIniLocation}", Enums.StatusSeverityType.Warning);
                 return;
             }
             //Delete all blocklist files in the blocklist folder before downloading new ones to ensure we don't have any old blocklists lying around.
-            foreach (var file in Directory.GetFiles(Settings.Default.BlocklistFolder))
+            foreach (var file in Directory.GetFiles(Settings.Default.BlocklistFolderLocation))
             {
                 try
                 {
@@ -53,20 +53,20 @@ namespace SinkDNS.Modules.SinkDNSInternals
                 }
             }
 
-            var urls = ReadUrlsFromFile(Settings.Default.BlocklistIni);
+            var urls = ReadUrlsFromFile(Settings.Default.BlocklistIniLocation);
             foreach (var url in urls)
             {
                 TraceLogger.Log($"Downloading blocklist from: {url}");
                 var fileName = Path.GetFileName(url);
-                var filePath = Path.Combine(Settings.Default.BlocklistFolder, fileName);
+                var filePath = Path.Combine(Settings.Default.BlocklistFolderLocation, fileName);
                 await DownloadManager.DownloadFileAsync(url, filePath).ConfigureAwait(false);
             }
             TraceLogger.Log("Finished downloading blocklists.");
-            IOManager.MergeFiles(Settings.Default.BlocklistFolder, Settings.Default.CombinedBlocklistFile);
-            IOManager.RemoveDuplicates(Settings.Default.CombinedBlocklistFile);
+            IOManager.MergeFiles(Settings.Default.BlocklistFolderLocation, Settings.Default.CombinedBlocklistFileLocation);
+            IOManager.RemoveDuplicates(Settings.Default.CombinedBlocklistFileLocation);
             TraceLogger.Log("Blocklist update complete. Checking if all files have been updated recently");
             //Check if the files in the blocklist have a update date via using the StartOfBlockList, if the file has been modified before the StartOfBlockList, then it means the file was not updated during this download process, and we should log a warning about it.
-            foreach (var file in Directory.GetFiles(Settings.Default.BlocklistFolder))
+            foreach (var file in Directory.GetFiles(Settings.Default.BlocklistFolderLocation))
             {
                 var lastWriteTime = File.GetLastWriteTime(file);
                 if (lastWriteTime < StartOfBlockList)
@@ -78,18 +78,18 @@ namespace SinkDNS.Modules.SinkDNSInternals
 
         public static async Task DownloadWhitelistsAsync()
         {
-            if (!File.Exists(Settings.Default.WhitelistIni))
+            if (!File.Exists(Settings.Default.WhitelistIniLocation))
             {
-                TraceLogger.LogAndThrowMsgBox($"Whitelist configuration file not found: {Settings.Default.WhitelistIni}", Enums.StatusSeverityType.Warning);
+                TraceLogger.LogAndThrowMsgBox($"Whitelist configuration file not found: {Settings.Default.WhitelistIniLocation}", Enums.StatusSeverityType.Warning);
                 return;
             }
 
-            var urls = ReadUrlsFromFile(Settings.Default.WhitelistIni);
+            var urls = ReadUrlsFromFile(Settings.Default.WhitelistIniLocation);
             foreach (var url in urls)
             {
                 TraceLogger.Log($"Downloading whitelist from: {url}");
                 var fileName = Path.GetFileName(url);
-                var filePath = Path.Combine(Settings.Default.WhitelistFolder, fileName);
+                var filePath = Path.Combine(Settings.Default.WhitelistFolderLocation, fileName);
                 await DownloadManager.DownloadFileAsync(url, filePath);
             }
             TraceLogger.Log("Finished downloading whitelists.");
@@ -98,45 +98,45 @@ namespace SinkDNS.Modules.SinkDNSInternals
         public static void AddToUserBlocklist(string domain)
         {
             TraceLogger.Log($"Adding domain to user blocklist: {domain}");
-            IOManager.AddToIniFile(Settings.Default.UserBlocklistIni, domain);
+            IOManager.AddToIniFile(Settings.Default.UserBlocklistIniLocation, domain);
         }
 
         public static void AddToUserWhitelist(string domain)
         {
             TraceLogger.Log($"Adding domain to user whitelist: {domain}");
-            IOManager.AddToIniFile(Settings.Default.UserWhitelistIni, domain);
+            IOManager.AddToIniFile(Settings.Default.UserWhitelistIniLocation, domain);
         }
 
         public static void MergeBlocklists()
         {
             TraceLogger.Log("Merging blocklist files...");
-            IOManager.MergeFiles(Settings.Default.BlocklistFolder, Settings.Default.CombinedBlocklistFile);
+            IOManager.MergeFiles(Settings.Default.BlocklistFolderLocation, Settings.Default.CombinedBlocklistFileLocation);
         }
 
         public static void MergeWhitelists()
         {
             TraceLogger.Log("Merging whitelist files...");
-            IOManager.MergeFiles(Settings.Default.WhitelistFolder, Settings.Default.CombinedWhitelistFile);
+            IOManager.MergeFiles(Settings.Default.WhitelistFolderLocation, Settings.Default.CombinedWhitelistFileLocation);
         }
 
         public static void ClearBlocklists()
         {
             TraceLogger.Log("Clearing blocklist files...");
-            IOManager.ClearFiles(Settings.Default.BlocklistFolder);
+            IOManager.ClearFiles(Settings.Default.BlocklistFolderLocation);
         }
 
         public static void ClearWhitelists()
         {
             TraceLogger.Log("Clearing whitelist files...");
-            IOManager.ClearFiles(Settings.Default.WhitelistFolder);
+            IOManager.ClearFiles(Settings.Default.WhitelistFolderLocation);
         }
 
         public static bool IsBlocked(string domain)
         {
-            if (!File.Exists(Settings.Default.CombinedBlocklistFile))
+            if (!File.Exists(Settings.Default.CombinedBlocklistFileLocation))
                 return false;
 
-            var lines = File.ReadAllLines(Settings.Default.CombinedBlocklistFile);
+            var lines = File.ReadAllLines(Settings.Default.CombinedBlocklistFileLocation);
             return lines.Any(line =>
                 !string.IsNullOrWhiteSpace(line) &&
                 !line.StartsWith('#') &&
@@ -145,10 +145,10 @@ namespace SinkDNS.Modules.SinkDNSInternals
 
         public static bool IsWhitelisted(string domain)
         {
-            if (!File.Exists(Settings.Default.CombinedWhitelistFile))
+            if (!File.Exists(Settings.Default.CombinedWhitelistFileLocation))
                 return false;
 
-            var lines = File.ReadAllLines(Settings.Default.CombinedWhitelistFile);
+            var lines = File.ReadAllLines(Settings.Default.CombinedWhitelistFileLocation);
             return lines.Any(line =>
                 !string.IsNullOrWhiteSpace(line) &&
                 !line.StartsWith('#') &&

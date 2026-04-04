@@ -11,6 +11,8 @@
     <ApplicationIcon>Resources\SinkDNSIcon.ico</ApplicationIcon>
     <FileVersion>1.0.0.0</FileVersion>
     <AssemblyVersion>0.0.0.1</AssemblyVersion>
+    <Company>$(Authors)</Company>
+    <PackageIcon>SinkDNSIconImage.png</PackageIcon>
   </PropertyGroup>
 
   <ItemGroup>
@@ -51,6 +53,10 @@
     <None Update="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <None Update="Resources\SinkDNSIconImage.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
     </None>
   </ItemGroup>
 

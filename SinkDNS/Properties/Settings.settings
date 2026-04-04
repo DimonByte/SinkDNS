@@ -2,52 +2,52 @@
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="SinkDNS.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
-    <Setting Name="BlocklistFolder" Type="System.String" Scope="Application">
+    <Setting Name="BlocklistFolderLocation" Type="System.String" Scope="Application">
       <Value Profile="(Default)">hostfiles/blocklist</Value>
     </Setting>
-    <Setting Name="WhitelistFolder" Type="System.String" Scope="Application">
+    <Setting Name="WhitelistFolderLocation" Type="System.String" Scope="Application">
       <Value Profile="(Default)">hostfiles/whitelist</Value>
     </Setting>
-    <Setting Name="BlocklistIni" Type="System.String" Scope="Application">
+    <Setting Name="BlocklistIniLocation" Type="System.String" Scope="Application">
       <Value Profile="(Default)">config/blocklist.ini</Value>
     </Setting>
-    <Setting Name="WhitelistIni" Type="System.String" Scope="Application">
+    <Setting Name="WhitelistIniLocation" Type="System.String" Scope="Application">
       <Value Profile="(Default)">config/whitelist.ini</Value>
     </Setting>
-    <Setting Name="UserBlocklistIni" Type="System.String" Scope="Application">
+    <Setting Name="UserBlocklistIniLocation" Type="System.String" Scope="Application">
       <Value Profile="(Default)">hostfiles/userblocklist.txt</Value>
     </Setting>
-    <Setting Name="UserWhitelistIni" Type="System.String" Scope="Application">
+    <Setting Name="UserWhitelistIniLocation" Type="System.String" Scope="Application">
       <Value Profile="(Default)">hostfiles/userwhitelist.txt</Value>
     </Setting>
-    <Setting Name="CombinedBlocklistFile" Type="System.String" Scope="Application">
+    <Setting Name="CombinedBlocklistFileLocation" Type="System.String" Scope="Application">
       <Value Profile="(Default)">hostfiles/blocklist/combined-blocklist.txt</Value>
     </Setting>
-    <Setting Name="CombinedWhitelistFile" Type="System.String" Scope="Application">
+    <Setting Name="CombinedWhitelistFileLocation" Type="System.String" Scope="Application">
       <Value Profile="(Default)">hostfiles/blocklist/combined-whitelist.txt</Value>
     </Setting>
-    <Setting Name="LogsFolder" Type="System.String" Scope="Application">
+    <Setting Name="LogsFolderLocation" Type="System.String" Scope="Application">
       <Value Profile="(Default)">logs</Value>
     </Setting>
-    <Setting Name="ConfigFolder" Type="System.String" Scope="Application">
+    <Setting Name="ConfigFolderLocation" Type="System.String" Scope="Application">
       <Value Profile="(Default)">config</Value>
     </Setting>
-    <Setting Name="ResolversFolder" Type="System.String" Scope="Application">
+    <Setting Name="ResolversFolderLocation" Type="System.String" Scope="Application">
       <Value Profile="(Default)">resolvers</Value>
     </Setting>
-    <Setting Name="HostFilesFolder" Type="System.String" Scope="Application">
+    <Setting Name="HostFilesFolderLocation" Type="System.String" Scope="Application">
       <Value Profile="(Default)">hostfiles</Value>
     </Setting>
-    <Setting Name="BackupFolder" Type="System.String" Scope="Application">
+    <Setting Name="BackupFolderLocation" Type="System.String" Scope="Application">
       <Value Profile="(Default)">backup</Value>
     </Setting>
-    <Setting Name="TaskSchedulerIni" Type="System.String" Scope="Application">
+    <Setting Name="TaskSchedulerIniLocation" Type="System.String" Scope="Application">
       <Value Profile="(Default)">taskschedules/taskscheduler.ini</Value>
     </Setting>
     <Setting Name="EnableDiskLogging" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
+      <Value Profile="(Default)">False</Value>
     </Setting>
-    <Setting Name="TaskScheduleFolder" Type="System.String" Scope="Application">
+    <Setting Name="TaskScheduleFolderLocation" Type="System.String" Scope="Application">
       <Value Profile="(Default)">taskschedules</Value>
     </Setting>
     <Setting Name="LogExpiryInDays" Type="System.Int32" Scope="User">
@@ -56,11 +56,14 @@
     <Setting Name="PendingDNSRestart" Type="System.Boolean" Scope="Application">
       <Value Profile="(Default)">False</Value>
     </Setting>
-    <Setting Name="DNSCryptInstallationPath" Type="System.String" Scope="User">
+    <Setting Name="DNSCryptInstallationLocation" Type="System.String" Scope="User">
       <Value Profile="(Default)">C:\Program Files\dnscrypt-proxy</Value>
     </Setting>
     <Setting Name="TraceLoggerThreshold" Type="System.String" Scope="User">
       <Value Profile="(Default)">Information</Value>
+    </Setting>
+    <Setting Name="DisableDNSCryptRestartWarning" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
     </Setting>
   </Settings>
 </SettingsFile>

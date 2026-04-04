@@ -22,10 +22,10 @@
 
 //TODO: SinkDNS will run from localappdata to allow non-admin writes to blocklists and such.
 
+using SinkDNS.ChildForms;
 using SinkDNS.Modules;
 using SinkDNS.Modules.SinkDNSInternals;
 using SinkDNS.Modules.System;
-using System.Linq.Expressions;
 
 namespace SinkDNS
 {
@@ -34,6 +34,30 @@ namespace SinkDNS
         public SinkDNSManagerForm()
         {
             InitializeComponent();
+        }
+        private void LoadControl(Form? form)
+        {
+            if (form == null)
+            {
+                MainPanel.Panel2.Controls.Clear();
+                return;
+            }
+            if (Program.ManagerFormCurrentPageHasUnsavedChanges)
+            {
+                //This is for when the user has unsaved changes in the current form, and they try to load another form. This will warn them that they have unsaved changes and ask if they want to continue loading the new form and lose their unsaved changes, or if they want to cancel and go back to the current form to save their changes.
+                DialogResult msg = MessageBox.Show("You have unsaved changes in the current page. Do you want to load the page you clicked and lose your unsaved changes, or do you want to cancel?", "Unsaved Changes Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                if (msg == DialogResult.No)
+                {
+                    return;
+                }
+            }
+            form.TopLevel = false;
+            form.FormBorderStyle = FormBorderStyle.None;
+            form.Dock = DockStyle.Fill;
+
+            MainPanel.Panel2.Controls.Clear();
+            MainPanel.Panel2.Controls.Add(form);
+            form.Show();
         }
         private void SinkDNSMainForm_Load(object sender, EventArgs e)
         {
@@ -141,6 +165,16 @@ namespace SinkDNS
         {
             About aboutForm = new About();
             aboutForm.ShowDialog();
+        }
+
+        private void DashboardBtn_Click(object sender, EventArgs e)
+        {
+            LoadControl(new HostListView());
+        }
+
+        private void SettingsBtn_Click(object sender, EventArgs e)
+        {
+            LoadControl(new SinkDNSSettings());
         }
     }
 }

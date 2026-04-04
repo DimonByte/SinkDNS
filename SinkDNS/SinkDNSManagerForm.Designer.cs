@@ -29,10 +29,6 @@
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
-            panel1 = new Panel();
-            pictureBox1 = new PictureBox();
-            SinkDNSDesignLabel = new Label();
-            DNSCryptStatusLabel = new Label();
             button1 = new Button();
             MainContextMenuStrip = new ContextMenuStrip(components);
             openManagerToolStripMenuItem = new ToolStripMenuItem();
@@ -43,67 +39,34 @@
             addURLToWhitelistToolStripMenuItem = new ToolStripMenuItem();
             toolStripSeparator2 = new ToolStripSeparator();
             updateBlocklistsToolStripMenuItem = new ToolStripMenuItem();
+            checkForProgramUpdatesToolStripMenuItem = new ToolStripMenuItem();
             bypassFilteringToolStripMenuItem = new ToolStripMenuItem();
             restartDNSCryptToolStripMenuItem = new ToolStripMenuItem();
             toolStripSeparator1 = new ToolStripSeparator();
             aboutSinkDNSToolStripMenuItem = new ToolStripMenuItem();
             exitSinkDNSToolStripMenuItem = new ToolStripMenuItem();
-            DomainBlockHistoryListBox = new ListBox();
-            checkForProgramUpdatesToolStripMenuItem = new ToolStripMenuItem();
-            panel1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
+            MainPanel = new SplitContainer();
+            QueryLogBtn = new Button();
+            UserDomainsBtn = new Button();
+            ListsBtn = new Button();
+            ToggleDNSCryptBtn = new Button();
+            SettingsBtn = new Button();
+            DashboardBtn = new Button();
+            label1 = new Label();
+            panel1 = new Panel();
             MainContextMenuStrip.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)MainPanel).BeginInit();
+            MainPanel.Panel1.SuspendLayout();
+            MainPanel.SuspendLayout();
             SuspendLayout();
-            // 
-            // panel1
-            // 
-            panel1.BackColor = Color.FromArgb(46, 140, 148);
-            panel1.Controls.Add(pictureBox1);
-            panel1.Controls.Add(SinkDNSDesignLabel);
-            panel1.Dock = DockStyle.Top;
-            panel1.Location = new Point(0, 0);
-            panel1.Name = "panel1";
-            panel1.Size = new Size(654, 38);
-            panel1.TabIndex = 0;
-            // 
-            // pictureBox1
-            // 
-            pictureBox1.Image = Properties.Resources.SinkDNSIconImage;
-            pictureBox1.Location = new Point(4, 5);
-            pictureBox1.Name = "pictureBox1";
-            pictureBox1.Size = new Size(32, 32);
-            pictureBox1.SizeMode = PictureBoxSizeMode.AutoSize;
-            pictureBox1.TabIndex = 2;
-            pictureBox1.TabStop = false;
-            // 
-            // SinkDNSDesignLabel
-            // 
-            SinkDNSDesignLabel.AutoSize = true;
-            SinkDNSDesignLabel.Font = new Font("Arial", 12F);
-            SinkDNSDesignLabel.ForeColor = Color.White;
-            SinkDNSDesignLabel.Location = new Point(33, 9);
-            SinkDNSDesignLabel.Name = "SinkDNSDesignLabel";
-            SinkDNSDesignLabel.Size = new Size(139, 18);
-            SinkDNSDesignLabel.TabIndex = 0;
-            SinkDNSDesignLabel.Text = "SinkDNS Manager";
-            // 
-            // DNSCryptStatusLabel
-            // 
-            DNSCryptStatusLabel.AutoSize = true;
-            DNSCryptStatusLabel.ForeColor = Color.White;
-            DNSCryptStatusLabel.Location = new Point(12, 41);
-            DNSCryptStatusLabel.Name = "DNSCryptStatusLabel";
-            DNSCryptStatusLabel.Size = new Size(124, 15);
-            DNSCryptStatusLabel.TabIndex = 0;
-            DNSCryptStatusLabel.Text = "DNSCrypt Status: N/A";
             // 
             // button1
             // 
-            button1.Location = new Point(12, 335);
+            button1.Location = new Point(51, 277);
             button1.Name = "button1";
             button1.Size = new Size(95, 26);
             button1.TabIndex = 1;
-            button1.Text = "button1";
+            button1.Text = "Test";
             button1.UseVisualStyleBackColor = true;
             button1.Click += button1_ClickAsync;
             // 
@@ -170,6 +133,12 @@
             updateBlocklistsToolStripMenuItem.ToolTipText = "Manually updates the blocklist and whitelist for the latest updates.";
             updateBlocklistsToolStripMenuItem.Click += updateBlocklistsToolStripMenuItem_Click;
             // 
+            // checkForProgramUpdatesToolStripMenuItem
+            // 
+            checkForProgramUpdatesToolStripMenuItem.Name = "checkForProgramUpdatesToolStripMenuItem";
+            checkForProgramUpdatesToolStripMenuItem.Size = new Size(229, 22);
+            checkForProgramUpdatesToolStripMenuItem.Text = "Check for Program Updates...";
+            // 
             // bypassFilteringToolStripMenuItem
             // 
             bypassFilteringToolStripMenuItem.CheckOnClick = true;
@@ -207,53 +176,175 @@
             exitSinkDNSToolStripMenuItem.Text = "Exit SinkDNS";
             exitSinkDNSToolStripMenuItem.Click += exitSinkDNSToolStripMenuItem_Click;
             // 
-            // DomainBlockHistoryListBox
+            // MainPanel
             // 
-            DomainBlockHistoryListBox.FormattingEnabled = true;
-            DomainBlockHistoryListBox.Location = new Point(349, 77);
-            DomainBlockHistoryListBox.Name = "DomainBlockHistoryListBox";
-            DomainBlockHistoryListBox.Size = new Size(203, 199);
-            DomainBlockHistoryListBox.TabIndex = 2;
+            MainPanel.Dock = DockStyle.Fill;
+            MainPanel.FixedPanel = FixedPanel.Panel1;
+            MainPanel.Location = new Point(0, 0);
+            MainPanel.Name = "MainPanel";
             // 
-            // checkForProgramUpdatesToolStripMenuItem
+            // MainPanel.Panel1
             // 
-            checkForProgramUpdatesToolStripMenuItem.Name = "checkForProgramUpdatesToolStripMenuItem";
-            checkForProgramUpdatesToolStripMenuItem.Size = new Size(229, 22);
-            checkForProgramUpdatesToolStripMenuItem.Text = "Check for Program Updates...";
+            MainPanel.Panel1.BackColor = Color.FromArgb(3, 83, 164);
+            MainPanel.Panel1.Controls.Add(SettingsBtn);
+            MainPanel.Panel1.Controls.Add(button1);
+            MainPanel.Panel1.Controls.Add(QueryLogBtn);
+            MainPanel.Panel1.Controls.Add(UserDomainsBtn);
+            MainPanel.Panel1.Controls.Add(ListsBtn);
+            MainPanel.Panel1.Controls.Add(ToggleDNSCryptBtn);
+            MainPanel.Panel1.Controls.Add(DashboardBtn);
+            MainPanel.Panel1.Controls.Add(label1);
+            MainPanel.Panel1.Controls.Add(panel1);
+            MainPanel.Panel1MinSize = 200;
+            // 
+            // MainPanel.Panel2
+            // 
+            MainPanel.Panel2.BackColor = Color.FromArgb(6, 26, 64);
+            MainPanel.Panel2MinSize = 400;
+            MainPanel.Size = new Size(650, 390);
+            MainPanel.SplitterDistance = 200;
+            MainPanel.SplitterWidth = 3;
+            MainPanel.TabIndex = 3;
+            // 
+            // QueryLogBtn
+            // 
+            QueryLogBtn.Dock = DockStyle.Top;
+            QueryLogBtn.FlatAppearance.BorderColor = Color.FromArgb(0, 109, 170);
+            QueryLogBtn.FlatAppearance.MouseDownBackColor = Color.FromArgb(0, 53, 89);
+            QueryLogBtn.FlatAppearance.MouseOverBackColor = Color.FromArgb(0, 109, 170);
+            QueryLogBtn.FlatStyle = FlatStyle.Flat;
+            QueryLogBtn.ForeColor = Color.White;
+            QueryLogBtn.Location = new Point(0, 203);
+            QueryLogBtn.Name = "QueryLogBtn";
+            QueryLogBtn.Size = new Size(200, 34);
+            QueryLogBtn.TabIndex = 9;
+            QueryLogBtn.Text = "Query Logs";
+            QueryLogBtn.UseVisualStyleBackColor = true;
+            // 
+            // UserDomainsBtn
+            // 
+            UserDomainsBtn.Dock = DockStyle.Top;
+            UserDomainsBtn.FlatAppearance.BorderColor = Color.FromArgb(0, 109, 170);
+            UserDomainsBtn.FlatAppearance.MouseDownBackColor = Color.FromArgb(0, 53, 89);
+            UserDomainsBtn.FlatAppearance.MouseOverBackColor = Color.FromArgb(0, 109, 170);
+            UserDomainsBtn.FlatStyle = FlatStyle.Flat;
+            UserDomainsBtn.ForeColor = Color.White;
+            UserDomainsBtn.Location = new Point(0, 169);
+            UserDomainsBtn.Name = "UserDomainsBtn";
+            UserDomainsBtn.Size = new Size(200, 34);
+            UserDomainsBtn.TabIndex = 8;
+            UserDomainsBtn.Text = "User Specified Domains";
+            UserDomainsBtn.UseVisualStyleBackColor = true;
+            // 
+            // ListsBtn
+            // 
+            ListsBtn.Dock = DockStyle.Top;
+            ListsBtn.FlatAppearance.BorderColor = Color.FromArgb(0, 109, 170);
+            ListsBtn.FlatAppearance.MouseDownBackColor = Color.FromArgb(0, 53, 89);
+            ListsBtn.FlatAppearance.MouseOverBackColor = Color.FromArgb(0, 109, 170);
+            ListsBtn.FlatStyle = FlatStyle.Flat;
+            ListsBtn.ForeColor = Color.White;
+            ListsBtn.Location = new Point(0, 135);
+            ListsBtn.Name = "ListsBtn";
+            ListsBtn.Size = new Size(200, 34);
+            ListsBtn.TabIndex = 7;
+            ListsBtn.Text = "Lists";
+            ListsBtn.UseVisualStyleBackColor = true;
+            // 
+            // ToggleDNSCryptBtn
+            // 
+            ToggleDNSCryptBtn.Dock = DockStyle.Top;
+            ToggleDNSCryptBtn.FlatAppearance.BorderColor = Color.FromArgb(0, 109, 170);
+            ToggleDNSCryptBtn.FlatAppearance.MouseDownBackColor = Color.FromArgb(0, 53, 89);
+            ToggleDNSCryptBtn.FlatAppearance.MouseOverBackColor = Color.FromArgb(0, 109, 170);
+            ToggleDNSCryptBtn.FlatStyle = FlatStyle.Flat;
+            ToggleDNSCryptBtn.ForeColor = Color.White;
+            ToggleDNSCryptBtn.Location = new Point(0, 101);
+            ToggleDNSCryptBtn.Name = "ToggleDNSCryptBtn";
+            ToggleDNSCryptBtn.Size = new Size(200, 34);
+            ToggleDNSCryptBtn.TabIndex = 6;
+            ToggleDNSCryptBtn.Text = "Disable DNSCrypt";
+            ToggleDNSCryptBtn.UseVisualStyleBackColor = true;
+            // 
+            // SettingsBtn
+            // 
+            SettingsBtn.Dock = DockStyle.Top;
+            SettingsBtn.FlatAppearance.BorderColor = Color.FromArgb(0, 109, 170);
+            SettingsBtn.FlatAppearance.MouseDownBackColor = Color.FromArgb(0, 53, 89);
+            SettingsBtn.FlatAppearance.MouseOverBackColor = Color.FromArgb(0, 109, 170);
+            SettingsBtn.FlatStyle = FlatStyle.Flat;
+            SettingsBtn.ForeColor = Color.White;
+            SettingsBtn.Location = new Point(0, 237);
+            SettingsBtn.Name = "SettingsBtn";
+            SettingsBtn.Size = new Size(200, 34);
+            SettingsBtn.TabIndex = 5;
+            SettingsBtn.Text = "All Settings";
+            SettingsBtn.UseVisualStyleBackColor = true;
+            SettingsBtn.Click += SettingsBtn_Click;
+            // 
+            // DashboardBtn
+            // 
+            DashboardBtn.Dock = DockStyle.Top;
+            DashboardBtn.FlatAppearance.BorderColor = Color.FromArgb(0, 109, 170);
+            DashboardBtn.FlatAppearance.MouseDownBackColor = Color.FromArgb(0, 53, 89);
+            DashboardBtn.FlatAppearance.MouseOverBackColor = Color.FromArgb(0, 109, 170);
+            DashboardBtn.FlatStyle = FlatStyle.Flat;
+            DashboardBtn.ForeColor = Color.White;
+            DashboardBtn.Location = new Point(0, 67);
+            DashboardBtn.Name = "DashboardBtn";
+            DashboardBtn.Size = new Size(200, 34);
+            DashboardBtn.TabIndex = 10;
+            DashboardBtn.Text = "Dashboard";
+            DashboardBtn.UseVisualStyleBackColor = true;
+            DashboardBtn.Click += DashboardBtn_Click;
+            // 
+            // label1
+            // 
+            label1.Dock = DockStyle.Top;
+            label1.Font = new Font("Arial", 8F);
+            label1.ForeColor = Color.White;
+            label1.Location = new Point(0, 45);
+            label1.Name = "label1";
+            label1.Size = new Size(200, 22);
+            label1.TabIndex = 12;
+            label1.Text = "SinkDNS Manager Window";
+            label1.TextAlign = ContentAlignment.MiddleCenter;
+            // 
+            // panel1
+            // 
+            panel1.BackgroundImage = Properties.Resources.SinkDNSIconImage;
+            panel1.BackgroundImageLayout = ImageLayout.Center;
+            panel1.Dock = DockStyle.Top;
+            panel1.Location = new Point(0, 0);
+            panel1.Name = "panel1";
+            panel1.Size = new Size(200, 45);
+            panel1.TabIndex = 11;
             // 
             // SinkDNSManagerForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            BackColor = Color.FromArgb(48, 68, 97);
-            ClientSize = new Size(654, 373);
-            Controls.Add(DomainBlockHistoryListBox);
-            Controls.Add(button1);
-            Controls.Add(DNSCryptStatusLabel);
-            Controls.Add(panel1);
+            BackColor = Color.FromArgb(3, 83, 194);
+            ClientSize = new Size(650, 390);
+            Controls.Add(MainPanel);
             Font = new Font("Arial", 9F);
             Margin = new Padding(3, 2, 3, 2);
+            MinimumSize = new Size(666, 429);
             Name = "SinkDNSManagerForm";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "SinkDNS Manager";
             WindowState = FormWindowState.Minimized;
             FormClosing += SinkDNSManagerForm_FormClosing;
             Load += SinkDNSMainForm_Load;
-            panel1.ResumeLayout(false);
-            panel1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             MainContextMenuStrip.ResumeLayout(false);
+            MainPanel.Panel1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)MainPanel).EndInit();
+            MainPanel.ResumeLayout(false);
             ResumeLayout(false);
-            PerformLayout();
         }
 
         #endregion
-
-        private Panel panel1;
-        private Label DNSCryptStatusLabel;
-        private Label SinkDNSDesignLabel;
         private Button button1;
-        private PictureBox pictureBox1;
         private ContextMenuStrip MainContextMenuStrip;
         private ToolStripSeparator toolStripSeparator1;
         private ToolStripMenuItem exitSinkDNSToolStripMenuItem;
@@ -267,8 +358,16 @@
         private ToolStripSeparator toolStripSeparator2;
         private ToolStripMenuItem restartDNSCryptToolStripMenuItem;
         private ToolStripMenuItem updateBlocklistsToolStripMenuItem;
-        private ListBox DomainBlockHistoryListBox;
         private ToolStripMenuItem aboutSinkDNSToolStripMenuItem;
         private ToolStripMenuItem checkForProgramUpdatesToolStripMenuItem;
+        private SplitContainer MainPanel;
+        private Button DashboardBtn;
+        private Button QueryLogBtn;
+        private Button UserDomainsBtn;
+        private Button ListsBtn;
+        private Button ToggleDNSCryptBtn;
+        private Button SettingsBtn;
+        private Panel panel1;
+        private Label label1;
     }
 }
