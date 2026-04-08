@@ -1,6 +1,8 @@
 ; SinkDNS Installer Script
 ; Requires: DNSCryptProxy\, SinkDNS\, DNSCryptConfig\, Credits.txt in same folder as this .nsi
 
+; TODO: Test on VM, and on install fail, run uninstall section
+
 !include "MUI2.nsh"
 !include "LogicLib.nsh"
 
@@ -17,6 +19,7 @@ InstallDir "$LOCALAPPDATA\SinkDNS"
 ;--------------------------------
 !insertmacro MUI_PAGE_WELCOME
 !insertmacro MUI_PAGE_LICENSE "Credits.txt"
+!insertmacro MUI_PAGE_COMPONENTS
 !insertmacro MUI_PAGE_DIRECTORY
 !insertmacro MUI_PAGE_INSTFILES
 !insertmacro MUI_PAGE_FINISH
@@ -38,6 +41,19 @@ Function .onInit
     continue:
     ${EndIf}
 FunctionEnd
+
+;--------------------------------
+; Optional Components
+;--------------------------------
+
+Section "Start SinkDNS on Startup" SecStartup
+SectionEnd
+
+Section "Add Start Menu Shortcut" SecStartMenu
+SectionEnd
+
+Section "Add Desktop Shortcut" SecDesktop
+SectionEnd
 
 ;--------------------------------
 ; Main Install Section
@@ -69,21 +85,42 @@ Section "Install SinkDNS"
         Abort
     ${EndIf}
 
-    ; Start service
-    ExecWait 'cmd /C sc start "dnscrypt-proxy"' $1
+    ; Stop service (We want SinkDNS to configure DNSCrypt-Proxy.)
+    ExecWait 'cmd /C sc stop "dnscrypt-proxy"' $1
     Sleep 1500
-
-    ; Verify service is running
-    ExecWait 'cmd /C sc query "dnscrypt-proxy" | find "RUNNING" >nul' $2
-    ${If} $2 != 0
-        MessageBox MB_ICONSTOP "dnscrypt-proxy service failed to start. Aborting installation."
-        Abort
-    ${EndIf}
 
     ; Write uninstall entry
     WriteUninstaller "$INSTDIR\Uninstall.exe"
     WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\SinkDNS" "DisplayName" "SinkDNS"
     WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\SinkDNS" "UninstallString" "$INSTDIR\Uninstall.exe"
+
+    ;--------------------------------
+    ; Optional: Start SinkDNS on Startup
+    ;--------------------------------
+    SectionGetFlags ${SecStartup} $0
+    IntOp $0 $0 & ${SF_SELECTED}
+    ${If} $0 <> 0
+        WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Run" "SinkDNS" '"$INSTDIR\SinkDNS.exe"'
+    ${EndIf}
+
+    ;--------------------------------
+    ; Optional: Start Menu Shortcut
+    ;--------------------------------
+    SectionGetFlags ${SecStartMenu} $0
+    IntOp $0 $0 & ${SF_SELECTED}
+    ${If} $0 <> 0
+        CreateDirectory "$SMPROGRAMS\SinkDNS"
+        CreateShortcut "$SMPROGRAMS\SinkDNS\SinkDNS.lnk" "$INSTDIR\SinkDNS.exe"
+    ${EndIf}
+
+    ;--------------------------------
+    ; Optional: Desktop Shortcut
+    ;--------------------------------
+    SectionGetFlags ${SecDesktop} $0
+    IntOp $0 $0 & ${SF_SELECTED}
+    ${If} $0 <> 0
+        CreateShortcut "$DESKTOP\SinkDNS.lnk" "$INSTDIR\SinkDNS.exe"
+    ${EndIf}
 
 SectionEnd
 
@@ -112,6 +149,15 @@ Please close SinkDNS before uninstalling."
 
     ; Remove SinkDNS folder
     RMDir /r "$INSTDIR"
+    
+    ; Remove startup entry
+    DeleteRegValue HKCU "Software\Microsoft\Windows\CurrentVersion\Run" "SinkDNS"
+
+    ; Remove Start Menu folder
+    RMDir /r "$SMPROGRAMS\SinkDNS"
+
+    ; Remove Desktop shortcut
+    Delete "$DESKTOP\SinkDNS.lnk"
 
     ; Remove registry entries
     DeleteRegKey HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\SinkDNS"

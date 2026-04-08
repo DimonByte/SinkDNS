@@ -8,9 +8,9 @@ using System.Windows.Forms;
 
 namespace SinkDNS
 {
-    public partial class ListEditor : Form
+    public partial class SinkDNSFirstTimeSetup : Form
     {
-        public ListEditor()
+        public SinkDNSFirstTimeSetup()
         {
             InitializeComponent();
         }

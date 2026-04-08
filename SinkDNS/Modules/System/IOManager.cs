@@ -38,8 +38,9 @@ namespace SinkDNS.Modules.System
                 {
                     try
                     {
+                        Program.firstTimeSetupRequired = true;
                         Directory.CreateDirectory(dir);
-                        TraceLogger.Log($"Created directory: {dir}");
+                        TraceLogger.Log($"Created directory: {dir} - First time setup will be started.");
                     }
                     catch (Exception ex)
                     {

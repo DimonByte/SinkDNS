@@ -182,12 +182,15 @@ namespace SinkDNS.Properties {
             }
         }
         
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool PendingDNSRestart {
+        public bool PendingDNSCryptRestart {
             get {
-                return ((bool)(this["PendingDNSRestart"]));
+                return ((bool)(this["PendingDNSCryptRestart"]));
+            }
+            set {
+                this["PendingDNSCryptRestart"] = value;
             }
         }
         
@@ -224,6 +227,18 @@ namespace SinkDNS.Properties {
             }
             set {
                 this["DisableDNSCryptRestartWarning"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool RestartDNSCryptAfterUpdatingLists {
+            get {
+                return ((bool)(this["RestartDNSCryptAfterUpdatingLists"]));
+            }
+            set {
+                this["RestartDNSCryptAfterUpdatingLists"] = value;
             }
         }
     }

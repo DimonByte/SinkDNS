@@ -59,6 +59,31 @@ namespace SinkDNS.Modules.System
             }
         }
 
+        public static void IsDNSCryptInstalled()
+        {
+            //Check if the DNSCryptInstallationLocation + dnscrypt-proxy.exe exists, if not, scan
+            if (!File.Exists(Path.Combine(Settings.Default.DNSCryptInstallationLocation, "dnscrypt-proxy.exe")))
+            {
+                TraceLogger.Log("dnscrypt-proxy executable not found in the configured DNSCryptInstallationLocation! Searching...");
+                string? dnsCryptLocation = GetDNSCryptInstallationDirectory();
+                if (dnsCryptLocation == null)
+                {
+                    TraceLogger.LogAndThrowMsgBox("dnscrypt-proxy executable not found in the configured DNSCryptInstallationLocation. Please ensure dnscrypt-proxy is installed and the correct location is set in settings. This instance will now exit.", Modules.Enums.StatusSeverityType.Fatal);
+                    return;
+                }
+                else
+                {
+                    TraceLogger.Log($"dnscrypt-proxy executable found at {dnsCryptLocation}. Updating settings...");
+                    Settings.Default.DNSCryptInstallationLocation = dnsCryptLocation;
+                    Settings.Default.Save();
+                }
+            }
+            else
+            {
+                TraceLogger.Log("DNSCryptInstallationLocation valid.");
+            }
+        }
+
         public static string ?GetDNSCryptInstallationDirectory(bool includeExecutablePath = false)
         {
             TraceLogger.Log("Getting DNSCrypt installation directory...");

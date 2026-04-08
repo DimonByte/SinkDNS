@@ -53,7 +53,7 @@
     <Setting Name="LogExpiryInDays" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">30</Value>
     </Setting>
-    <Setting Name="PendingDNSRestart" Type="System.Boolean" Scope="Application">
+    <Setting Name="PendingDNSCryptRestart" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="DNSCryptInstallationLocation" Type="System.String" Scope="User">
@@ -64,6 +64,9 @@
     </Setting>
     <Setting Name="DisableDNSCryptRestartWarning" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="RestartDNSCryptAfterUpdatingLists" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
     </Setting>
   </Settings>
 </SettingsFile>

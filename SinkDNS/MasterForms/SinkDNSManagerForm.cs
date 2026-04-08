@@ -26,6 +26,7 @@ using SinkDNS.ChildForms;
 using SinkDNS.Modules;
 using SinkDNS.Modules.SinkDNSInternals;
 using SinkDNS.Modules.System;
+using SinkDNS.Properties;
 
 namespace SinkDNS
 {
@@ -144,13 +145,20 @@ namespace SinkDNS
             GlobalNotifyIcon.Instance.SetIcon(Properties.Resources.DownloadingIcon);
             HostListManager.DownloadBlocklistsAsync().GetAwaiter().GetResult();
             GlobalNotifyIcon.Instance.SetIcon(Properties.Resources.UpdateAvailableIcon);
-            if (LocalSystemManager.RestartDnsCrypt())
+            if (Settings.Default.RestartDNSCryptAfterUpdatingLists)
             {
-                NotificationManager.ShowNotification("Blocklists Updated", "Blocklists have been updated and DNSCrypt restarted successfully.", Enums.StatusSeverityType.Information);
+                if (LocalSystemManager.RestartDnsCrypt())
+                {
+                    NotificationManager.ShowNotification("Blocklists Updated", "Blocklists have been updated and DNSCrypt restarted successfully.", Enums.StatusSeverityType.Information);
+                }
+                else
+                {
+                    NotificationManager.ShowNotification("Blocklists Updated", "Blocklists have been updated, but DNSCrypt restart failed.", Enums.StatusSeverityType.Warning);
+                }
             }
             else
             {
-                NotificationManager.ShowNotification("Blocklists Updated", "Blocklists have been updated, but DNSCrypt restart failed.", Enums.StatusSeverityType.Warning);
+                NotificationManager.ShowNotification("Blocklists Updated", "Blocklists have been updated and will be applied after a DNSCrypt service restart.", Enums.StatusSeverityType.Information);
             }
             GlobalNotifyIcon.Instance.SetIcon(Properties.Resources.SinkDNSIcon);
         }

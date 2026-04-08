@@ -1,7 +1,28 @@
+//MIT License
+
+//Copyright (c) 2025 Dimon
+
+//Permission is hereby granted, free of charge, to any person obtaining a copy
+//of this software and associated documentation files (the "Software"), to deal
+//in the Software without restriction, including without limitation the rights
+//to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+//copies of the Software, and to permit persons to whom the Software is
+//furnished to do so, subject to the following conditions:
+
+//The above copyright notice and this permission notice shall be included in all
+//copies or substantial portions of the Software.
+
+//THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+//AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+//OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+//SOFTWARE.
+
 using SinkDNS.Modules.SinkDNSInternals;
 using SinkDNS.Modules.System;
 using SinkDNS.Properties;
-using System.Diagnostics;
 using static SinkDNS.Modules.Enums;
 
 namespace SinkDNS
@@ -13,6 +34,7 @@ namespace SinkDNS
         /// </summary>
         private static Mutex? _singleInstanceMutex;
         public static bool ManagerFormCurrentPageHasUnsavedChanges { get; set; } = false;
+        public static bool firstTimeSetupRequired = false;
         [STAThread]
         static void Main()
         {
@@ -22,16 +44,17 @@ namespace SinkDNS
             bool createdNew;
             _singleInstanceMutex =
                 new Mutex(true, "SinkDNS_singleton_mutex", out createdNew);
-
+            
             if (!createdNew)
             {
                 // Another instance already holds the mutex
                 TraceLogger.LogAndThrowMsgBox(
                     "Another instance of SinkDNS is already running. This instance will now exit.",
-                    Modules.Enums.StatusSeverityType.Error);
+                    StatusSeverityType.Error);
                 return;   // Mutex will be released automatically when process exits
             }
             IOManager.CreateNecessaryDirectoriesAndFiles();
+            LocalSystemManager.IsDNSCryptInstalled();
             TraceLogger.Log("SinkDNS Program Starting...");
             Application.SetCompatibleTextRenderingDefault(false);
             ApplicationConfiguration.Initialize();
@@ -51,7 +74,15 @@ namespace SinkDNS
                 TraceLogger.Log("Disk logging is disabled in settings by user.");
             }
             TraceLogger.Log("Creating application main form...");
-            Application.Run(new SinkDNSManagerForm());
+            if (firstTimeSetupRequired)
+            {
+                TraceLogger.Log("First time setup is required due to missing files/folders. Opening first time setup form.");
+                Application.Run(new SinkDNSFirstTimeSetup());
+            }
+            else
+            {
+                Application.Run(new SinkDNSManagerForm());
+            }
             TraceLogger.Log("SinkDNS Exiting...");
         }
     }

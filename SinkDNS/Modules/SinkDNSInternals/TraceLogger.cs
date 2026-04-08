@@ -99,7 +99,10 @@ namespace SinkDNS.Modules.SinkDNSInternals
                               [CallerLineNumber] int lineNumber = 0)
         {
             if (!ShouldLog(severity, Threshold))
-                return;          // drop the message
+                return;
+            //Perhaps have a DisableLogging instead of DisableDiskLogging. Prevents the overhead of preparing log entries when logging is disabled, even if disk logging is off.
+            if (!Settings.Default.EnableDiskLogging && severity != StatusSeverityType.Fatal)
+                return;
 
             string className = ExtractClassName(filePath);
             if (string.IsNullOrEmpty(message))
