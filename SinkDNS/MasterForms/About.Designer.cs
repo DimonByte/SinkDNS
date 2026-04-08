@@ -57,6 +57,7 @@
             // 
             // richTextBox1
             // 
+            richTextBox1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             richTextBox1.BackColor = SystemColors.InactiveCaption;
             richTextBox1.Location = new Point(12, 50);
             richTextBox1.Name = "richTextBox1";
@@ -73,7 +74,8 @@
             Controls.Add(richTextBox1);
             Controls.Add(verLabel);
             Controls.Add(pictureBox1);
-            FormBorderStyle = FormBorderStyle.FixedToolWindow;
+            FormBorderStyle = FormBorderStyle.SizableToolWindow;
+            MinimumSize = new Size(477, 317);
             Name = "About";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "About SinkDNS";
