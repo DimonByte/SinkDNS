@@ -2,11 +2,10 @@
     <img src="SinkDNS\Resources\SinkDNSIconImage.png" alt="SinkDNS" />
 </p>
 
-SinkDNS is a Windows-based DNSCrypt tool that interfaces with the DNSCrypt service to provide encrypted DNS traffic filtering that has auto-updating blocklists. It allows users to block unwanted domains via host files or individual user defined domains while maintaining the ability to bypass filtering when needed. The tool supports customizable blocklists and provides options for automatic updates of blocklists.
+SinkDNS is an MIT-licensed, Windows-based tool that interfaces with the DNSCrypt-Proxy service to provide encrypted DNS traffic filtering that has auto-updating blocklists. This is possible with individual user defined domains and user defined, community mantained blocklists.
 
 [![GitHub issues](https://img.shields.io/github/issues/DimonByte/SinkDNS)](https://github.com/DimonByte/SinkDNS/issues)
 [![GitHub stars](https://img.shields.io/github/stars/DimonByte/SinkDNS)](https://github.com/DimonByte/SinkDNS/stargazers)
-[![GitHub license](https://img.shields.io/github/license/DimonByte/SinkDNS)](https://github.com/DimonByte/SinkDNS/blob/master/LICENSE)
 ![GitHub CodeQL](https://github.com/DimonByte/SinkDNS/actions/workflows/codeql.yml/badge.svg)
 ![GitHub DOTNET](https://github.com/DimonByte/SinkDNS/actions/workflows/dotnet.yml/badge.svg)
 
