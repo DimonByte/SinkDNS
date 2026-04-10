@@ -27,6 +27,7 @@ using SinkDNS.Modules;
 using SinkDNS.Modules.SinkDNSInternals;
 using SinkDNS.Modules.System;
 using SinkDNS.Properties;
+using SinkDNS.UserControls;
 
 namespace SinkDNS
 {
@@ -36,8 +37,9 @@ namespace SinkDNS
         {
             InitializeComponent();
         }
-        private void LoadControl(Form? form)
+        private void LoadControl(UserControl? form)
         {
+            TraceLogger.Log($"Loading form: {form?.GetType().Name ?? "null"}");
             if (form == null)
             {
                 MainPanel.Panel2.Controls.Clear();
@@ -52,13 +54,12 @@ namespace SinkDNS
                     return;
                 }
             }
-            form.TopLevel = false;
-            form.FormBorderStyle = FormBorderStyle.None;
             form.Dock = DockStyle.Fill;
 
             MainPanel.Panel2.Controls.Clear();
             MainPanel.Panel2.Controls.Add(form);
             form.Show();
+            TraceLogger.Log($"Form loaded: {form.GetType().Name}");
         }
         private void SinkDNSMainForm_Load(object sender, EventArgs e)
         {
@@ -101,7 +102,8 @@ namespace SinkDNS
             //MessageBox.Show(monitor.isMonitoring.ToString());
             //NotificationManager.ShowNotification("This button does nothing", "This button is just a placeholder for now and does not do anything.", Enums.StatusSeverityType.Information);
             //TraceLogger.Log(LocalSystemManager.GetDNSCryptInstallationDirectory(true),Enums.StatusSeverityType.Debug);
-            TraceLogger.Log(UpdateManager.IsDNSCryptProxyUpdateAvailable().ToString(), Enums.StatusSeverityType.Debug);
+            //TraceLogger.Log(UpdateManager.IsDNSCryptProxyUpdateAvailable().ToString(), Enums.StatusSeverityType.Debug);
+            //TraceLogger.Log(LocalSystemManager.GetDNSCryptInstallationDirectory(), Enums.StatusSeverityType.Information);
         }
 
         private void SinkDNSManagerForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -177,7 +179,7 @@ namespace SinkDNS
 
         private void DashboardBtn_Click(object sender, EventArgs e)
         {
-            LoadControl(new HostListView());
+            LoadControl(new DNSConfigurationList());
         }
 
         private void SettingsBtn_Click(object sender, EventArgs e)

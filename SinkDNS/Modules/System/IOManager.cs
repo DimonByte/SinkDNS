@@ -45,7 +45,7 @@ namespace SinkDNS.Modules.System
                     catch (Exception ex)
                     {
                         //Since we failed here, we can't continue since it might be missing required configuration files for SinkDNS.
-                        TraceLogger.LogAndThrowMsgBox($"Error creating directory {dir}: {ex.Message}", Enums.StatusSeverityType.Fatal);
+                        TraceLogger.LogAndThrowMsgBox($"Error creating directory {dir}: {ex.ToString()}", Enums.StatusSeverityType.Fatal);
                     }
                 }
             }
@@ -64,7 +64,7 @@ namespace SinkDNS.Modules.System
                     }
                     catch (Exception ex)
                     {
-                        TraceLogger.Log($"Error creating file {file}: {ex.Message}", Enums.StatusSeverityType.Error);
+                        TraceLogger.Log($"Error creating file {file}: {ex.ToString()}", Enums.StatusSeverityType.Error);
                     }
                 }
                 else
@@ -161,9 +161,9 @@ namespace SinkDNS.Modules.System
             }
             catch (Exception ex)
             {
-                //TraceLogger.LogAndThrowMsgBox($"Configuration corruption check failure, SinkDNS cannot continue. {ex.Message}", Enums.StatusSeverityType.Fatal);
-                TraceLogger.Log($"Configuration corruption check failure: {ex.Message}", Enums.StatusSeverityType.Error);
-                DialogResult diagresult = MessageBox.Show($"SinkDNS - Configuration corruption check failed and is unable to confirm validity of config files. Do you want to reset all configuration folders and files to fix SinkDNS? This will delete all your custom blocklists, whitelists, resolvers, host files, and task schedules.\nMake sure to backup any important data before proceeding.\n\nYes to reset, No to attempt to run SinkDNS with existing configs, Cancel to exit SinkDNS.\n\n Error details: {ex.Message}", "SinkDNS - Configuration Corruption Detected", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning);
+                //TraceLogger.LogAndThrowMsgBox($"Configuration corruption check failure, SinkDNS cannot continue. {ex.ToString()}", Enums.StatusSeverityType.Fatal);
+                TraceLogger.Log($"Configuration corruption check failure: {ex.ToString()}", Enums.StatusSeverityType.Error);
+                DialogResult diagresult = MessageBox.Show($"SinkDNS - Configuration corruption check failed and is unable to confirm validity of config files. Do you want to reset all configuration folders and files to fix SinkDNS? This will delete all your custom blocklists, whitelists, resolvers, host files, and task schedules.\nMake sure to backup any important data before proceeding.\n\nYes to reset, No to attempt to run SinkDNS with existing configs, Cancel to exit SinkDNS.\n\n Error details: {ex.ToString()}", "SinkDNS - Configuration Corruption Detected", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning);
                 if (diagresult == DialogResult.Yes)
                 {
                     TraceLogger.Log("User chose to reset configuration folders and files to fix corruption.");
@@ -197,7 +197,7 @@ namespace SinkDNS.Modules.System
             }
             catch (Exception ex)
             {
-                TraceLogger.Log($"Error resetting configuration folders and files: {ex.Message}", Enums.StatusSeverityType.Error);
+                TraceLogger.Log($"Error resetting configuration folders and files: {ex.ToString()}", Enums.StatusSeverityType.Error);
             }
         }
 
@@ -213,7 +213,7 @@ namespace SinkDNS.Modules.System
                 }
                 catch (Exception ex)
                 {
-                    TraceLogger.Log($"Error creating backup for file {filePath}: {ex.Message}", Enums.StatusSeverityType.Error);
+                    TraceLogger.Log($"Error creating backup for file {filePath}: {ex.ToString()}", Enums.StatusSeverityType.Error);
                 }
             }
         }
@@ -265,7 +265,7 @@ namespace SinkDNS.Modules.System
             }
             catch (Exception ex)
             {
-                TraceLogger.Log($"Error merging files into {outputFile}: {ex.Message}", Enums.StatusSeverityType.Error);
+                TraceLogger.Log($"Error merging files into {outputFile}: {ex.ToString()}", Enums.StatusSeverityType.Error);
             }
             TraceLogger.Log($"Total entries in {outputFile}: {File.ReadAllLines(outputFile).Length}");
         }
@@ -281,7 +281,7 @@ namespace SinkDNS.Modules.System
                 }
                 catch (Exception ex)
                 {
-                    TraceLogger.Log($"Error deleting file {file}: {ex.Message}", Enums.StatusSeverityType.Error);
+                    TraceLogger.Log($"Error deleting file {file}: {ex.ToString()}", Enums.StatusSeverityType.Error);
                 }
             }
             TraceLogger.Log($"Cleared all files in folder: {folder}");
@@ -306,7 +306,7 @@ namespace SinkDNS.Modules.System
             }
             catch(Exception ex)
             {
-                TraceLogger.Log($"Error removing duplicates from {MergedFileLoc}: {ex.Message}", Enums.StatusSeverityType.Error);
+                TraceLogger.Log($"Error removing duplicates from {MergedFileLoc}: {ex.ToString()}", Enums.StatusSeverityType.Error);
             }
         }
     }

@@ -62,7 +62,7 @@ Instead of relying on the Windows host file, SinkDNS is a program that integrate
 
 ### Free & Open Source
 - 100% free
-- MIT licensed
+- SinkDNS is MIT licensed
 - No telemetry, no ads, no data collection, no nonsense
 
 ## Requirements

@@ -69,8 +69,8 @@ namespace SinkDNS.Modules.SinkDNSInternals
                 }
                 catch (Exception ex)
                 {
-                    Log($"Failed to clear expired logs: {ex.Message}", StatusSeverityType.Error);
-                    Debug.WriteLine($"Failed to clear expired logs: {ex.Message}");
+                    Log($"Failed to clear expired logs: {ex.ToString()}", StatusSeverityType.Error);
+                    Debug.WriteLine($"Failed to clear expired logs: {ex.ToString()}");
                 }
             }
         }
@@ -127,7 +127,7 @@ namespace SinkDNS.Modules.SinkDNSInternals
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Failed to prepare log entry: {ex.Message}");
+                Debug.WriteLine($"Failed to prepare log entry: {ex.ToString()}");
             }
             Debug.WriteLine(logEntry);
             lock (_lock)
@@ -141,7 +141,7 @@ namespace SinkDNS.Modules.SinkDNSInternals
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"Failed to write to log: {ex.Message}");
+                    Debug.WriteLine($"Failed to write to log: {ex.ToString()}");
                 }
             }
         }

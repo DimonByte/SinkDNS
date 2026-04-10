@@ -15,16 +15,16 @@
       <Value Profile="(Default)">config/whitelist.ini</Value>
     </Setting>
     <Setting Name="UserBlocklistIniLocation" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">hostfiles/userblocklist.txt</Value>
+      <Value Profile="(Default)">config/userblocklist.txt</Value>
     </Setting>
     <Setting Name="UserWhitelistIniLocation" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">hostfiles/userwhitelist.txt</Value>
+      <Value Profile="(Default)">config/userwhitelist.txt</Value>
     </Setting>
     <Setting Name="CombinedBlocklistFileLocation" Type="System.String" Scope="Application">
       <Value Profile="(Default)">hostfiles/blocklist/combined-blocklist.txt</Value>
     </Setting>
     <Setting Name="CombinedWhitelistFileLocation" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">hostfiles/blocklist/combined-whitelist.txt</Value>
+      <Value Profile="(Default)">hostfiles/whitelist/combined-whitelist.txt</Value>
     </Setting>
     <Setting Name="LogsFolderLocation" Type="System.String" Scope="Application">
       <Value Profile="(Default)">logs</Value>

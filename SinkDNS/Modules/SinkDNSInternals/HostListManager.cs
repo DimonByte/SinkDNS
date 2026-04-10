@@ -48,7 +48,7 @@ namespace SinkDNS.Modules.SinkDNSInternals
                 catch (Exception ex)
                 {
                     //We can't continue if we can't delete blocklists, since it failed here it might be permissions. And we don't want to merge old blocklists with new ones.
-                    TraceLogger.Log($"Failed to delete old blocklist file: {file}. Download halted. Exception: {ex.Message}", Enums.StatusSeverityType.Error);
+                    TraceLogger.Log($"Failed to delete old blocklist file: {file}. Download halted. Exception: {ex.ToString()}", Enums.StatusSeverityType.Error);
                     return;
                 }
             }

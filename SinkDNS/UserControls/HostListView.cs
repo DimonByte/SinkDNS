@@ -8,7 +8,7 @@ using System.Windows.Forms;
 
 namespace SinkDNS.ChildForms
 {
-    public partial class HostListView : Form
+    public partial class HostListView : UserControl
     {
         public HostListView()
         {

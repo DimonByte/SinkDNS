@@ -55,7 +55,7 @@ namespace SinkDNS.Modules.System
             }
             catch (Exception ex)
             {
-                TraceLogger.Log($"Error running command '{command}': {ex.Message}", Enums.StatusSeverityType.Error);
+                TraceLogger.Log($"Error running command '{command}': {ex.ToString()}", Enums.StatusSeverityType.Error);
                 return string.Empty;
             }
         }
@@ -117,7 +117,7 @@ namespace SinkDNS.Modules.System
             }
             catch (Exception ex)
             {
-                TraceLogger.Log($"Failed to run elevated commands: {ex.Message}", Enums.StatusSeverityType.Error);
+                TraceLogger.Log($"Failed to run elevated commands: {ex.ToString()}", Enums.StatusSeverityType.Error);
                 return false;
             }
         }
@@ -155,7 +155,32 @@ namespace SinkDNS.Modules.System
             }
             catch (Exception ex)
             {
-                TraceLogger.Log($"Failed to run elevated command: {ex.Message}", Enums.StatusSeverityType.Error);
+                TraceLogger.Log($"Failed to run elevated command: {ex.ToString()}", Enums.StatusSeverityType.Error);
+                return false;
+            }
+        }
+
+        public static bool SaveToFileWithElevation(string filePath, string content)
+        {
+            try
+            {
+                string tempFilePath = Path.GetTempFileName();
+                File.WriteAllText(tempFilePath, content);
+                TraceLogger.Log($"Temporary file created at {tempFilePath} for saving content with elevation.");
+                bool success = RunElevatedCommand("cmd.exe", $"/c move /Y \"{tempFilePath}\" \"{filePath}\"");
+                if (success)
+                {
+                    TraceLogger.Log($"Content saved to {filePath} successfully with elevation.");
+                }
+                else
+                {
+                    TraceLogger.Log($"Failed to save content to {filePath} with elevation.", Enums.StatusSeverityType.Error);
+                }
+                return success;
+            }
+            catch (Exception ex)
+            {
+                TraceLogger.Log($"Error saving to file with elevation: {ex.ToString()}", Enums.StatusSeverityType.Error);
                 return false;
             }
         }

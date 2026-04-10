@@ -118,7 +118,7 @@ namespace SinkDNS.Modules.System
                 }
                 catch (Exception ex)
                 {
-                    TraceLogger.Log($"Error showing main window from NotifyIcon: {ex.Message}", Enums.StatusSeverityType.Error);
+                    TraceLogger.Log($"Error showing main window from NotifyIcon: {ex.ToString()}", Enums.StatusSeverityType.Error);
                 }
 
             }

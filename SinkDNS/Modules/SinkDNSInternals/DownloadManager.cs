@@ -105,7 +105,7 @@ namespace SinkDNS.Modules.SinkDNSInternals
             }
             catch (Exception ex)
             {
-                TraceLogger.Log($"Error downloading file: {ex.Message}", Enums.StatusSeverityType.Error);
+                TraceLogger.Log($"Error downloading file: {ex.ToString()}", Enums.StatusSeverityType.Error);
                 TraceLogger.Log($"Exception details: {ex}", Enums.StatusSeverityType.Error);
                 return false;
             }
@@ -130,7 +130,7 @@ namespace SinkDNS.Modules.SinkDNSInternals
         //    }
         //    catch (Exception ex)
         //    {
-        //        TraceLogger.Log($"Error downloading string: {ex.Message}", Enums.StatusSeverityType.Error);
+        //        TraceLogger.Log($"Error downloading string: {ex.ToString()}", Enums.StatusSeverityType.Error);
         //        return null;
         //    }
         //}
@@ -153,7 +153,7 @@ namespace SinkDNS.Modules.SinkDNSInternals
         //    }
         //    catch (Exception ex)
         //    {
-        //        TraceLogger.Log($"Error getting HTTP headers: {ex.Message}", Enums.StatusSeverityType.Error);
+        //        TraceLogger.Log($"Error getting HTTP headers: {ex.ToString()}", Enums.StatusSeverityType.Error);
         //        return null;
         //    }
         //}

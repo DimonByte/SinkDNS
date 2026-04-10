@@ -26,6 +26,7 @@ using System.Runtime.InteropServices;
 
 public class DNSCryptQueryMonitor
 {
+    //Done via watching the log file that DNSCrypt creates.
     private string logFilePath;
     private FileSystemWatcher fileWatcher;
     public bool isMonitoring = false;
@@ -68,7 +69,7 @@ public class DNSCryptQueryMonitor
         }
         catch (Exception ex)
         {
-            TraceLogger.Log($"Error starting monitoring: {ex.Message}", Enums.StatusSeverityType.Error);
+            TraceLogger.Log($"Error starting monitoring: {ex.ToString()}", Enums.StatusSeverityType.Error);
         }
     }
     private bool IsFileLocked(IOException ex)
@@ -107,13 +108,13 @@ public class DNSCryptQueryMonitor
                 }
                 else
                 {
-                    TraceLogger.Log($"Failed to read log file after {maxRetries} attempts: {ex.Message}", Enums.StatusSeverityType.Error);
+                    TraceLogger.Log($"Failed to read log file after {maxRetries} attempts: {ex.ToString()}", Enums.StatusSeverityType.Error);
                     throw;
                 }
             }
             catch (Exception ex)
             {
-                TraceLogger.Log($"Error reading existing log: {ex.Message}", Enums.StatusSeverityType.Error);
+                TraceLogger.Log($"Error reading existing log: {ex.ToString()}", Enums.StatusSeverityType.Error);
                 throw;
             }
         }
@@ -171,7 +172,7 @@ public class DNSCryptQueryMonitor
             }
             catch (Exception ex)
             {
-                TraceLogger.Log($"Background polling error: {ex.Message}", Enums.StatusSeverityType.Error);
+                TraceLogger.Log($"Background polling error: {ex.ToString()}", Enums.StatusSeverityType.Error);
             }
         }
     }
@@ -205,7 +206,7 @@ public class DNSCryptQueryMonitor
         }
         catch (Exception ex)
         {
-            TraceLogger.Log($"Error processing log line: {ex.Message}", Enums.StatusSeverityType.Error);
+            TraceLogger.Log($"Error processing log line: {ex.ToString()}", Enums.StatusSeverityType.Error);
         }
     }
     private async Task ProcessNewLogLines()
@@ -241,12 +242,12 @@ public class DNSCryptQueryMonitor
                 }
                 else
                 {
-                    TraceLogger.Log($"Failed to process new log lines after {maxRetries} attempts: {ex.Message}", Enums.StatusSeverityType.Error);
+                    TraceLogger.Log($"Failed to process new log lines after {maxRetries} attempts: {ex.ToString()}", Enums.StatusSeverityType.Error);
                 }
             }
             catch (Exception ex)
             {
-                TraceLogger.Log($"Error processing new log lines: {ex.Message}", Enums.StatusSeverityType.Error);
+                TraceLogger.Log($"Error processing new log lines: {ex.ToString()}", Enums.StatusSeverityType.Error);
                 break;
             }
         }

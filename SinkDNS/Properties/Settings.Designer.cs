@@ -61,7 +61,7 @@ namespace SinkDNS.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("hostfiles/userblocklist.txt")]
+        [global::System.Configuration.DefaultSettingValueAttribute("config/userblocklist.txt")]
         public string UserBlocklistIniLocation {
             get {
                 return ((string)(this["UserBlocklistIniLocation"]));
@@ -70,7 +70,7 @@ namespace SinkDNS.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("hostfiles/userwhitelist.txt")]
+        [global::System.Configuration.DefaultSettingValueAttribute("config/userwhitelist.txt")]
         public string UserWhitelistIniLocation {
             get {
                 return ((string)(this["UserWhitelistIniLocation"]));
@@ -88,7 +88,7 @@ namespace SinkDNS.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("hostfiles/blocklist/combined-whitelist.txt")]
+        [global::System.Configuration.DefaultSettingValueAttribute("hostfiles/whitelist/combined-whitelist.txt")]
         public string CombinedWhitelistFileLocation {
             get {
                 return ((string)(this["CombinedWhitelistFileLocation"]));

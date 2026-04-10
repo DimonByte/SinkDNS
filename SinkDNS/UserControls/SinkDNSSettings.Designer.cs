@@ -63,9 +63,6 @@
             ClientSize = new Size(800, 450);
             Controls.Add(pgSettings);
             Controls.Add(label1);
-            FormBorderStyle = FormBorderStyle.None;
-            Name = "SinkDNSSettings";
-            Text = "SinkDNSSettings";
             Load += SinkDNSSettings_Load;
             ResumeLayout(false);
         }

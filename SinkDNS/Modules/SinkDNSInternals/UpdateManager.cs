@@ -147,7 +147,7 @@ namespace SinkDNS.Modules.SinkDNSInternals
             }
             catch (Exception ex)
             {
-                TraceLogger.Log($"GetLatestReleaseTag error for {ownerRepo}: {ex.Message}", Enums.StatusSeverityType.Error);
+                TraceLogger.Log($"GetLatestReleaseTag error for {ownerRepo}: {ex.ToString()}", Enums.StatusSeverityType.Error);
             }
             TraceLogger.Log($"Failed to get latest release tag for {ownerRepo}.", Enums.StatusSeverityType.Error);
             return "";

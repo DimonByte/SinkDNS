@@ -59,7 +59,7 @@ namespace SinkDNS.Modules.System
             }
             catch (Exception ex)
             {
-                TraceLogger.Log($"Failed to show system tray notification: {ex.Message}", StatusSeverityType.Error);
+                TraceLogger.Log($"Failed to show system tray notification: {ex.ToString()}", StatusSeverityType.Error);
             }
         }
 

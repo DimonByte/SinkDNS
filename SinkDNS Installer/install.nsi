@@ -2,6 +2,7 @@
 ; Requires: DNSCryptProxy\, SinkDNS\, DNSCryptConfig\, Credits.txt in same folder as this .nsi
 
 ; TODO: Test on VM, and on install fail, run uninstall section
+;Also TODO: if possible, also install .Net Desktop Runtime version 10.0.5 x64 since install now works but running SinkDNS doesn't on a fresh Windows OS.
 
 !include "MUI2.nsh"
 !include "LogicLib.nsh"
@@ -20,7 +21,7 @@ InstallDir "$LOCALAPPDATA\SinkDNS"
 !insertmacro MUI_PAGE_WELCOME
 !insertmacro MUI_PAGE_LICENSE "Credits.txt"
 !insertmacro MUI_PAGE_COMPONENTS
-!insertmacro MUI_PAGE_DIRECTORY
+;!insertmacro MUI_PAGE_DIRECTORY - Removed
 !insertmacro MUI_PAGE_INSTFILES
 !insertmacro MUI_PAGE_FINISH
 

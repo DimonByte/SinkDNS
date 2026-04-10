@@ -44,11 +44,10 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(703, 406);
+            BackColor = SystemColors.ActiveCaption;
             Controls.Add(label1);
-            FormBorderStyle = FormBorderStyle.None;
             Name = "HostListView";
-            Text = "HostListView";
+            Size = new Size(703, 406);
             ResumeLayout(false);
             PerformLayout();
         }

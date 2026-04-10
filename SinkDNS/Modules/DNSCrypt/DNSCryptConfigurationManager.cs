@@ -238,7 +238,7 @@ namespace SinkDNS.Modules.DNSCrypt
             }
             catch (Exception ex)
             {
-                TraceLogger.LogAndThrowMsgBox($"Failed to write configuration file: {ex.Message}", Enums.StatusSeverityType.Error);
+                TraceLogger.LogAndThrowMsgBox($"Failed to write configuration file: {ex.ToString()}", Enums.StatusSeverityType.Error);
             }
         }
 

@@ -73,14 +73,14 @@ namespace SinkDNS
             {
                 TraceLogger.Log("Disk logging is disabled in settings by user.");
             }
-            TraceLogger.Log("Creating application main form...");
             if (firstTimeSetupRequired)
             {
-                TraceLogger.Log("First time setup is required due to missing files/folders. Opening first time setup form.");
+                TraceLogger.Log("First time setup is required due to missing files/folders. Opening first time setup form...");
                 Application.Run(new SinkDNSFirstTimeSetup());
             }
             else
             {
+                TraceLogger.Log("First time setup is not required. Running main manager form.");
                 Application.Run(new SinkDNSManagerForm());
             }
             TraceLogger.Log("SinkDNS Exiting...");

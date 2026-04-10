@@ -27,7 +27,7 @@ using System.Configuration;
 
 namespace SinkDNS.ChildForms
 {
-    public partial class SinkDNSSettings : Form
+    public partial class SinkDNSSettings : UserControl
     {
         public SinkDNSSettings()
         {
@@ -77,7 +77,7 @@ namespace SinkDNS.ChildForms
             }
             catch(Exception ex)
             {
-                TraceLogger.LogAndThrowMsgBox($"Failed to save setting: {e.ChangedItem.PropertyDescriptor.Name} - {ex.Message}", Enums.StatusSeverityType.Error);
+                TraceLogger.LogAndThrowMsgBox($"Failed to save setting: {e.ChangedItem.PropertyDescriptor.Name} - {ex.ToString()}", Enums.StatusSeverityType.Error);
                 return;
             }
         }
