@@ -1,6 +1,6 @@
 ﻿//MIT License
 
-//Copyright (c) 2026 Dimon
+//Copyright (c) 2025 - 2026 Dimon
 
 //Permission is hereby granted, free of charge, to any person obtaining a copy
 //of this software and associated documentation files (the "Software"), to deal
@@ -69,8 +69,8 @@ namespace SinkDNS.Modules.SinkDNSInternals
                 }
                 catch (Exception ex)
                 {
-                    Log($"Failed to clear expired logs: {ex.ToString()}", StatusSeverityType.Error);
-                    Debug.WriteLine($"Failed to clear expired logs: {ex.ToString()}");
+                    Log($"Failed to clear expired logs: {ex}", StatusSeverityType.Error);
+                    Debug.WriteLine($"Failed to clear expired logs: {ex}");
                 }
             }
         }
@@ -122,12 +122,12 @@ namespace SinkDNS.Modules.SinkDNSInternals
                 }
                 string timestamp = now.ToString("yyyy-MM-dd HH:mm:ss.fff");
                 string severityText = severity.ToString().ToUpper();
-                string processID = Process.GetCurrentProcess().Id.ToString();
+                string processID = Environment.ProcessId.ToString();
                 logEntry = $"[{timestamp}] [PID: {processID}] [{severityText}] [{className}] [{memberName}] [Line: {lineNumber}]: {message}";
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Failed to prepare log entry: {ex.ToString()}");
+                Debug.WriteLine($"Failed to prepare log entry: {ex}");
             }
             Debug.WriteLine(logEntry);
             lock (_lock)
@@ -141,7 +141,7 @@ namespace SinkDNS.Modules.SinkDNSInternals
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"Failed to write to log: {ex.ToString()}");
+                    Debug.WriteLine($"Failed to write to log: {ex}");
                 }
             }
         }

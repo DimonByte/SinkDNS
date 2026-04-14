@@ -36,10 +36,10 @@
             // 
             pgSettings.BackColor = SystemColors.Control;
             pgSettings.Dock = DockStyle.Fill;
-            pgSettings.Location = new Point(0, 39);
+            pgSettings.Location = new Point(0, 36);
             pgSettings.Name = "pgSettings";
             pgSettings.PropertySort = PropertySort.Categorized;
-            pgSettings.Size = new Size(800, 411);
+            pgSettings.Size = new Size(800, 414);
             pgSettings.TabIndex = 0;
             pgSettings.PropertyValueChanged += pgSettings_PropertyValueChanged;
             // 
@@ -50,7 +50,7 @@
             label1.ForeColor = Color.Yellow;
             label1.Location = new Point(0, 0);
             label1.Name = "label1";
-            label1.Size = new Size(800, 39);
+            label1.Size = new Size(800, 36);
             label1.TabIndex = 1;
             label1.Text = "Warning: Changing these settings to incorrect values can make SinkDNS and/or DNSCrypt-Proxy (the service that filters DNS traffic) stop working.";
             label1.TextAlign = ContentAlignment.MiddleCenter;
@@ -60,9 +60,10 @@
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.FromArgb(6, 26, 64);
-            ClientSize = new Size(800, 450);
             Controls.Add(pgSettings);
             Controls.Add(label1);
+            Name = "SinkDNSSettings";
+            Size = new Size(800, 450);
             Load += SinkDNSSettings_Load;
             ResumeLayout(false);
         }

@@ -1,6 +1,7 @@
 ﻿using SinkDNS.Modules.SinkDNSInternals;
 using SinkDNS.Modules.System;
 using SinkDNS.Properties;
+using SinkDNS.Modules.DNSCrypt;
 using System.Data;
 
 namespace SinkDNS.UserControls
@@ -11,7 +12,7 @@ namespace SinkDNS.UserControls
         {
             InitializeComponent();
         }
-
+        private string DNSCryptPath = LocalSystemManager.GetDNSCryptInstallationDirectory(); //Cache result.
         private async void DNSConfigurationList_Load(object sender, EventArgs e)
         {
             TraceLogger.Log("Loading DNS Configuration List...");
@@ -46,10 +47,10 @@ namespace SinkDNS.UserControls
                     return;
                 }
                 markdownContent = markdownContent.Replace("\r\n", "\n").Replace("\r", "\n"); // Normalize line endings
-                List<string> resolverNames = ParseResolverNamesFromMarkdown(markdownContent).OrderBy(name => name).ToList();
-                checkedListBox1.Items.AddRange(resolverNames.ToArray());
-                string tomlPath = Path.Combine(LocalSystemManager.GetDNSCryptInstallationDirectory(), "dnscrypt-proxy.toml");
-                List<string> selectedResolverNames = GetConfiguredResolversFromToml(File.ReadAllText(tomlPath));
+                List<string> resolverNames = [.. PublicResolverManager.ParseResolverNamesFromMarkdown(markdownContent).OrderBy(name => name)];
+                checkedListBox1.Items.AddRange([.. resolverNames]);
+                string tomlPath = Path.Combine(DNSCryptPath, "dnscrypt-proxy.toml");
+                List<string> selectedResolverNames = PublicResolverManager.GetConfiguredResolversFromToml(File.ReadAllText(tomlPath));
                 SetCheckBoxesOnListbox(selectedResolverNames);
             }
             catch (Exception ex)
@@ -77,62 +78,38 @@ namespace SinkDNS.UserControls
             TraceLogger.Log("Finished setting checkboxes on listbox.");
         }
 
-        private static List<string> ParseResolverNamesFromMarkdown(string? markdownContent)
+        private void ApplyBtn_Click(object sender, EventArgs e)
         {
-            //Format of the markdown is:
-            //## TEST DNS
-
-            //Non-filtering, No-logging, DNSSEC DoH operated by someone.
-            //Homepage: https://TEST.COm
-
-            //sdns://REMOVED
-            //sdns://REMOVED
-            List<string>? resolverNames = null;
-            foreach (string line in markdownContent?.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries) ?? Array.Empty<string>())
-            {
-                if (line.StartsWith("## "))
-                {
-                    string resolverName = line.Substring(3).Trim();
-                    resolverNames ??= new List<string>();
-                    resolverNames.Add(resolverName);
-                }
-            }
-            TraceLogger.Log($"Total resolver names parsed from markdown: {resolverNames?.Count ?? 0}");
-            return resolverNames ?? new List<string>();
+            TraceLogger.Log("Attempting to apply selected DNS resolvers...");
+            PublicResolverManager.WriteNewResolversToToml(Path.Combine(DNSCryptPath, "dnscrypt-proxy.toml"), checkedListBox1.CheckedItems.Cast<string>().ToList());
         }
-        private static List<string> GetConfiguredResolversFromToml(string tomlContent)
+
+        private void ApplyAndRestartBtn_Click(object sender, EventArgs e)
         {
-            List<string> configuredResolvers = new List<string>();
-            foreach (string line in tomlContent.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries))
+            TraceLogger.Log("Attempting to apply selected DNS resolvers...");
+            PublicResolverManager.WriteNewResolversToToml(Path.Combine(DNSCryptPath, "dnscrypt-proxy.toml"), checkedListBox1.CheckedItems.Cast<string>().ToList());
+            TraceLogger.Log("Attempting to restart DNSCrypt service...");
+            LocalSystemManager.RestartDnsCrypt();
+        }
+
+        private void AddCustomToListBtn_Click(object sender, EventArgs e)
+        {
+            //Check if text is customStaticTxt is valid (not empty, and not already in the list), if it is valid, add it to the checkedListBox1 and check it.
+            if (!string.IsNullOrWhiteSpace(customStaticServerTxt.Text))
             {
-                //TraceLogger.Log("Checking line in toml: " + line);
-                if (line.TrimStart().StartsWith("server_names = ["))
+                string newResolver = customStaticServerTxt.Text.Trim();
+                if (!checkedListBox1.Items.Contains(newResolver))
                 {
-                    TraceLogger.Log("Found server_names line: " + line);
-                    int startIndex = line.IndexOf('[') + 1;
-                    int endIndex = line.IndexOf(']');
-                    if (startIndex > 0 && endIndex > startIndex)
-                    {
-                        TraceLogger.Log("Extracting resolver names from server_names line.");
-                        string resolversList = line.Substring(startIndex, endIndex - startIndex);
-                        string[] resolvers = resolversList.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-                        foreach (string resolver in resolvers)
-                        {
-                            TraceLogger.Log("Processing resolver entry: " + resolver);
-                            string cleanedResolver = resolver.Trim().Trim('"');
-                            if (!string.IsNullOrEmpty(cleanedResolver))
-                            {
-                                TraceLogger.Log("Adding resolver to configured list: " + cleanedResolver);
-                                configuredResolvers.Add(cleanedResolver);
-                            }
-                        }
-                    }
+                    checkedListBox1.Items.Add(newResolver, true);
+                    TraceLogger.Log($"Added custom resolver to list and checked it: {newResolver}");
+                    MessageBox.Show($"Added custom resolver to list and checked it: {newResolver}", "Custom Resolver Added", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                else
+                {
+                    TraceLogger.Log($"Custom resolver already exists in the list, not adding: {newResolver}");
+                    MessageBox.Show($"Custom resolver already exists in the list, not adding: {newResolver}", "Duplicate Resolver", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
             }
-            TraceLogger.Log("Total configured resolvers found: " + configuredResolvers.Count);
-            configuredResolvers = configuredResolvers.Select(r => r.Trim().Trim('"', '\'')).Where(r => !string.IsNullOrEmpty(r)).ToList();
-            TraceLogger.Log("Resolver List:" + string.Join(", ", configuredResolvers));
-            return configuredResolvers;
         }
     }
 }

@@ -1,6 +1,6 @@
 //MIT License
 
-//Copyright (c) 2026 Dimon
+//Copyright (c) 2025 - 2026 Dimon
 
 //Permission is hereby granted, free of charge, to any person obtaining a copy
 //of this software and associated documentation files (the "Software"), to deal
@@ -23,6 +23,7 @@
 //TODO: SinkDNS will run from localappdata to allow non-admin writes to blocklists and such.
 
 using SinkDNS.ChildForms;
+using SinkDNS.MasterForms;
 using SinkDNS.Modules;
 using SinkDNS.Modules.SinkDNSInternals;
 using SinkDNS.Modules.System;
@@ -77,7 +78,7 @@ namespace SinkDNS
             else
             {
                 GlobalNotifyIcon.Instance.SetText("SinkDNS - DNSCrypt Stopped");
-                GlobalNotifyIcon.Instance.SetIcon(Properties.Resources.WarningIcon);
+                GlobalNotifyIcon.Instance.SetIcon(Resources.WarningIcon);
                 //Since this program is likely set to start at startup, and DNSCrypt is not running, maybe check after a minute or so if DNSCrypt is running. This is because DNSCrypt might take a while to start up, and we don't want to show this manager form unnecessarily.
                 NotificationManager.ShowNotification("DNSCrypt Not Running", "DNSCrypt is not running. Please start DNSCrypt to use SinkDNS features.", Enums.StatusSeverityType.Warning);
                 TraceLogger.Log("DNSCrypt is not running.", Enums.StatusSeverityType.Warning);
@@ -126,11 +127,11 @@ namespace SinkDNS
 
         private void restartDNSCryptToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            GlobalNotifyIcon.Instance.SetIcon(Properties.Resources.WarningIcon);
+            GlobalNotifyIcon.Instance.SetIcon(Resources.WarningIcon);
             NotificationManager.ShowNotification("Restarting DNSCrypt", "Attempting to restart DNSCrypt...", Enums.StatusSeverityType.Information);
             if (LocalSystemManager.RestartDnsCrypt())
             {
-                GlobalNotifyIcon.Instance.SetIcon(Properties.Resources.SinkDNSIcon);
+                GlobalNotifyIcon.Instance.SetIcon(Resources.SinkDNSIcon);
                 NotificationManager.ShowNotification("DNSCrypt Restarted", "DNSCrypt has been restarted successfully.", Enums.StatusSeverityType.Information);
                 TraceLogger.Log("DNSCrypt restarted successfully.");
             }
@@ -143,26 +144,7 @@ namespace SinkDNS
 
         private void updateBlocklistsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            NotificationManager.ShowNotification("Updating Blocklists", "Downloading and updating blocklists...", Enums.StatusSeverityType.Information);
-            GlobalNotifyIcon.Instance.SetIcon(Properties.Resources.DownloadingIcon);
-            HostListManager.DownloadBlocklistsAsync().GetAwaiter().GetResult();
-            GlobalNotifyIcon.Instance.SetIcon(Properties.Resources.UpdateAvailableIcon);
-            if (Settings.Default.RestartDNSCryptAfterUpdatingLists)
-            {
-                if (LocalSystemManager.RestartDnsCrypt())
-                {
-                    NotificationManager.ShowNotification("Blocklists Updated", "Blocklists have been updated and DNSCrypt restarted successfully.", Enums.StatusSeverityType.Information);
-                }
-                else
-                {
-                    NotificationManager.ShowNotification("Blocklists Updated", "Blocklists have been updated, but DNSCrypt restart failed.", Enums.StatusSeverityType.Warning);
-                }
-            }
-            else
-            {
-                NotificationManager.ShowNotification("Blocklists Updated", "Blocklists have been updated and will be applied after a DNSCrypt service restart.", Enums.StatusSeverityType.Information);
-            }
-            GlobalNotifyIcon.Instance.SetIcon(Properties.Resources.SinkDNSIcon);
+            HostListManager.UpdateLists(Enums.ListType.Blocklist);
         }
 
         private void openManagerToolStripMenuItem_Click(object sender, EventArgs e)
@@ -179,12 +161,23 @@ namespace SinkDNS
 
         private void DashboardBtn_Click(object sender, EventArgs e)
         {
-            LoadControl(new DNSConfigurationList());
+            LoadControl(new HostListView());
         }
 
         private void SettingsBtn_Click(object sender, EventArgs e)
         {
             LoadControl(new SinkDNSSettings());
+        }
+
+        private void traceLogViewerToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            TraceLogViewer traceLogViewer = new TraceLogViewer();
+            traceLogViewer.Show();
+        }
+
+        private void PublicResolversBtn_Click(object sender, EventArgs e)
+        {
+            LoadControl(new DNSConfigurationList());
         }
     }
 }

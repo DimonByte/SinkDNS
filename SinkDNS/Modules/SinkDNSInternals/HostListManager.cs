@@ -1,6 +1,6 @@
 ﻿//MIT License
 
-//Copyright (c) 2026 Dimon
+//Copyright (c) 2025 - 2026 Dimon
 
 //Permission is hereby granted, free of charge, to any person obtaining a copy
 //of this software and associated documentation files (the "Software"), to deal
@@ -30,16 +30,65 @@ namespace SinkDNS.Modules.SinkDNSInternals
     //BlockListCompression as well, that will remove any # comments and blank lines from the block lists to reduce their size.
     public static class HostListManager
     {
-        public static async Task DownloadBlocklistsAsync()
+        private static bool ProblemWhenDownloadingLists = false;
+        public static void UpdateLists(Enums.ListType listType)
         {
-            DateTime StartOfBlockList = DateTime.Now;
-            if (!File.Exists(Settings.Default.BlocklistIniLocation))
+            string listName = listType == Enums.ListType.Blocklist ? "Blocklists" : "Whitelists";
+            NotificationManager.ShowNotification($"Updating {listName}", $"Downloading and updating {listName}...", Enums.StatusSeverityType.Information);
+            GlobalNotifyIcon.Instance.SetIcon(Resources.DownloadingIcon);
+            if (listType == Enums.ListType.Blocklist)
             {
-                TraceLogger.LogAndThrowMsgBox($"Blocklist configuration file not found: {Settings.Default.BlocklistIniLocation}", Enums.StatusSeverityType.Warning);
+                DownloadListsAsync(Settings.Default.BlocklistIniLocation, Settings.Default.BlocklistFolderLocation, Settings.Default.CombinedBlocklistFileLocation).GetAwaiter().GetResult();
+            }
+            else if (listType == Enums.ListType.Whitelist)
+            {
+                DownloadListsAsync(Settings.Default.WhitelistIniLocation, Settings.Default.WhitelistFolderLocation, Settings.Default.CombinedWhitelistFileLocation).GetAwaiter().GetResult();
+            }
+            else
+            {
+                TraceLogger.Log($"Invalid list type specified for update: {listType}", Enums.StatusSeverityType.Error);
                 return;
             }
-            //Delete all blocklist files in the blocklist folder before downloading new ones to ensure we don't have any old blocklists lying around.
-            foreach (var file in Directory.GetFiles(Settings.Default.BlocklistFolderLocation))
+            GlobalNotifyIcon.Instance.SetIcon(Resources.UpdateAvailableIcon);
+            if (Settings.Default.RestartDNSCryptAfterUpdatingLists)
+            {
+                bool RestartResult = LocalSystemManager.RestartDnsCrypt();
+                TraceLogger.Log($"DNSCrypt restart result after updating {listName}: {RestartResult}", Enums.StatusSeverityType.Information);
+                if (RestartResult & !ProblemWhenDownloadingLists)
+                {
+                    NotificationManager.ShowNotification($"{listName} Updated", $"{listName} have been updated and DNSCrypt restarted successfully.", Enums.StatusSeverityType.Information);
+                }
+                else if (!RestartResult & !ProblemWhenDownloadingLists)
+                {
+                    NotificationManager.ShowNotification($"{listName} Updated", $"{listName} have been updated, but DNSCrypt restart failed.", Enums.StatusSeverityType.Warning);
+                }
+                else if (RestartResult & ProblemWhenDownloadingLists)
+                {
+                    NotificationManager.ShowNotification($"{listName} Updated with Issues", $"{listName} update was attempted and DNSCrypt restarted successfully, but there were issues during the download process. Check logs for details.", Enums.StatusSeverityType.Warning);
+                }
+                else if (!RestartResult & ProblemWhenDownloadingLists)
+                 {
+                    NotificationManager.ShowNotification($"{listName} Updated with Issues", $"{listName} update was attempted, but DNSCrypt restart failed and there were issues during the download process. Check logs for details.", Enums.StatusSeverityType.Error);
+                }
+                else
+                {
+                    NotificationManager.ShowNotification($"{listName} Updated", $"{listName} have been updated and will be applied after a DNSCrypt service restart.", Enums.StatusSeverityType.Information);
+                }
+                GlobalNotifyIcon.Instance.SetIcon(Resources.SinkDNSIcon);
+                TraceLogger.Log($"Finished {listName} update process. DNSCrypt restart attempted: {RestartResult}, Problem when downloading lists: {ProblemWhenDownloadingLists}", Enums.StatusSeverityType.Information);
+                ProblemWhenDownloadingLists = false;
+            }
+        }
+
+        private static async Task DownloadListsAsync(string IniLocation, string ListFolderLocation, string CombinedListLocation)
+        {
+            DateTime StartOfBlockList = DateTime.Now;
+            if (!File.Exists(IniLocation))
+            {
+                TraceLogger.LogAndThrowMsgBox($"List configuration file not found: {IniLocation}", Enums.StatusSeverityType.Warning);
+                return;
+            }
+            foreach (var file in Directory.GetFiles(ListFolderLocation))
             {
                 try
                 {
@@ -47,52 +96,34 @@ namespace SinkDNS.Modules.SinkDNSInternals
                 }
                 catch (Exception ex)
                 {
-                    //We can't continue if we can't delete blocklists, since it failed here it might be permissions. And we don't want to merge old blocklists with new ones.
-                    TraceLogger.Log($"Failed to delete old blocklist file: {file}. Download halted. Exception: {ex.ToString()}", Enums.StatusSeverityType.Error);
+                    ProblemWhenDownloadingLists = true;
+                    TraceLogger.Log($"Failed to delete old list file: {file}. Download halted. Exception: {ex.ToString()}", Enums.StatusSeverityType.Error);
                     return;
                 }
             }
 
-            var urls = ReadUrlsFromFile(Settings.Default.BlocklistIniLocation);
+            var urls = ReadUrlsFromFile(IniLocation);
             foreach (var url in urls)
             {
-                TraceLogger.Log($"Downloading blocklist from: {url}");
+                TraceLogger.Log($"Downloading list from: {url}");
                 var fileName = Path.GetFileName(url);
-                var filePath = Path.Combine(Settings.Default.BlocklistFolderLocation, fileName);
+                var filePath = Path.Combine(ListFolderLocation, fileName);
                 await DownloadManager.DownloadFileAsync(url, filePath).ConfigureAwait(false);
             }
-            TraceLogger.Log("Finished downloading blocklists.");
-            IOManager.MergeFiles(Settings.Default.BlocklistFolderLocation, Settings.Default.CombinedBlocklistFileLocation);
-            IOManager.RemoveDuplicates(Settings.Default.CombinedBlocklistFileLocation);
-            TraceLogger.Log("Blocklist update complete. Checking if all files have been updated recently");
+            TraceLogger.Log("Finished downloading lists.");
+            IOManager.MergeFiles(ListFolderLocation, CombinedListLocation);
+            IOManager.RemoveDuplicates(CombinedListLocation);
+            TraceLogger.Log("List update complete. Checking if all files have been updated recently");
             //Check if the files in the blocklist have a update date via using the StartOfBlockList, if the file has been modified before the StartOfBlockList, then it means the file was not updated during this download process, and we should log a warning about it.
-            foreach (var file in Directory.GetFiles(Settings.Default.BlocklistFolderLocation))
+            foreach (var file in Directory.GetFiles(ListFolderLocation))
             {
                 var lastWriteTime = File.GetLastWriteTime(file);
                 if (lastWriteTime < StartOfBlockList)
                 {
-                    TraceLogger.Log($"Warning: Blocklist file {file} was not updated during this download process. Check logs if the download process failed on this file. Last write time: {lastWriteTime}", Enums.StatusSeverityType.Warning);
+                    ProblemWhenDownloadingLists = true;
+                    TraceLogger.Log($"Warning: List file {file} was not updated during this download process. Check logs if the download process failed on this file. Last write time: {lastWriteTime}", Enums.StatusSeverityType.Warning);
                 }
             }
-        }
-
-        public static async Task DownloadWhitelistsAsync()
-        {
-            if (!File.Exists(Settings.Default.WhitelistIniLocation))
-            {
-                TraceLogger.LogAndThrowMsgBox($"Whitelist configuration file not found: {Settings.Default.WhitelistIniLocation}", Enums.StatusSeverityType.Warning);
-                return;
-            }
-
-            var urls = ReadUrlsFromFile(Settings.Default.WhitelistIniLocation);
-            foreach (var url in urls)
-            {
-                TraceLogger.Log($"Downloading whitelist from: {url}");
-                var fileName = Path.GetFileName(url);
-                var filePath = Path.Combine(Settings.Default.WhitelistFolderLocation, fileName);
-                await DownloadManager.DownloadFileAsync(url, filePath);
-            }
-            TraceLogger.Log("Finished downloading whitelists.");
         }
 
         public static void AddToUserBlocklist(string domain)

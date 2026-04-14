@@ -31,6 +31,10 @@
             checkedListBox1 = new CheckedListBox();
             label1 = new Label();
             label2 = new Label();
+            ApplyBtn = new Button();
+            ApplyAndRestartBtn = new Button();
+            customStaticServerTxt = new TextBox();
+            AddCustomToListBtn = new Button();
             SuspendLayout();
             // 
             // checkedListBox1
@@ -63,11 +67,55 @@
             label2.Text = "Or add a custom static server below:";
             label2.TextAlign = ContentAlignment.MiddleCenter;
             // 
+            // ApplyBtn
+            // 
+            ApplyBtn.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            ApplyBtn.Location = new Point(423, 338);
+            ApplyBtn.Name = "ApplyBtn";
+            ApplyBtn.Size = new Size(75, 23);
+            ApplyBtn.TabIndex = 3;
+            ApplyBtn.Text = "Apply";
+            ApplyBtn.UseVisualStyleBackColor = true;
+            ApplyBtn.Click += ApplyBtn_Click;
+            // 
+            // ApplyAndRestartBtn
+            // 
+            ApplyAndRestartBtn.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            ApplyAndRestartBtn.Location = new Point(292, 338);
+            ApplyAndRestartBtn.Name = "ApplyAndRestartBtn";
+            ApplyAndRestartBtn.Size = new Size(125, 23);
+            ApplyAndRestartBtn.TabIndex = 3;
+            ApplyAndRestartBtn.Text = "Apply && Restart";
+            ApplyAndRestartBtn.UseVisualStyleBackColor = true;
+            ApplyAndRestartBtn.Click += ApplyAndRestartBtn_Click;
+            // 
+            // customStaticServerTxt
+            // 
+            customStaticServerTxt.Location = new Point(13, 300);
+            customStaticServerTxt.Name = "customStaticServerTxt";
+            customStaticServerTxt.Size = new Size(404, 23);
+            customStaticServerTxt.TabIndex = 4;
+            // 
+            // AddCustomToListBtn
+            // 
+            AddCustomToListBtn.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            AddCustomToListBtn.Location = new Point(423, 299);
+            AddCustomToListBtn.Name = "AddCustomToListBtn";
+            AddCustomToListBtn.Size = new Size(75, 23);
+            AddCustomToListBtn.TabIndex = 5;
+            AddCustomToListBtn.Text = "Add to list";
+            AddCustomToListBtn.UseVisualStyleBackColor = true;
+            AddCustomToListBtn.Click += AddCustomToListBtn_Click;
+            // 
             // DNSConfigurationList
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.FromArgb(224, 224, 224);
+            Controls.Add(AddCustomToListBtn);
+            Controls.Add(customStaticServerTxt);
+            Controls.Add(ApplyAndRestartBtn);
+            Controls.Add(ApplyBtn);
             Controls.Add(label2);
             Controls.Add(checkedListBox1);
             Controls.Add(label1);
@@ -75,11 +123,16 @@
             Size = new Size(513, 375);
             Load += DNSConfigurationList_Load;
             ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion
         private Label label1;
         private Label label2;
         private CheckedListBox checkedListBox1;
+        private Button ApplyBtn;
+        private Button ApplyAndRestartBtn;
+        private TextBox customStaticServerTxt;
+        private Button AddCustomToListBtn;
     }
 }

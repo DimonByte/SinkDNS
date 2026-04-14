@@ -38,6 +38,7 @@
             addURLToBlocklistToolStripMenuItem = new ToolStripMenuItem();
             addURLToWhitelistToolStripMenuItem = new ToolStripMenuItem();
             toolStripSeparator2 = new ToolStripSeparator();
+            traceLogViewerToolStripMenuItem = new ToolStripMenuItem();
             updateBlocklistsToolStripMenuItem = new ToolStripMenuItem();
             checkForProgramUpdatesToolStripMenuItem = new ToolStripMenuItem();
             bypassFilteringToolStripMenuItem = new ToolStripMenuItem();
@@ -46,14 +47,15 @@
             aboutSinkDNSToolStripMenuItem = new ToolStripMenuItem();
             exitSinkDNSToolStripMenuItem = new ToolStripMenuItem();
             MainPanel = new SplitContainer();
+            SettingsBtn = new Button();
             QueryLogBtn = new Button();
             UserDomainsBtn = new Button();
             ListsBtn = new Button();
             ToggleDNSCryptBtn = new Button();
-            SettingsBtn = new Button();
             DashboardBtn = new Button();
             label1 = new Label();
             panel1 = new Panel();
+            PublicResolversBtn = new Button();
             MainContextMenuStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)MainPanel).BeginInit();
             MainPanel.Panel1.SuspendLayout();
@@ -62,7 +64,7 @@
             // 
             // button1
             // 
-            button1.Location = new Point(51, 277);
+            button1.Location = new Point(52, 322);
             button1.Name = "button1";
             button1.Size = new Size(95, 26);
             button1.TabIndex = 1;
@@ -72,9 +74,9 @@
             // 
             // MainContextMenuStrip
             // 
-            MainContextMenuStrip.Items.AddRange(new ToolStripItem[] { openManagerToolStripMenuItem, toolStripSeparator3, addNewBlocklistToolStripMenuItem, addNewWhitelistToolStripMenuItem, addURLToBlocklistToolStripMenuItem, addURLToWhitelistToolStripMenuItem, toolStripSeparator2, updateBlocklistsToolStripMenuItem, checkForProgramUpdatesToolStripMenuItem, bypassFilteringToolStripMenuItem, restartDNSCryptToolStripMenuItem, toolStripSeparator1, aboutSinkDNSToolStripMenuItem, exitSinkDNSToolStripMenuItem });
+            MainContextMenuStrip.Items.AddRange(new ToolStripItem[] { openManagerToolStripMenuItem, toolStripSeparator3, addNewBlocklistToolStripMenuItem, addNewWhitelistToolStripMenuItem, addURLToBlocklistToolStripMenuItem, addURLToWhitelistToolStripMenuItem, toolStripSeparator2, traceLogViewerToolStripMenuItem, updateBlocklistsToolStripMenuItem, checkForProgramUpdatesToolStripMenuItem, bypassFilteringToolStripMenuItem, restartDNSCryptToolStripMenuItem, toolStripSeparator1, aboutSinkDNSToolStripMenuItem, exitSinkDNSToolStripMenuItem });
             MainContextMenuStrip.Name = "MainContextMenuStrip";
-            MainContextMenuStrip.Size = new Size(230, 264);
+            MainContextMenuStrip.Size = new Size(230, 286);
             // 
             // openManagerToolStripMenuItem
             // 
@@ -123,6 +125,13 @@
             // 
             toolStripSeparator2.Name = "toolStripSeparator2";
             toolStripSeparator2.Size = new Size(226, 6);
+            // 
+            // traceLogViewerToolStripMenuItem
+            // 
+            traceLogViewerToolStripMenuItem.Name = "traceLogViewerToolStripMenuItem";
+            traceLogViewerToolStripMenuItem.Size = new Size(229, 22);
+            traceLogViewerToolStripMenuItem.Text = "Trace Log Viewer";
+            traceLogViewerToolStripMenuItem.Click += traceLogViewerToolStripMenuItem_Click;
             // 
             // updateBlocklistsToolStripMenuItem
             // 
@@ -187,6 +196,7 @@
             // 
             MainPanel.Panel1.BackColor = Color.FromArgb(3, 83, 164);
             MainPanel.Panel1.Controls.Add(SettingsBtn);
+            MainPanel.Panel1.Controls.Add(PublicResolversBtn);
             MainPanel.Panel1.Controls.Add(button1);
             MainPanel.Panel1.Controls.Add(QueryLogBtn);
             MainPanel.Panel1.Controls.Add(UserDomainsBtn);
@@ -205,6 +215,22 @@
             MainPanel.SplitterDistance = 200;
             MainPanel.SplitterWidth = 3;
             MainPanel.TabIndex = 3;
+            // 
+            // SettingsBtn
+            // 
+            SettingsBtn.Dock = DockStyle.Top;
+            SettingsBtn.FlatAppearance.BorderColor = Color.FromArgb(0, 109, 170);
+            SettingsBtn.FlatAppearance.MouseDownBackColor = Color.FromArgb(0, 53, 89);
+            SettingsBtn.FlatAppearance.MouseOverBackColor = Color.FromArgb(0, 109, 170);
+            SettingsBtn.FlatStyle = FlatStyle.Flat;
+            SettingsBtn.ForeColor = Color.White;
+            SettingsBtn.Location = new Point(0, 271);
+            SettingsBtn.Name = "SettingsBtn";
+            SettingsBtn.Size = new Size(200, 34);
+            SettingsBtn.TabIndex = 5;
+            SettingsBtn.Text = "All Settings";
+            SettingsBtn.UseVisualStyleBackColor = true;
+            SettingsBtn.Click += SettingsBtn_Click;
             // 
             // QueryLogBtn
             // 
@@ -266,22 +292,6 @@
             ToggleDNSCryptBtn.Text = "Disable DNSCrypt";
             ToggleDNSCryptBtn.UseVisualStyleBackColor = true;
             // 
-            // SettingsBtn
-            // 
-            SettingsBtn.Dock = DockStyle.Top;
-            SettingsBtn.FlatAppearance.BorderColor = Color.FromArgb(0, 109, 170);
-            SettingsBtn.FlatAppearance.MouseDownBackColor = Color.FromArgb(0, 53, 89);
-            SettingsBtn.FlatAppearance.MouseOverBackColor = Color.FromArgb(0, 109, 170);
-            SettingsBtn.FlatStyle = FlatStyle.Flat;
-            SettingsBtn.ForeColor = Color.White;
-            SettingsBtn.Location = new Point(0, 237);
-            SettingsBtn.Name = "SettingsBtn";
-            SettingsBtn.Size = new Size(200, 34);
-            SettingsBtn.TabIndex = 5;
-            SettingsBtn.Text = "All Settings";
-            SettingsBtn.UseVisualStyleBackColor = true;
-            SettingsBtn.Click += SettingsBtn_Click;
-            // 
             // DashboardBtn
             // 
             DashboardBtn.Dock = DockStyle.Top;
@@ -319,6 +329,22 @@
             panel1.Name = "panel1";
             panel1.Size = new Size(200, 45);
             panel1.TabIndex = 11;
+            // 
+            // PublicResolversBtn
+            // 
+            PublicResolversBtn.Dock = DockStyle.Top;
+            PublicResolversBtn.FlatAppearance.BorderColor = Color.FromArgb(0, 109, 170);
+            PublicResolversBtn.FlatAppearance.MouseDownBackColor = Color.FromArgb(0, 53, 89);
+            PublicResolversBtn.FlatAppearance.MouseOverBackColor = Color.FromArgb(0, 109, 170);
+            PublicResolversBtn.FlatStyle = FlatStyle.Flat;
+            PublicResolversBtn.ForeColor = Color.White;
+            PublicResolversBtn.Location = new Point(0, 237);
+            PublicResolversBtn.Name = "PublicResolversBtn";
+            PublicResolversBtn.Size = new Size(200, 34);
+            PublicResolversBtn.TabIndex = 13;
+            PublicResolversBtn.Text = "Public Resolvers";
+            PublicResolversBtn.UseVisualStyleBackColor = true;
+            PublicResolversBtn.Click += PublicResolversBtn_Click;
             // 
             // SinkDNSManagerForm
             // 
@@ -369,5 +395,7 @@
         private Button SettingsBtn;
         private Panel panel1;
         private Label label1;
+        private ToolStripMenuItem traceLogViewerToolStripMenuItem;
+        private Button PublicResolversBtn;
     }
 }
