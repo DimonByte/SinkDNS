@@ -20,8 +20,9 @@
 //OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //SOFTWARE.
 
-namespace SinkDNS.Modules.System
+namespace SinkDNS.Modules.WindowsSystem
 {
+    using Microsoft.VisualBasic.Devices;
     using SinkDNS.Modules.SinkDNSInternals;
     using SinkDNS.Properties;
 
@@ -45,7 +46,7 @@ namespace SinkDNS.Modules.System
                     catch (Exception ex)
                     {
                         //Since we failed here, we can't continue since it might be missing required configuration files for SinkDNS.
-                        TraceLogger.LogAndThrowMsgBox($"Error creating directory {dir}: {ex.ToString()}", Enums.StatusSeverityType.Fatal);
+                        TraceLogger.LogAndThrowMsgBox($"Error creating directory {dir}: {ex}", Enums.StatusSeverityType.Fatal);
                     }
                 }
             }
@@ -64,7 +65,7 @@ namespace SinkDNS.Modules.System
                     }
                     catch (Exception ex)
                     {
-                        TraceLogger.Log($"Error creating file {file}: {ex.ToString()}", Enums.StatusSeverityType.Error);
+                        TraceLogger.Log($"Error creating file {file}: {ex}", Enums.StatusSeverityType.Error);
                     }
                 }
                 else
@@ -162,8 +163,8 @@ namespace SinkDNS.Modules.System
             catch (Exception ex)
             {
                 //TraceLogger.LogAndThrowMsgBox($"Configuration corruption check failure, SinkDNS cannot continue. {ex.ToString()}", Enums.StatusSeverityType.Fatal);
-                TraceLogger.Log($"Configuration corruption check failure: {ex.ToString()}", Enums.StatusSeverityType.Error);
-                DialogResult diagresult = MessageBox.Show($"SinkDNS - Configuration corruption check failed and is unable to confirm validity of config files. Do you want to reset all configuration folders and files to fix SinkDNS? This will delete all your custom blocklists, whitelists, resolvers, host files, and task schedules.\nMake sure to backup any important data before proceeding.\n\nYes to reset, No to attempt to run SinkDNS with existing configs, Cancel to exit SinkDNS.\n\n Error details: {ex.ToString()}", "SinkDNS - Configuration Corruption Detected", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning);
+                TraceLogger.Log($"Configuration corruption check failure: {ex}", Enums.StatusSeverityType.Error);
+                DialogResult diagresult = MessageBox.Show($"SinkDNS - Configuration corruption check failed and is unable to confirm validity of config files. Do you want to reset all configuration folders and files to fix SinkDNS? This will delete all your custom blocklists, whitelists, resolvers, host files, and task schedules.\nMake sure to backup any important data before proceeding.\n\nYes to reset, No to attempt to run SinkDNS with existing configs, Cancel to exit SinkDNS.\n\n Error details: {ex}", "SinkDNS - Configuration Corruption Detected", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning);
                 if (diagresult == DialogResult.Yes)
                 {
                     TraceLogger.Log("User chose to reset configuration folders and files to fix corruption.");
@@ -172,7 +173,7 @@ namespace SinkDNS.Modules.System
                 else if (diagresult == DialogResult.Cancel)
                 {
                     TraceLogger.Log("SinkDNS terminated due to configuration corruption.", Enums.StatusSeverityType.Fatal);
-                    Environment.FailFast($"SinkDNS terminated due to configuration corruption. Error details: {ex.ToString()}");
+                    Environment.FailFast($"SinkDNS terminated due to configuration corruption. Error details: {ex}");
                 }
                 else
                 {
@@ -197,7 +198,7 @@ namespace SinkDNS.Modules.System
             }
             catch (Exception ex)
             {
-                TraceLogger.Log($"Error resetting configuration folders and files: {ex.ToString()}", Enums.StatusSeverityType.Error);
+                TraceLogger.Log($"Error resetting configuration folders and files: {ex}", Enums.StatusSeverityType.Error);
             }
         }
 
@@ -213,7 +214,7 @@ namespace SinkDNS.Modules.System
                 }
                 catch (Exception ex)
                 {
-                    TraceLogger.Log($"Error creating backup for file {filePath}: {ex.ToString()}", Enums.StatusSeverityType.Error);
+                    TraceLogger.Log($"Error creating backup for file {filePath}: {ex}", Enums.StatusSeverityType.Error);
                 }
             }
         }
@@ -265,7 +266,7 @@ namespace SinkDNS.Modules.System
             }
             catch (Exception ex)
             {
-                TraceLogger.Log($"Error merging files into {outputFile}: {ex.ToString()}", Enums.StatusSeverityType.Error);
+                TraceLogger.Log($"Error merging files into {outputFile}: {ex}", Enums.StatusSeverityType.Error);
             }
             TraceLogger.Log($"Total entries in {outputFile}: {File.ReadAllLines(outputFile).Length}");
         }
@@ -281,7 +282,7 @@ namespace SinkDNS.Modules.System
                 }
                 catch (Exception ex)
                 {
-                    TraceLogger.Log($"Error deleting file {file}: {ex.ToString()}", Enums.StatusSeverityType.Error);
+                    TraceLogger.Log($"Error deleting file {file}: {ex}", Enums.StatusSeverityType.Error);
                 }
             }
             TraceLogger.Log($"Cleared all files in folder: {folder}");
@@ -306,7 +307,46 @@ namespace SinkDNS.Modules.System
             }
             catch(Exception ex)
             {
-                TraceLogger.Log($"Error removing duplicates from {MergedFileLoc}: {ex.ToString()}", Enums.StatusSeverityType.Error);
+                TraceLogger.Log($"Error removing duplicates from {MergedFileLoc}: {ex}", Enums.StatusSeverityType.Error);
+            }
+        }
+        
+        public static bool? BackupDNSConfigOfPrimaryNetworkAdapter(string adapterName)
+        {
+            //Get DNS config of PrimaryNetworkAdapter and save it to a file in the backup folder. This will allow us to restore the original DNS config if something goes wrong with changing the DNS settings to use DNSCrypt.
+            if (string.IsNullOrEmpty(adapterName))
+            {
+                TraceLogger.Log("No primary network adapter selected. Skipping DNS config backup.", Enums.StatusSeverityType.Error);
+                return null;
+            }
+            else
+            {
+                if (System.Net.NetworkInformation.NetworkInterface.GetAllNetworkInterfaces().FirstOrDefault(n => n.Name == adapterName) is System.Net.NetworkInformation.NetworkInterface adapter)
+                {
+                    var ipProperties = adapter.GetIPProperties();
+                    var dnsAddresses = ipProperties.DnsAddresses;
+                    if (dnsAddresses.Count > 0)
+                    {
+                        string backupFilePath = $"{Settings.Default.BackupFolderLocation}/{adapterName}_dns_backup.txt";
+                        try
+                        {
+                            TraceLogger.Log($"Backing up DNS config for adapter {adapterName} to {backupFilePath}");
+                            File.WriteAllLines(backupFilePath, dnsAddresses.Select(addr => addr.ToString()));
+                            return true;
+                        }
+                        catch (Exception ex)
+                        {
+                            TraceLogger.Log($"Error backing up DNS config for adapter {adapterName}: {ex}", Enums.StatusSeverityType.Error);
+                            return false;
+                        }
+                    }
+                    else
+                    {
+                        TraceLogger.Log($"No DNS addresses found for adapter {adapterName}. Nothing to backup.", Enums.StatusSeverityType.Warning);
+                        return null;
+                    }
+                }
+                return null;
             }
         }
     }

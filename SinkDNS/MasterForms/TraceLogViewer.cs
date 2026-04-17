@@ -14,7 +14,7 @@ namespace SinkDNS.MasterForms
             if (File.Exists(Settings.Default.LogsFolderLocation + "\\" + DateTime.Now.ToString("dd-MM-yyyy") + ".log"))
             {
                 LoadLogFile();
-                FileSystemWatcher logWatch = new FileSystemWatcher(Settings.Default.LogsFolderLocation, DateTime.Now.ToString("dd-MM-yyyy") + ".log");
+                FileSystemWatcher logWatch = new(Settings.Default.LogsFolderLocation, DateTime.Now.ToString("dd-MM-yyyy") + ".log");
                 if (logWatch != null)
                 {
                     logWatch.Changed += LogWatch_Changed;

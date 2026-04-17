@@ -22,7 +22,7 @@
 
 namespace SinkDNS.Modules.SinkDNSInternals
 {
-    using SinkDNS.Modules.System;
+    using SinkDNS.Modules.WindowsSystem;
     using SinkDNS.Properties;
 
     //This will manage the block lists for SinkDNS, including downloading, updating, and parsing them.
@@ -97,7 +97,7 @@ namespace SinkDNS.Modules.SinkDNSInternals
                 catch (Exception ex)
                 {
                     ProblemWhenDownloadingLists = true;
-                    TraceLogger.Log($"Failed to delete old list file: {file}. Download halted. Exception: {ex.ToString()}", Enums.StatusSeverityType.Error);
+                    TraceLogger.Log($"Failed to delete old list file: {file}. Download halted. Exception: {ex}", Enums.StatusSeverityType.Error);
                     return;
                 }
             }

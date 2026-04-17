@@ -148,7 +148,7 @@ namespace SinkDNS.Modules.SinkDNSInternals
             }
             catch (Exception ex)
             {
-                TraceLogger.Log($"Error executing task {task.Name}: {ex.ToString()}", StatusSeverityType.Error);
+                TraceLogger.Log($"Error executing task {task.Name}: {ex}", StatusSeverityType.Error);
             }
         }
 
@@ -181,7 +181,7 @@ namespace SinkDNS.Modules.SinkDNSInternals
             }
             catch (Exception ex)
             {
-                TraceLogger.Log($"Error saving tasks: {ex.ToString()}", StatusSeverityType.Error);
+                TraceLogger.Log($"Error saving tasks: {ex}", StatusSeverityType.Error);
             }
         }
 
@@ -259,7 +259,7 @@ namespace SinkDNS.Modules.SinkDNSInternals
             }
             catch (Exception ex)
             {
-                TraceLogger.Log($"Error loading tasks: {ex.ToString()}", StatusSeverityType.Error);
+                TraceLogger.Log($"Error loading tasks: {ex}", StatusSeverityType.Error);
                 _tasks = [];
             }
         }

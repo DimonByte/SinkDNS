@@ -21,7 +21,7 @@
 //SOFTWARE.
 
 using SinkDNS.Modules.SinkDNSInternals;
-using SinkDNS.Modules.System;
+using SinkDNS.Modules.WindowsSystem;
 using System.Text.RegularExpressions;
 
 namespace SinkDNS.Modules.DNSCrypt

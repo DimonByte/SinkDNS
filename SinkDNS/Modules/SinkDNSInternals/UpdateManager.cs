@@ -20,7 +20,7 @@
 //OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //SOFTWARE.
 
-using SinkDNS.Modules.System;
+using SinkDNS.Modules.WindowsSystem;
 using System.Net;
 using System.Text.RegularExpressions;
 
@@ -70,7 +70,7 @@ namespace SinkDNS.Modules.SinkDNSInternals
                 TraceLogger.Log("Failed to determine latest dnscrypt-proxy release.", Enums.StatusSeverityType.Warning);
                 return false;
             }
-            string latestVersion = latestTag.StartsWith("v", StringComparison.OrdinalIgnoreCase) ? latestTag.Substring(1) : latestTag;
+            string latestVersion = latestTag.StartsWith("v", StringComparison.OrdinalIgnoreCase) ? latestTag[1..] : latestTag;
 
             TraceLogger.Log($"Latest dnscrypt-proxy release tag: {latestTag} (normalized: {latestVersion})");
 
@@ -105,49 +105,47 @@ namespace SinkDNS.Modules.SinkDNSInternals
             try
             {
                 TraceLogger.Log($"Checking latest release for {ownerRepo}...");
-                using (var http = new HttpClient(new HttpClientHandler { AllowAutoRedirect = false }))
-                {
-                    http.DefaultRequestHeaders.UserAgent.ParseAdd("SinkDNS-Updater/1.0 (+https://example/)");
+                using HttpClient http = new(new HttpClientHandler { AllowAutoRedirect = false });
+                http.DefaultRequestHeaders.UserAgent.ParseAdd("SinkDNS-Updater/1.0 (+https://example/)");
 
-                    var url = $"https://github.com/{ownerRepo}/releases/latest";
-                    var resp = http.GetAsync(url).GetAwaiter().GetResult();
-                    TraceLogger.Log($"HTTP response for {url}: {(int)resp.StatusCode} {resp.StatusCode}");
-                    // Check for redirect location (preferred, reliable)
-                    if (resp.StatusCode == HttpStatusCode.Found ||
-                        resp.StatusCode == HttpStatusCode.Redirect ||
-                        resp.StatusCode == HttpStatusCode.MovedPermanently ||
-                        resp.StatusCode == HttpStatusCode.SeeOther ||
-                        resp.StatusCode == HttpStatusCode.TemporaryRedirect ||
-                        resp.StatusCode == HttpStatusCode.PermanentRedirect)
+                var url = $"https://github.com/{ownerRepo}/releases/latest";
+                var resp = http.GetAsync(url).GetAwaiter().GetResult();
+                TraceLogger.Log($"HTTP response for {url}: {(int)resp.StatusCode} {resp.StatusCode}");
+                // Check for redirect location (preferred, reliable)
+                if (resp.StatusCode == HttpStatusCode.Found ||
+                    resp.StatusCode == HttpStatusCode.Redirect ||
+                    resp.StatusCode == HttpStatusCode.MovedPermanently ||
+                    resp.StatusCode == HttpStatusCode.SeeOther ||
+                    resp.StatusCode == HttpStatusCode.TemporaryRedirect ||
+                    resp.StatusCode == HttpStatusCode.PermanentRedirect)
+                {
+                    var loc = resp.Headers.Location;
+                    if (loc != null)
                     {
-                        var loc = resp.Headers.Location;
-                        if (loc != null)
+                        TraceLogger.Log($"Redirect location: {loc}");
+                        // The redirect typically ends with "/releases/tag/vX.Y.Z" -> we take the last segment
+                        var segments = loc.Segments.Select(s => s.Trim('/')).Where(s => !string.IsNullOrEmpty(s)).ToArray();
+                        if (segments.Length > 0)
                         {
-                            TraceLogger.Log($"Redirect location: {loc}");
-                            // The redirect typically ends with "/releases/tag/vX.Y.Z" -> we take the last segment
-                            var segments = loc.Segments.Select(s => s.Trim('/')).Where(s => !string.IsNullOrEmpty(s)).ToArray();
-                            if (segments.Length > 0)
-                            {
-                                var tag = segments.Last();
-                                TraceLogger.Log($"Extracted tag from redirect: {tag}");
-                                return tag;
-                            }
+                            var tag = segments.Last();
+                            TraceLogger.Log($"Extracted tag from redirect: {tag}");
+                            return tag;
                         }
                     }
-                    TraceLogger.Log($"No redirect found for {url}, status code: {(int)resp.StatusCode} {resp.StatusCode}. Attempting HTML parsing fallback.");
-                    // Fallback: some servers may not redirect; parse the HTML for /releases/tag/<tag>
-                    var html = resp.Content.ReadAsStringAsync().GetAwaiter().GetResult();
-                    var m = Regex.Match(html, @"/releases/tag/([^""'\s<>]+)");
-                    if (m.Success && m.Groups.Count > 1)
-                    {
-                        TraceLogger.Log($"Extracted tag from HTML: {m.Groups[1].Value}");
-                        return m.Groups[1].Value.Trim('/');
-                    }
+                }
+                TraceLogger.Log($"No redirect found for {url}, status code: {(int)resp.StatusCode} {resp.StatusCode}. Attempting HTML parsing fallback.");
+                // Fallback: some servers may not redirect; parse the HTML for /releases/tag/<tag>
+                var html = resp.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+                var m = Regex.Match(html, @"/releases/tag/([^""'\s<>]+)");
+                if (m.Success && m.Groups.Count > 1)
+                {
+                    TraceLogger.Log($"Extracted tag from HTML: {m.Groups[1].Value}");
+                    return m.Groups[1].Value.Trim('/');
                 }
             }
             catch (Exception ex)
             {
-                TraceLogger.Log($"GetLatestReleaseTag error for {ownerRepo}: {ex.ToString()}", Enums.StatusSeverityType.Error);
+                TraceLogger.Log($"GetLatestReleaseTag error for {ownerRepo}: {ex}", Enums.StatusSeverityType.Error);
             }
             TraceLogger.Log($"Failed to get latest release tag for {ownerRepo}.", Enums.StatusSeverityType.Error);
             return "";

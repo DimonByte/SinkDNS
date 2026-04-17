@@ -26,7 +26,7 @@ using SinkDNS.ChildForms;
 using SinkDNS.MasterForms;
 using SinkDNS.Modules;
 using SinkDNS.Modules.SinkDNSInternals;
-using SinkDNS.Modules.System;
+using SinkDNS.Modules.WindowsSystem;
 using SinkDNS.Properties;
 using SinkDNS.UserControls;
 
@@ -155,7 +155,7 @@ namespace SinkDNS
 
         private void aboutSinkDNSToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            About aboutForm = new About();
+            About aboutForm = new();
             aboutForm.ShowDialog();
         }
 
@@ -171,13 +171,18 @@ namespace SinkDNS
 
         private void traceLogViewerToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            TraceLogViewer traceLogViewer = new TraceLogViewer();
+            TraceLogViewer traceLogViewer = new();
             traceLogViewer.Show();
         }
 
         private void PublicResolversBtn_Click(object sender, EventArgs e)
         {
             LoadControl(new DNSConfigurationList());
+        }
+
+        private void bypassFilteringToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

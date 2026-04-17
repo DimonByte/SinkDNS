@@ -21,7 +21,7 @@
 //SOFTWARE.
 
 using SinkDNS.Modules.SinkDNSInternals;
-using SinkDNS.Modules.System;
+using SinkDNS.Modules.WindowsSystem;
 using SinkDNS.Properties;
 using static SinkDNS.Modules.Enums;
 

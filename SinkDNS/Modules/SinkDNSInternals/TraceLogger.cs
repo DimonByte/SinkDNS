@@ -146,7 +146,7 @@ namespace SinkDNS.Modules.SinkDNSInternals
             }
         }
 
-        public static void LogAndThrowMsgBox(string message, StatusSeverityType severity = StatusSeverityType.Information, string title = "",
+        public static void LogAndThrowMsgBox(string message, StatusSeverityType severity = StatusSeverityType.Information,
                               [CallerMemberName] string memberName = "",
                               [CallerFilePath] string filePath = "",
                               [CallerLineNumber] int lineNumber = 0

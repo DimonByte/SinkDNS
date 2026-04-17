@@ -24,7 +24,7 @@ using SinkDNS.Modules.SinkDNSInternals;
 using System.Diagnostics;
 using System.Security.Principal;
 
-namespace SinkDNS.Modules.System
+namespace SinkDNS.Modules.WindowsSystem
 {
     public static class CommandRunner
     {
@@ -40,9 +40,7 @@ namespace SinkDNS.Modules.System
                     UseShellExecute = false,
                     CreateNoWindow = true
                 };
-                using var process = Process.Start(processInfo);
-                if (process == null)
-                    throw new InvalidOperationException("Failed to start process for command execution.");
+                using var process = Process.Start(processInfo) ?? throw new InvalidOperationException("Failed to start process for command execution.");
                 string output = process.StandardOutput.ReadToEnd();
                 string error = process.StandardError.ReadToEnd();
                 TraceLogger.Log("Waiting for command to exit...");
@@ -55,7 +53,7 @@ namespace SinkDNS.Modules.System
             }
             catch (Exception ex)
             {
-                TraceLogger.Log($"Error running command '{command}': {ex.ToString()}", Enums.StatusSeverityType.Error);
+                TraceLogger.Log($"Error running command '{command}': {ex}", Enums.StatusSeverityType.Error);
                 return string.Empty;
             }
         }
@@ -117,7 +115,7 @@ namespace SinkDNS.Modules.System
             }
             catch (Exception ex)
             {
-                TraceLogger.Log($"Failed to run elevated commands: {ex.ToString()}", Enums.StatusSeverityType.Error);
+                TraceLogger.Log($"Failed to run elevated commands: {ex}", Enums.StatusSeverityType.Error);
                 return false;
             }
         }
@@ -155,7 +153,7 @@ namespace SinkDNS.Modules.System
             }
             catch (Exception ex)
             {
-                TraceLogger.Log($"Failed to run elevated command: {ex.ToString()}", Enums.StatusSeverityType.Error);
+                TraceLogger.Log($"Failed to run elevated command: {ex}", Enums.StatusSeverityType.Error);
                 return false;
             }
         }
@@ -180,7 +178,7 @@ namespace SinkDNS.Modules.System
             }
             catch (Exception ex)
             {
-                TraceLogger.Log($"Error saving to file with elevation: {ex.ToString()}", Enums.StatusSeverityType.Error);
+                TraceLogger.Log($"Error saving to file with elevation: {ex}", Enums.StatusSeverityType.Error);
                 return false;
             }
         }

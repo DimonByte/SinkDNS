@@ -21,7 +21,7 @@
 //SOFTWARE.
 
 using SinkDNS.Modules.SinkDNSInternals;
-using SinkDNS.Modules.System;
+using SinkDNS.Modules.WindowsSystem;
 
 namespace SinkDNS.Modules.DNSCrypt
 {
@@ -118,7 +118,7 @@ namespace SinkDNS.Modules.DNSCrypt
             // If value contains spaces or special characters, wrap in quotes
             if (string.IsNullOrEmpty(value))
                 return "\"\"";
-            if (value.Contains(' ') || value.Contains("=") || value.Contains("#"))
+            if (value.Contains(' ') || value.Contains('=') || value.Contains('#'))
             {
                 // Escape quotes in value
                 var escapedValue = value.Replace("\"", "\\\"");
@@ -187,12 +187,12 @@ namespace SinkDNS.Modules.DNSCrypt
                 {
                     TraceLogger.Log($"Setting '{settingName}' found at line {i + 1}. Extracting value.");
                     // Extract everything after the equals sign
-                    var value = line.Substring(settingName.Length + 1).Trim();
+                    var value = line[(settingName.Length + 1)..].Trim();
 
                     // Remove leading spaces and equals sign if present
                     while (value.StartsWith("=") || value.StartsWith(" "))
                     {
-                        value = value.Substring(1).Trim();
+                        value = value[1..].Trim();
                     }
 
                     // Remove quotes if present
@@ -206,7 +206,7 @@ namespace SinkDNS.Modules.DNSCrypt
                     int commentIndex = value.IndexOf('#');
                     if (commentIndex >= 0)
                     {
-                        value = value.Substring(0, commentIndex).Trim();
+                        value = value[..commentIndex].Trim();
                     }
                     value = value.Replace("'", "");
                     TraceLogger.Log($"Value for setting '{settingName}' extracted: {value}");
@@ -238,7 +238,7 @@ namespace SinkDNS.Modules.DNSCrypt
             }
             catch (Exception ex)
             {
-                TraceLogger.LogAndThrowMsgBox($"Failed to write configuration file: {ex.ToString()}", Enums.StatusSeverityType.Error);
+                TraceLogger.LogAndThrowMsgBox($"Failed to write configuration file: {ex}", Enums.StatusSeverityType.Error);
             }
         }
 

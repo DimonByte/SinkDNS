@@ -22,7 +22,7 @@
 
 using SinkDNS.Modules.SinkDNSInternals;
 
-namespace SinkDNS.Modules.System
+namespace SinkDNS.Modules.WindowsSystem
 {
     public sealed class GlobalNotifyIcon : IDisposable
     {
@@ -118,7 +118,7 @@ namespace SinkDNS.Modules.System
                 }
                 catch (Exception ex)
                 {
-                    TraceLogger.Log($"Error showing main window from NotifyIcon: {ex.ToString()}", Enums.StatusSeverityType.Error);
+                    TraceLogger.Log($"Error showing main window from NotifyIcon: {ex}", Enums.StatusSeverityType.Error);
                 }
 
             }

@@ -48,6 +48,7 @@
             exitSinkDNSToolStripMenuItem = new ToolStripMenuItem();
             MainPanel = new SplitContainer();
             SettingsBtn = new Button();
+            PublicResolversBtn = new Button();
             QueryLogBtn = new Button();
             UserDomainsBtn = new Button();
             ListsBtn = new Button();
@@ -55,7 +56,6 @@
             DashboardBtn = new Button();
             label1 = new Label();
             panel1 = new Panel();
-            PublicResolversBtn = new Button();
             MainContextMenuStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)MainPanel).BeginInit();
             MainPanel.Panel1.SuspendLayout();
@@ -76,7 +76,7 @@
             // 
             MainContextMenuStrip.Items.AddRange(new ToolStripItem[] { openManagerToolStripMenuItem, toolStripSeparator3, addNewBlocklistToolStripMenuItem, addNewWhitelistToolStripMenuItem, addURLToBlocklistToolStripMenuItem, addURLToWhitelistToolStripMenuItem, toolStripSeparator2, traceLogViewerToolStripMenuItem, updateBlocklistsToolStripMenuItem, checkForProgramUpdatesToolStripMenuItem, bypassFilteringToolStripMenuItem, restartDNSCryptToolStripMenuItem, toolStripSeparator1, aboutSinkDNSToolStripMenuItem, exitSinkDNSToolStripMenuItem });
             MainContextMenuStrip.Name = "MainContextMenuStrip";
-            MainContextMenuStrip.Size = new Size(230, 286);
+            MainContextMenuStrip.Size = new Size(230, 308);
             // 
             // openManagerToolStripMenuItem
             // 
@@ -156,6 +156,7 @@
             bypassFilteringToolStripMenuItem.Size = new Size(229, 22);
             bypassFilteringToolStripMenuItem.Text = "Bypass Filtering";
             bypassFilteringToolStripMenuItem.ToolTipText = "Turns off DNSCrypt and reverts to the DNS settings that was set before installing SinkDNS. If no setting is found, the DNS will be set to 1.1.1.1.";
+            bypassFilteringToolStripMenuItem.Click += bypassFilteringToolStripMenuItem_Click;
             // 
             // restartDNSCryptToolStripMenuItem
             // 
@@ -231,6 +232,22 @@
             SettingsBtn.Text = "All Settings";
             SettingsBtn.UseVisualStyleBackColor = true;
             SettingsBtn.Click += SettingsBtn_Click;
+            // 
+            // PublicResolversBtn
+            // 
+            PublicResolversBtn.Dock = DockStyle.Top;
+            PublicResolversBtn.FlatAppearance.BorderColor = Color.FromArgb(0, 109, 170);
+            PublicResolversBtn.FlatAppearance.MouseDownBackColor = Color.FromArgb(0, 53, 89);
+            PublicResolversBtn.FlatAppearance.MouseOverBackColor = Color.FromArgb(0, 109, 170);
+            PublicResolversBtn.FlatStyle = FlatStyle.Flat;
+            PublicResolversBtn.ForeColor = Color.White;
+            PublicResolversBtn.Location = new Point(0, 237);
+            PublicResolversBtn.Name = "PublicResolversBtn";
+            PublicResolversBtn.Size = new Size(200, 34);
+            PublicResolversBtn.TabIndex = 13;
+            PublicResolversBtn.Text = "Public Resolvers";
+            PublicResolversBtn.UseVisualStyleBackColor = true;
+            PublicResolversBtn.Click += PublicResolversBtn_Click;
             // 
             // QueryLogBtn
             // 
@@ -329,22 +346,6 @@
             panel1.Name = "panel1";
             panel1.Size = new Size(200, 45);
             panel1.TabIndex = 11;
-            // 
-            // PublicResolversBtn
-            // 
-            PublicResolversBtn.Dock = DockStyle.Top;
-            PublicResolversBtn.FlatAppearance.BorderColor = Color.FromArgb(0, 109, 170);
-            PublicResolversBtn.FlatAppearance.MouseDownBackColor = Color.FromArgb(0, 53, 89);
-            PublicResolversBtn.FlatAppearance.MouseOverBackColor = Color.FromArgb(0, 109, 170);
-            PublicResolversBtn.FlatStyle = FlatStyle.Flat;
-            PublicResolversBtn.ForeColor = Color.White;
-            PublicResolversBtn.Location = new Point(0, 237);
-            PublicResolversBtn.Name = "PublicResolversBtn";
-            PublicResolversBtn.Size = new Size(200, 34);
-            PublicResolversBtn.TabIndex = 13;
-            PublicResolversBtn.Text = "Public Resolvers";
-            PublicResolversBtn.UseVisualStyleBackColor = true;
-            PublicResolversBtn.Click += PublicResolversBtn_Click;
             // 
             // SinkDNSManagerForm
             // 

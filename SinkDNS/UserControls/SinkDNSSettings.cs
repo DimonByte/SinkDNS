@@ -77,7 +77,7 @@ namespace SinkDNS.ChildForms
             }
             catch(Exception ex)
             {
-                TraceLogger.LogAndThrowMsgBox($"Failed to save setting: {e.ChangedItem.PropertyDescriptor.Name} - {ex.ToString()}", Enums.StatusSeverityType.Error);
+                TraceLogger.LogAndThrowMsgBox($"Failed to save setting: {e.ChangedItem.PropertyDescriptor.Name} - {ex}", Enums.StatusSeverityType.Error);
                 return;
             }
         }

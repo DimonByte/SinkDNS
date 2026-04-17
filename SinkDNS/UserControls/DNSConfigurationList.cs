@@ -1,8 +1,8 @@
 ﻿using SinkDNS.Modules.SinkDNSInternals;
-using SinkDNS.Modules.System;
 using SinkDNS.Properties;
 using SinkDNS.Modules.DNSCrypt;
 using System.Data;
+using SinkDNS.Modules.WindowsSystem;
 
 namespace SinkDNS.UserControls
 {

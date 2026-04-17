@@ -22,7 +22,7 @@
 
 using SinkDNS.Modules.SinkDNSInternals;
 using static SinkDNS.Modules.Enums;
-namespace SinkDNS.Modules.System
+namespace SinkDNS.Modules.WindowsSystem
 {
     internal class NotificationManager
     {
@@ -59,7 +59,7 @@ namespace SinkDNS.Modules.System
             }
             catch (Exception ex)
             {
-                TraceLogger.Log($"Failed to show system tray notification: {ex.ToString()}", StatusSeverityType.Error);
+                TraceLogger.Log($"Failed to show system tray notification: {ex}", StatusSeverityType.Error);
             }
         }
 
