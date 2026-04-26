@@ -25,6 +25,7 @@ namespace SinkDNS.Modules.WindowsSystem
     using Microsoft.VisualBasic.Devices;
     using SinkDNS.Modules.SinkDNSInternals;
     using SinkDNS.Properties;
+    using System.Net.NetworkInformation;
 
     //This will handle folder and file management for SinkDNS, like creating necessary directories.
     internal class IOManager
@@ -143,7 +144,7 @@ namespace SinkDNS.Modules.WindowsSystem
                     }
                 }
                 //Step 3: Check TraceThreshold via enum tryparse. if tryparse fails, restore to "Information".
-                if (Enum.TryParse<Enums.StatusSeverityType>(Settings.Default.TraceLoggerThreshold, out var threshold))
+                if (Enum.TryParse<Enums.StatusSeverityType>(Settings.Default.TraceLoggerThreshold, out Enums.StatusSeverityType threshold))
                 {
                     TraceLogger.Log($"TraceThreshold is valid: {threshold}");
                 }
@@ -323,8 +324,8 @@ namespace SinkDNS.Modules.WindowsSystem
             {
                 if (System.Net.NetworkInformation.NetworkInterface.GetAllNetworkInterfaces().FirstOrDefault(n => n.Name == adapterName) is System.Net.NetworkInformation.NetworkInterface adapter)
                 {
-                    var ipProperties = adapter.GetIPProperties();
-                    var dnsAddresses = ipProperties.DnsAddresses;
+                    IPInterfaceProperties ipProperties = adapter.GetIPProperties();
+                    IPAddressCollection dnsAddresses = ipProperties.DnsAddresses;
                     if (dnsAddresses.Count > 0)
                     {
                         string backupFilePath = $"{Settings.Default.BackupFolderLocation}/{adapterName}_dns_backup.txt";

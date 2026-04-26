@@ -40,7 +40,7 @@ namespace SinkDNS.Modules.WindowsSystem
                     UseShellExecute = false,
                     CreateNoWindow = true
                 };
-                using var process = Process.Start(processInfo) ?? throw new InvalidOperationException("Failed to start process for command execution.");
+                using Process process = Process.Start(processInfo) ?? throw new InvalidOperationException("Failed to start process for command execution.");
                 string output = process.StandardOutput.ReadToEnd();
                 string error = process.StandardError.ReadToEnd();
                 TraceLogger.Log("Waiting for command to exit...");

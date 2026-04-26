@@ -10,7 +10,7 @@
             Debug = 3,
             Fatal = 4
         }
-        public enum  ListType
+        public enum ListType
         {
             Blocklist,
             Whitelist

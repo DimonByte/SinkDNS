@@ -24,7 +24,7 @@ using SinkDNS.Modules.SinkDNSInternals;
 using SinkDNS.Modules.WindowsSystem;
 using System.Text.RegularExpressions;
 
-namespace SinkDNS.Modules.DNSCrypt
+namespace SinkDNS.Modules.DNSCrypt.Data
 {
     // This will load the public resolvers from DNSCrypt and return a list of them.
     internal class PublicResolverManager

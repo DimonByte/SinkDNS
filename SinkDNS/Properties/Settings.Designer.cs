@@ -253,5 +253,29 @@ namespace SinkDNS.Properties {
                 this["PrimaryNetworkAdapter"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("admin")]
+        public string DNSCryptMonitoringUIUsername {
+            get {
+                return ((string)(this["DNSCryptMonitoringUIUsername"]));
+            }
+            set {
+                this["DNSCryptMonitoringUIUsername"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("changeme")]
+        public string DNSCryptMonitoringUIPassword {
+            get {
+                return ((string)(this["DNSCryptMonitoringUIPassword"]));
+            }
+            set {
+                this["DNSCryptMonitoringUIPassword"] = value;
+            }
+        }
     }
 }

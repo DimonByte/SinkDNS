@@ -1,8 +1,8 @@
 ﻿using SinkDNS.Modules.SinkDNSInternals;
 using SinkDNS.Properties;
-using SinkDNS.Modules.DNSCrypt;
 using System.Data;
 using SinkDNS.Modules.WindowsSystem;
+using SinkDNS.Modules.DNSCrypt.Data;
 
 namespace SinkDNS.UserControls
 {
@@ -34,6 +34,7 @@ namespace SinkDNS.UserControls
                     {
                         TraceLogger.Log($"public-resolvers.md is older than 7 days, redownloading...");
                         await DownloadManager.DownloadFileAsync("https://raw.githubusercontent.com/DNSCrypt/dnscrypt-resolvers/master/v3/public-resolvers.md", Path.Combine(Settings.Default.ResolversFolderLocation, "public-resolvers.md"));
+                        markdownContent= File.ReadAllText(Path.Combine(Settings.Default.ResolversFolderLocation, "public-resolvers.md"));
                     }
                     else
                     {
@@ -43,7 +44,7 @@ namespace SinkDNS.UserControls
                 }
                 if (markdownContent == null)
                 {
-                    TraceLogger.Log("Failed to load resolver list: Content is null");
+                    TraceLogger.Log("Failed to load resolver list: Content is null", Modules.Enums.StatusSeverityType.Error);
                     return;
                 }
                 markdownContent = markdownContent.Replace("\r\n", "\n").Replace("\r", "\n"); // Normalize line endings
@@ -81,13 +82,13 @@ namespace SinkDNS.UserControls
         private void ApplyBtn_Click(object sender, EventArgs e)
         {
             TraceLogger.Log("Attempting to apply selected DNS resolvers...");
-            PublicResolverManager.WriteNewResolversToToml(Path.Combine(DNSCryptPath, "dnscrypt-proxy.toml"), checkedListBox1.CheckedItems.Cast<string>().ToList());
+            PublicResolverManager.WriteNewResolversToToml(Path.Combine(DNSCryptPath, "dnscrypt-proxy.toml"), [.. checkedListBox1.CheckedItems.Cast<string>()]);
         }
 
         private void ApplyAndRestartBtn_Click(object sender, EventArgs e)
         {
             TraceLogger.Log("Attempting to apply selected DNS resolvers...");
-            PublicResolverManager.WriteNewResolversToToml(Path.Combine(DNSCryptPath, "dnscrypt-proxy.toml"), checkedListBox1.CheckedItems.Cast<string>().ToList());
+            PublicResolverManager.WriteNewResolversToToml(Path.Combine(DNSCryptPath, "dnscrypt-proxy.toml"), [.. checkedListBox1.CheckedItems.Cast<string>()]);
             TraceLogger.Log("Attempting to restart DNSCrypt service...");
             LocalSystemManager.RestartDnsCrypt();
         }

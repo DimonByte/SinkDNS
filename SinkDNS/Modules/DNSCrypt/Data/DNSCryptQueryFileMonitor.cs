@@ -23,9 +23,9 @@
 using SinkDNS.Modules.SinkDNSInternals;
 using System.Runtime.InteropServices;
 
-namespace SinkDNS.Modules.DNSCrypt
+namespace SinkDNS.Modules.DNSCrypt.Data
 {
-    public class DNSCryptQueryMonitor(string logFilePath)
+    public class DNSCryptQueryFileMonitor(string logFilePath)
     {
         //Done via watching the log file that DNSCrypt creates.
         private readonly string logFilePath = logFilePath;

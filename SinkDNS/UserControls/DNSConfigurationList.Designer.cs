@@ -91,6 +91,7 @@
             // 
             // customStaticServerTxt
             // 
+            customStaticServerTxt.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             customStaticServerTxt.Location = new Point(13, 300);
             customStaticServerTxt.Name = "customStaticServerTxt";
             customStaticServerTxt.Size = new Size(404, 23);

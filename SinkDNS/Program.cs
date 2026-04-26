@@ -41,6 +41,7 @@ namespace SinkDNS
             // To customize application configuration such as set high DPI settings or default font,
             // see https://aka.ms/applicationconfiguration.
             //Check if another instance of SinkDNS is already running, if so, exit this instance.
+            TraceLogger.Log("SinkDNS Program Starting...");
             bool createdNew;
             _singleInstanceMutex =
                 new Mutex(true, "SinkDNS_singleton_mutex", out createdNew);
@@ -55,11 +56,10 @@ namespace SinkDNS
             }
             IOManager.CreateNecessaryDirectoriesAndFiles();
             LocalSystemManager.IsDNSCryptInstalled();
-            TraceLogger.Log("SinkDNS Program Starting...");
             Application.SetCompatibleTextRenderingDefault(false);
             ApplicationConfiguration.Initialize();
             TraceLogger.ClearExpiredLogs();
-            var notifyIcon = GlobalNotifyIcon.Instance.NotifyIcon;
+            NotifyIcon? notifyIcon = GlobalNotifyIcon.Instance.NotifyIcon;
             if (notifyIcon is not null)
             {
                 NotificationManager.SetNotifyIcon(notifyIcon);

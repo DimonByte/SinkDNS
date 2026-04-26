@@ -78,7 +78,7 @@ namespace SinkDNS.Modules.SinkDNSInternals
             string localDNSCryptVer = CommandRunner.RunCommand($"\"{dnsCryptInstallationDirectory}\" --version");
             TraceLogger.Log($"Local dnscrypt-proxy version output: {localDNSCryptVer}");
             //Compare! If the remote version is newer than the local version, return true, else return false. Simples!
-            if (Version.TryParse(latestVersion, out var latestVer) && Version.TryParse(localDNSCryptVer, out var localVer))
+            if (Version.TryParse(latestVersion, out Version? latestVer) && Version.TryParse(localDNSCryptVer, out Version? localVer))
             {
                 if (latestVer > localVer)
                 {
@@ -109,7 +109,7 @@ namespace SinkDNS.Modules.SinkDNSInternals
                 http.DefaultRequestHeaders.UserAgent.ParseAdd("SinkDNS-Updater/1.0 (+https://example/)");
 
                 var url = $"https://github.com/{ownerRepo}/releases/latest";
-                var resp = http.GetAsync(url).GetAwaiter().GetResult();
+                HttpResponseMessage resp = http.GetAsync(url).GetAwaiter().GetResult();
                 TraceLogger.Log($"HTTP response for {url}: {(int)resp.StatusCode} {resp.StatusCode}");
                 // Check for redirect location (preferred, reliable)
                 if (resp.StatusCode == HttpStatusCode.Found ||
@@ -119,7 +119,7 @@ namespace SinkDNS.Modules.SinkDNSInternals
                     resp.StatusCode == HttpStatusCode.TemporaryRedirect ||
                     resp.StatusCode == HttpStatusCode.PermanentRedirect)
                 {
-                    var loc = resp.Headers.Location;
+                    Uri? loc = resp.Headers.Location;
                     if (loc != null)
                     {
                         TraceLogger.Log($"Redirect location: {loc}");
@@ -136,7 +136,7 @@ namespace SinkDNS.Modules.SinkDNSInternals
                 TraceLogger.Log($"No redirect found for {url}, status code: {(int)resp.StatusCode} {resp.StatusCode}. Attempting HTML parsing fallback.");
                 // Fallback: some servers may not redirect; parse the HTML for /releases/tag/<tag>
                 var html = resp.Content.ReadAsStringAsync().GetAwaiter().GetResult();
-                var m = Regex.Match(html, @"/releases/tag/([^""'\s<>]+)");
+                Match m = Regex.Match(html, @"/releases/tag/([^""'\s<>]+)");
                 if (m.Success && m.Groups.Count > 1)
                 {
                     TraceLogger.Log($"Extracted tag from HTML: {m.Groups[1].Value}");

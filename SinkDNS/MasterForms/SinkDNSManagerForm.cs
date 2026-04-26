@@ -25,10 +25,12 @@
 using SinkDNS.ChildForms;
 using SinkDNS.MasterForms;
 using SinkDNS.Modules;
+using SinkDNS.Modules.DNSCrypt.Data;
 using SinkDNS.Modules.SinkDNSInternals;
 using SinkDNS.Modules.WindowsSystem;
 using SinkDNS.Properties;
 using SinkDNS.UserControls;
+using static SinkDNS.Modules.Enums;
 
 namespace SinkDNS
 {
@@ -87,24 +89,25 @@ namespace SinkDNS
 
         private async void button1_ClickAsync(object sender, EventArgs e)
         {
-            //NotificationManager.ShowNotification("Updating Blocklists", "Downloading and updating blocklists...", Enums.StatusSeverityType.Information);
-            //BlocklistManager.DownloadBlocklistsAsync().GetAwaiter().GetResult();
-            //GlobalNotifyIcon.Instance.SetIcon(Properties.Resources.WarningIcon);
-            //NotificationManager.ShowNotification("Stopping DNSCrypt", "Attempting to stop DNSCrypt...", Enums.StatusSeverityType.Information);
-            //ServiceManager.StopDnsCrypt();
-            //DNSCryptConfigurationManager dNSCryptConfigurationManager = new DNSCryptConfigurationManager(ServiceManager.GetDnsCryptInstallationPath() + "\\dnscrypt-proxy.toml");
-            //TraceLogger.Log(ServiceManager.GetDNSCryptInstallationDirectory());
-
-            //string dnscryptpath = ServiceManager.GetDNSCryptInstallationDirectory();
-            //DNSCryptConfigurationManager dNSCryptConfigurationManager = new DNSCryptConfigurationManager(dnscryptpath + "\\dnscrypt-proxy.toml");
-            //DNSCryptQueryMonitor monitor = new DNSCryptQueryMonitor($"{dnscryptpath}\\{dNSCryptConfigurationManager.GetSetting("[query_log]", "file")}");
-            //await monitor.StartMonitoringAsync();
-
-            //MessageBox.Show(monitor.isMonitoring.ToString());
-            //NotificationManager.ShowNotification("This button does nothing", "This button is just a placeholder for now and does not do anything.", Enums.StatusSeverityType.Information);
-            //TraceLogger.Log(LocalSystemManager.GetDNSCryptInstallationDirectory(true),Enums.StatusSeverityType.Debug);
-            //TraceLogger.Log(UpdateManager.IsDNSCryptProxyUpdateAvailable().ToString(), Enums.StatusSeverityType.Debug);
-            //TraceLogger.Log(LocalSystemManager.GetDNSCryptInstallationDirectory(), Enums.StatusSeverityType.Information);
+            //Test button
+            //object topDomainsData = await DNSCryptDataAPI.GetData(MetricsType.TopDomains);
+            //if (topDomainsData != null)
+            //{
+            //    MessageBox.Show($"Top Domains Data: {System.Text.Json.JsonSerializer.Serialize(topDomainsData)}");
+            //}
+            //else
+            //{
+            //    MessageBox.Show("Failed to get Top Domains data.");
+            //}
+            object recentDomains = await DNSCryptDataAPI.GetData(MetricsType.RecentQueries);
+            if (recentDomains != null)
+            {
+                MessageBox.Show($"Recent Queries Data: {System.Text.Json.JsonSerializer.Serialize(recentDomains)}");
+            }
+            else
+            {
+                MessageBox.Show("Failed to get Recent Queries data.");
+            }
         }
 
         private void SinkDNSManagerForm_FormClosing(object sender, FormClosingEventArgs e)

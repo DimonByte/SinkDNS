@@ -55,7 +55,7 @@ namespace SinkDNS.Modules.SinkDNSInternals
                     if (!Directory.Exists(_logDirectory))
                         return;
                     var logFiles = Directory.GetFiles(_logDirectory, "*.log");
-                    var expiryDate = DateTime.Now.AddDays(-Settings.Default.LogExpiryInDays);
+                    DateTime expiryDate = DateTime.Now.AddDays(-Settings.Default.LogExpiryInDays);
                     foreach (var logFile in logFiles)
                     {
                         var fileInfo = new FileInfo(logFile);
@@ -113,7 +113,7 @@ namespace SinkDNS.Modules.SinkDNSInternals
             string filePathLog = Path.Combine(_logDirectory, $"{_currentDate}.log");
             try
             {
-                var now = DateTime.Now;
+                DateTime now = DateTime.Now;
                 var currentDate = now.ToString("dd-MM-yyyy");
                 if (now.Subtract(_lastDateCheck).TotalSeconds > 10)
                 {

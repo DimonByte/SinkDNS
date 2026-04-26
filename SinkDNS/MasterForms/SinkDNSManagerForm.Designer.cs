@@ -76,7 +76,7 @@
             // 
             MainContextMenuStrip.Items.AddRange(new ToolStripItem[] { openManagerToolStripMenuItem, toolStripSeparator3, addNewBlocklistToolStripMenuItem, addNewWhitelistToolStripMenuItem, addURLToBlocklistToolStripMenuItem, addURLToWhitelistToolStripMenuItem, toolStripSeparator2, traceLogViewerToolStripMenuItem, updateBlocklistsToolStripMenuItem, checkForProgramUpdatesToolStripMenuItem, bypassFilteringToolStripMenuItem, restartDNSCryptToolStripMenuItem, toolStripSeparator1, aboutSinkDNSToolStripMenuItem, exitSinkDNSToolStripMenuItem });
             MainContextMenuStrip.Name = "MainContextMenuStrip";
-            MainContextMenuStrip.Size = new Size(230, 308);
+            MainContextMenuStrip.Size = new Size(230, 286);
             // 
             // openManagerToolStripMenuItem
             // 
@@ -321,7 +321,7 @@
             DashboardBtn.Name = "DashboardBtn";
             DashboardBtn.Size = new Size(200, 34);
             DashboardBtn.TabIndex = 10;
-            DashboardBtn.Text = "Dashboard";
+            DashboardBtn.Text = "Monitoring";
             DashboardBtn.UseVisualStyleBackColor = true;
             DashboardBtn.Click += DashboardBtn_Click;
             // 

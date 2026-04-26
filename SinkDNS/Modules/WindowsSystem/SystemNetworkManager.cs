@@ -65,8 +65,8 @@ namespace SinkDNS.Modules.WindowsSystem
             {
                 if (!string.IsNullOrEmpty(adapterName))
                 {
-                    var networkInterfaces = NetworkInterface.GetAllNetworkInterfaces();
-                    foreach (var networkInterface in networkInterfaces)
+                    NetworkInterface[] networkInterfaces = NetworkInterface.GetAllNetworkInterfaces();
+                    foreach (NetworkInterface networkInterface in networkInterfaces)
                     {
                         if (networkInterface.Name == adapterName)
                         {
@@ -104,12 +104,12 @@ namespace SinkDNS.Modules.WindowsSystem
             //Check if the system supports IPv6 and then check if the primary network adapter has IPv6 enabled. If the system does not support IPv6, then we should not try to change the DNS settings to use IPv6 addresses, because it will not work and could cause issues for the user.
             if (NetworkInterface.GetIsNetworkAvailable())
             {
-                var networkInterfaces = NetworkInterface.GetAllNetworkInterfaces();
-                foreach (var networkInterface in networkInterfaces)
+                NetworkInterface[] networkInterfaces = NetworkInterface.GetAllNetworkInterfaces();
+                foreach (NetworkInterface networkInterface in networkInterfaces)
                 {
                     if (networkInterface.Name == Settings.Default.PrimaryNetworkAdapter)
                     {
-                        var ipProperties = networkInterface.GetIPProperties();
+                        IPInterfaceProperties ipProperties = networkInterface.GetIPProperties();
                         if (ipProperties.UnicastAddresses.Any(addr => addr.Address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetworkV6))
                         {
                             TraceLogger.Log($"IPv6 is enabled on primary network adapter: {Settings.Default.PrimaryNetworkAdapter}");

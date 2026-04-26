@@ -102,7 +102,7 @@ namespace SinkDNS.Modules.SinkDNSInternals
             TraceLogger.Log("Checking for pending scheduled tasks to execute.", StatusSeverityType.Information);
             lock (LockObject)
             {
-                var now = DateTime.Now;
+                DateTime now = DateTime.Now;
                 var pendingTasks = _tasks.Where(t => t.IsEnabled &&
                     (t.Type == TaskType.RunAtApplicationStart ||
                      (t.ScheduledTime.HasValue && t.ScheduledTime.Value <= now) ||
@@ -111,7 +111,7 @@ namespace SinkDNS.Modules.SinkDNSInternals
                       t.ScheduledTime.Value.Add(t.Interval.Value) <= now)))
                     .ToList();
 
-                foreach (var task in pendingTasks)
+                foreach (ScheduledTask? task in pendingTasks)
                 {
                     TraceLogger.Log($"Executing scheduled task: {task.Name}", StatusSeverityType.Information);
                     ExecuteTask(task);
@@ -164,7 +164,7 @@ namespace SinkDNS.Modules.SinkDNSInternals
                     "[ScheduledTasks]"
                 };
 
-                foreach (var task in _tasks)
+                foreach (ScheduledTask task in _tasks)
                 {
                     TraceLogger.Log($"Saving task: {task.Name}", StatusSeverityType.Information);
                     lines.Add($"TaskName={task.Name}");
@@ -229,15 +229,15 @@ namespace SinkDNS.Modules.SinkDNSInternals
                             currentTask = new ScheduledTask { Name = value };
                             break;
                         case "TaskType":
-                            if (currentTask != null && Enum.TryParse<TaskType>(value, out var taskType))
+                            if (currentTask != null && Enum.TryParse<TaskType>(value, out TaskType taskType))
                                 currentTask.Type = taskType;
                             break;
                         case "TaskAction":
-                            if (currentTask != null && Enum.TryParse<TaskAction>(value, out var taskAction))
+                            if (currentTask != null && Enum.TryParse<TaskAction>(value, out TaskAction taskAction))
                                 currentTask.Action = taskAction;
                             break;
                         case "ScheduledTime":
-                            if (currentTask != null && DateTime.TryParse(value, out var scheduledTime))
+                            if (currentTask != null && DateTime.TryParse(value, out DateTime scheduledTime))
                                 currentTask.ScheduledTime = scheduledTime;
                             break;
                         case "Interval":

@@ -71,5 +71,11 @@
     <Setting Name="PrimaryNetworkAdapter" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
+    <Setting Name="DNSCryptMonitoringUIUsername" Type="System.String" Scope="User">
+      <Value Profile="(Default)">admin</Value>
+    </Setting>
+    <Setting Name="DNSCryptMonitoringUIPassword" Type="System.String" Scope="User">
+      <Value Profile="(Default)">changeme</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

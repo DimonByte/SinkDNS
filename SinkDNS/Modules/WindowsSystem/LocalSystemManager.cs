@@ -102,7 +102,7 @@ namespace SinkDNS.Modules.WindowsSystem
             TraceLogger.Log("DNSCrypt installation location not saved in settings - Attempting to get DNSCrypt installation directory from registry...");
             try
             {
-                using var key = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Services\dnscrypt-proxy");
+                using RegistryKey? key = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Services\dnscrypt-proxy");
                 if (key != null)
                 {
                     TraceLogger.Log("Found DNSCrypt service registry key.");

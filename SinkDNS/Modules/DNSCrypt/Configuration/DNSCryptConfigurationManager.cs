@@ -23,7 +23,7 @@
 using SinkDNS.Modules.SinkDNSInternals;
 using SinkDNS.Modules.WindowsSystem;
 
-namespace SinkDNS.Modules.DNSCrypt
+namespace SinkDNS.Modules.DNSCrypt.Configuration
 {
     //This class is responsible for parsing and writing configuration data to and from DNSCrypt.
     //It handles reading configuration files, interpreting settings, and converting them into usable formats for the application.

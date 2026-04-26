@@ -102,7 +102,7 @@ namespace SinkDNS.Modules.SinkDNSInternals
                 }
             }
 
-            var urls = ReadUrlsFromFile(IniLocation);
+            List<string> urls = ReadUrlsFromFile(IniLocation);
             foreach (var url in urls)
             {
                 TraceLogger.Log($"Downloading list from: {url}");
@@ -117,7 +117,7 @@ namespace SinkDNS.Modules.SinkDNSInternals
             //Check if the files in the blocklist have a update date via using the StartOfBlockList, if the file has been modified before the StartOfBlockList, then it means the file was not updated during this download process, and we should log a warning about it.
             foreach (var file in Directory.GetFiles(ListFolderLocation))
             {
-                var lastWriteTime = File.GetLastWriteTime(file);
+                DateTime lastWriteTime = File.GetLastWriteTime(file);
                 if (lastWriteTime < StartOfBlockList)
                 {
                     ProblemWhenDownloadingLists = true;
