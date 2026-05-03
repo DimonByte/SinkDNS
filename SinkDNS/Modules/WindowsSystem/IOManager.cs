@@ -26,6 +26,7 @@ namespace SinkDNS.Modules.WindowsSystem
     using SinkDNS.Properties;
     using System.Net;
     using System.Net.NetworkInformation;
+    using System.Text;
 
     //This will handle folder and file management for SinkDNS, like creating necessary directories.
     internal class IOManager
@@ -230,12 +231,6 @@ namespace SinkDNS.Modules.WindowsSystem
 
         public static void MergeFiles(string sourceFolder, string outputFile)
         {
-            // Delete existing combined file, we don't want that mess to happen...
-            //TraceLogger.Log($"Creating combined file: {outputFile}");
-            //if (File.Exists(outputFile))
-            //    File.Delete(outputFile);
-            //    TraceLogger.Log($"Deleted existing combined file: {outputFile}");
-
             var files = Directory.GetFiles(sourceFolder, "*.txt");
             if (files.Length == 0)
             {
@@ -306,9 +301,68 @@ namespace SinkDNS.Modules.WindowsSystem
                 TraceLogger.Log($"Removed {lines.Length - uniqueLines.Count} duplicate entries.");
                 TraceLogger.Log($"Total lines in {MergedFileLoc} after removing duplicates: {File.ReadAllLines(MergedFileLoc).Length}");
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 TraceLogger.Log($"Error removing duplicates from {MergedFileLoc}: {ex}", Enums.StatusSeverityType.Error);
+            }
+        }
+
+        public static bool BackupDNSConfigToFolder(string backuplocation, string ipv4Primary, string ipv4Secondary, string ipv6Primary, string ipv6Secondary)
+        {
+            List<string> backupLinesConstructor =
+            [
+                $"IPv4 Primary: {ipv4Primary}",
+                $"IPv4 Secondary: {ipv4Secondary}",
+                $"IPv6 Primary: {ipv6Primary}",
+                $"IPv6 Secondary: {ipv6Secondary}",
+            ];
+            try
+            {
+                File.WriteAllLines(backuplocation, backupLinesConstructor, Encoding.UTF8);
+            }
+            catch (Exception ex)
+            {
+                TraceLogger.Log($"Error backing up DNS configuration to {backuplocation}: {ex}", Enums.StatusSeverityType.Error);
+                return false;
+            }
+            TraceLogger.Log($"Backed up DNS configuration to {backuplocation}");
+            return true;
+        }
+
+        public static (string ipv4Primary, string ipv4Secondary, string ipv6Primary, string ipv6Secondary) ReadDNSConfigFromBackup(string backuplocation)
+        {
+            try
+            {
+                if (!File.Exists(backuplocation))
+                {
+                    TraceLogger.Log($"Backup file not found: {backuplocation}", Enums.StatusSeverityType.Warning);
+                    return (string.Empty, string.Empty, string.Empty, string.Empty);
+                }
+                var lines = File.ReadAllLines(backuplocation);
+                string ipv4Primary = lines.FirstOrDefault(line => line.StartsWith("IPv4 Primary: "))
+                    ?.Substring("IPv4 Primary: ".Length)
+                    ?.Trim() ?? string.Empty;
+
+                string ipv4Secondary = lines.FirstOrDefault(line => line.StartsWith("IPv4 Secondary: "))
+                    ?.Substring("IPv4 Secondary: ".Length)
+                    ?.Trim() ?? string.Empty;
+
+                string ipv6Primary = lines.FirstOrDefault(line => line.StartsWith("IPv6 Primary: "))
+                    ?.Substring("IPv6 Primary: ".Length)
+                    ?.Trim() ?? string.Empty;
+
+                string ipv6Secondary = lines.FirstOrDefault(line => line.StartsWith("IPv6 Secondary: "))
+                    ?.Substring("IPv6 Secondary: ".Length)
+                    ?.Trim() ?? string.Empty;
+
+                TraceLogger.Log($"Read DNS configuration from backup at {backuplocation}");
+                TraceLogger.Log($"IPv4 Primary: {ipv4Primary}, IPv4 Secondary: {ipv4Secondary}, IPv6 Primary: {ipv6Primary}, IPv6 Secondary: {ipv6Secondary}");
+                return (ipv4Primary, ipv4Secondary, ipv6Primary, ipv6Secondary);
+            }
+            catch (Exception ex)
+            {
+                TraceLogger.Log($"Error reading DNS configuration from backup at {backuplocation}: {ex}", Enums.StatusSeverityType.Error);
+                return (string.Empty, string.Empty, string.Empty, string.Empty);
             }
         }
     }

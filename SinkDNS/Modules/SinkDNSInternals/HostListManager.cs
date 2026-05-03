@@ -124,6 +124,10 @@ namespace SinkDNS.Modules.SinkDNSInternals
                     ProblemWhenDownloadingLists = true;
                     TraceLogger.Log($"Warning: List file {file} was not updated during this download process. Check logs if the download process failed on this file. Last write time: {lastWriteTime}", Enums.StatusSeverityType.Warning);
                 }
+                else
+                {
+                    TraceLogger.Log($"List file {file} was updated successfully. Last write time: {lastWriteTime}");
+                }
             }
         }
 

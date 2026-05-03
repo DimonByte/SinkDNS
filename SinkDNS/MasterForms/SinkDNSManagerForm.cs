@@ -26,11 +26,12 @@ using SinkDNS.ChildForms;
 using SinkDNS.MasterForms;
 using SinkDNS.Modules;
 using SinkDNS.Modules.DNSCrypt;
-using SinkDNS.Modules.DNSCrypt.Data;
 using SinkDNS.Modules.SinkDNSInternals;
 using SinkDNS.Modules.WindowsSystem;
 using SinkDNS.Properties;
 using SinkDNS.UserControls;
+using System.Net;
+using System.Net.NetworkInformation;
 
 namespace SinkDNS
 {
@@ -114,8 +115,12 @@ namespace SinkDNS
             //{
             //    MessageBox.Show($"Host List Entry: {entry.Name} - {entry.Description}");
             //}
-            string alladapters = string.Join(Environment.NewLine, SystemNetworkManager.GetNetworkAdapterNames());
-            MessageBox.Show($"Network Adapter: {alladapters}");
+            //string alladapters = string.Join(Environment.NewLine, SystemNetworkManager.GetNetworkAdapterNames());
+            //MessageBox.Show($"Network Adapter: {alladapters}");
+            //SystemNetworkManager.SaveSelectedNetworkAdapterToSettings("WiFi");
+            //NetworkManager.BackupDNSConfigOfNetworkAdapter("WiFi");
+            //NetworkManager.SetDNSOnSelectedAdapter(NetworkManager.GetAdapterInterfaceByName(Settings.Default.PrimaryNetworkAdapter), false, IPAddress.Parse("127.0.0.1"), IPAddress.Parse("::1"));
+            NetworkManager.RevertToBackupDNS(NetworkManager.GetAdapterInterfaceByName(Settings.Default.PrimaryNetworkAdapter), false);
         }
 
         private void SinkDNSManagerForm_FormClosing(object sender, FormClosingEventArgs e)

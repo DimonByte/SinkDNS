@@ -110,8 +110,10 @@ namespace SinkDNS.Modules.SinkDNSInternals
                     _mainForm.Invoke(new Action(() =>
                     {
                         _mainForm.Show();
+                        _mainForm.TopMost = true;
                         _mainForm.BringToFront();
                         _mainForm.WindowState = FormWindowState.Normal;
+                        _mainForm.TopMost = false;
                     }));
                 }
                 catch (Exception ex)
