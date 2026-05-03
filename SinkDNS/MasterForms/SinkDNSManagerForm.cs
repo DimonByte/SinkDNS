@@ -25,12 +25,12 @@
 using SinkDNS.ChildForms;
 using SinkDNS.MasterForms;
 using SinkDNS.Modules;
+using SinkDNS.Modules.DNSCrypt;
 using SinkDNS.Modules.DNSCrypt.Data;
 using SinkDNS.Modules.SinkDNSInternals;
 using SinkDNS.Modules.WindowsSystem;
 using SinkDNS.Properties;
 using SinkDNS.UserControls;
-using static SinkDNS.Modules.Enums;
 
 namespace SinkDNS
 {
@@ -68,7 +68,7 @@ namespace SinkDNS
         {
             NotificationManager.SetContextMenu(MainContextMenuStrip);
             GlobalNotifyIcon.Instance.SetMainForm(this);
-            if (LocalSystemManager.IsDNSCryptRunning())
+            if (DnsCryptServiceManager.IsDNSCryptRunning())
             {
                 //Since DNSCrypt is running, don't show this manager, since this program couldve been started at startup.
                 BeginInvoke(new MethodInvoker(delegate
@@ -99,15 +99,23 @@ namespace SinkDNS
             //{
             //    MessageBox.Show("Failed to get Top Domains data.");
             //}
-            object recentDomains = await DNSCryptDataAPI.GetData(MetricsType.RecentQueries);
-            if (recentDomains != null)
-            {
-                MessageBox.Show($"Recent Queries Data: {System.Text.Json.JsonSerializer.Serialize(recentDomains)}");
-            }
-            else
-            {
-                MessageBox.Show("Failed to get Recent Queries data.");
-            }
+            //object recentDomains = await DNSCryptDataAPI.GetData(MetricsType.RecentQueries);
+            //if (recentDomains != null)
+            //{
+            //    MessageBox.Show($"Recent Queries Data: {System.Text.Json.JsonSerializer.Serialize(recentDomains)}");
+            //}
+            //else
+            //{
+            //    MessageBox.Show("Failed to get Recent Queries data.");
+            //}
+            //Get HostListDirectory
+            //await HostListDirectory.InitializeHostListAsync();
+            //foreach (var entry in HostListDirectory.HostListEntries)
+            //{
+            //    MessageBox.Show($"Host List Entry: {entry.Name} - {entry.Description}");
+            //}
+            string alladapters = string.Join(Environment.NewLine, SystemNetworkManager.GetNetworkAdapterNames());
+            MessageBox.Show($"Network Adapter: {alladapters}");
         }
 
         private void SinkDNSManagerForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -132,7 +140,7 @@ namespace SinkDNS
         {
             GlobalNotifyIcon.Instance.SetIcon(Resources.WarningIcon);
             NotificationManager.ShowNotification("Restarting DNSCrypt", "Attempting to restart DNSCrypt...", Enums.StatusSeverityType.Information);
-            if (LocalSystemManager.RestartDnsCrypt())
+            if (DnsCryptServiceManager.RestartDnsCrypt())
             {
                 GlobalNotifyIcon.Instance.SetIcon(Resources.SinkDNSIcon);
                 NotificationManager.ShowNotification("DNSCrypt Restarted", "DNSCrypt has been restarted successfully.", Enums.StatusSeverityType.Information);

@@ -22,9 +22,9 @@
 
 namespace SinkDNS.Modules.WindowsSystem
 {
-    using Microsoft.VisualBasic.Devices;
     using SinkDNS.Modules.SinkDNSInternals;
     using SinkDNS.Properties;
+    using System.Net;
     using System.Net.NetworkInformation;
 
     //This will handle folder and file management for SinkDNS, like creating necessary directories.
@@ -269,7 +269,7 @@ namespace SinkDNS.Modules.WindowsSystem
             {
                 TraceLogger.Log($"Error merging files into {outputFile}: {ex}", Enums.StatusSeverityType.Error);
             }
-            TraceLogger.Log($"Total entries in {outputFile}: {File.ReadAllLines(outputFile).Length}");
+            //TraceLogger.Log($"Total entries in {outputFile}: {File.ReadAllLines(outputFile).Length}"); Removing since it will be in notification and that will be logged anyway.
         }
 
         public static void ClearFiles(string folder)
@@ -309,45 +309,6 @@ namespace SinkDNS.Modules.WindowsSystem
             catch(Exception ex)
             {
                 TraceLogger.Log($"Error removing duplicates from {MergedFileLoc}: {ex}", Enums.StatusSeverityType.Error);
-            }
-        }
-        
-        public static bool? BackupDNSConfigOfPrimaryNetworkAdapter(string adapterName)
-        {
-            //Get DNS config of PrimaryNetworkAdapter and save it to a file in the backup folder. This will allow us to restore the original DNS config if something goes wrong with changing the DNS settings to use DNSCrypt.
-            if (string.IsNullOrEmpty(adapterName))
-            {
-                TraceLogger.Log("No primary network adapter selected. Skipping DNS config backup.", Enums.StatusSeverityType.Error);
-                return null;
-            }
-            else
-            {
-                if (System.Net.NetworkInformation.NetworkInterface.GetAllNetworkInterfaces().FirstOrDefault(n => n.Name == adapterName) is System.Net.NetworkInformation.NetworkInterface adapter)
-                {
-                    IPInterfaceProperties ipProperties = adapter.GetIPProperties();
-                    IPAddressCollection dnsAddresses = ipProperties.DnsAddresses;
-                    if (dnsAddresses.Count > 0)
-                    {
-                        string backupFilePath = $"{Settings.Default.BackupFolderLocation}/{adapterName}_dns_backup.txt";
-                        try
-                        {
-                            TraceLogger.Log($"Backing up DNS config for adapter {adapterName} to {backupFilePath}");
-                            File.WriteAllLines(backupFilePath, dnsAddresses.Select(addr => addr.ToString()));
-                            return true;
-                        }
-                        catch (Exception ex)
-                        {
-                            TraceLogger.Log($"Error backing up DNS config for adapter {adapterName}: {ex}", Enums.StatusSeverityType.Error);
-                            return false;
-                        }
-                    }
-                    else
-                    {
-                        TraceLogger.Log($"No DNS addresses found for adapter {adapterName}. Nothing to backup.", Enums.StatusSeverityType.Warning);
-                        return null;
-                    }
-                }
-                return null;
             }
         }
     }

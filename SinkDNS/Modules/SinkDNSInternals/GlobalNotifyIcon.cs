@@ -20,9 +20,7 @@
 //OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //SOFTWARE.
 
-using SinkDNS.Modules.SinkDNSInternals;
-
-namespace SinkDNS.Modules.WindowsSystem
+namespace SinkDNS.Modules.SinkDNSInternals
 {
     public sealed class GlobalNotifyIcon : IDisposable
     {

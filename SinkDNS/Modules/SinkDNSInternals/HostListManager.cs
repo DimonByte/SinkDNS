@@ -22,6 +22,7 @@
 
 namespace SinkDNS.Modules.SinkDNSInternals
 {
+    using SinkDNS.Modules.DNSCrypt;
     using SinkDNS.Modules.WindowsSystem;
     using SinkDNS.Properties;
 
@@ -52,11 +53,11 @@ namespace SinkDNS.Modules.SinkDNSInternals
             GlobalNotifyIcon.Instance.SetIcon(Resources.UpdateAvailableIcon);
             if (Settings.Default.RestartDNSCryptAfterUpdatingLists)
             {
-                bool RestartResult = LocalSystemManager.RestartDnsCrypt();
+                bool RestartResult = DnsCryptServiceManager.RestartDnsCrypt();
                 TraceLogger.Log($"DNSCrypt restart result after updating {listName}: {RestartResult}", Enums.StatusSeverityType.Information);
                 if (RestartResult & !ProblemWhenDownloadingLists)
                 {
-                    NotificationManager.ShowNotification($"{listName} Updated", $"{listName} have been updated and DNSCrypt restarted successfully.", Enums.StatusSeverityType.Information);
+                    NotificationManager.ShowNotification($"{listName} Updated", $"{listName} have been updated with {File.ReadAllLines(listType == Enums.ListType.Blocklist ? Settings.Default.CombinedBlocklistFileLocation : Settings.Default.CombinedWhitelistFileLocation).Length} unique entries.", Enums.StatusSeverityType.Information);
                 }
                 else if (!RestartResult & !ProblemWhenDownloadingLists)
                 {
@@ -72,7 +73,7 @@ namespace SinkDNS.Modules.SinkDNSInternals
                 }
                 else
                 {
-                    NotificationManager.ShowNotification($"{listName} Updated", $"{listName} have been updated and will be applied after a DNSCrypt service restart.", Enums.StatusSeverityType.Information);
+                    NotificationManager.ShowNotification($"{listName} Updated", $"{listName} have been updated with {File.ReadAllLines(listType == Enums.ListType.Blocklist ? Settings.Default.CombinedBlocklistFileLocation : Settings.Default.CombinedWhitelistFileLocation).Length} unique entries and will be applied after a DNSCrypt service restart.", Enums.StatusSeverityType.Information);
                 }
                 GlobalNotifyIcon.Instance.SetIcon(Resources.SinkDNSIcon);
                 TraceLogger.Log($"Finished {listName} update process. DNSCrypt restart attempted: {RestartResult}, Problem when downloading lists: {ProblemWhenDownloadingLists}", Enums.StatusSeverityType.Information);
@@ -108,7 +109,7 @@ namespace SinkDNS.Modules.SinkDNSInternals
                 TraceLogger.Log($"Downloading list from: {url}");
                 var fileName = Path.GetFileName(url);
                 var filePath = Path.Combine(ListFolderLocation, fileName);
-                await DownloadManager.DownloadFileAsync(url, filePath).ConfigureAwait(false);
+                await DownloadController.DownloadFileAsync(url, filePath).ConfigureAwait(false);
             }
             TraceLogger.Log("Finished downloading lists.");
             IOManager.MergeFiles(ListFolderLocation, CombinedListLocation);

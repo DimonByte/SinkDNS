@@ -20,6 +20,7 @@
 //OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //SOFTWARE.
 
+using SinkDNS.Modules.DNSCrypt;
 using SinkDNS.Modules.WindowsSystem;
 using System.Net;
 using System.Text.RegularExpressions;
@@ -51,7 +52,7 @@ namespace SinkDNS.Modules.SinkDNSInternals
         public static bool IsDNSCryptProxyUpdateAvailable()
         {
             //Step 1: Get the installation directory of DNSCryptProxy, including the executable path, using the ServiceManager.GetDNSCryptInstallationDirectory(true) method.
-            string dnsCryptInstallationDirectory = LocalSystemManager.GetDNSCryptInstallationDirectory(true);
+            string dnsCryptInstallationDirectory = DnsCryptServiceManager.GetDNSCryptInstallationDirectory(true);
             if (string.IsNullOrEmpty(dnsCryptInstallationDirectory))
             {
                 TraceLogger.Log("Unable to get installation directory of DNSCryptProxy. Update check failure.", Enums.StatusSeverityType.Error);

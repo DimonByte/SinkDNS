@@ -22,13 +22,14 @@
 
 using Microsoft.Win32;
 using SinkDNS.Modules.SinkDNSInternals;
+using SinkDNS.Modules.WindowsSystem;
 using SinkDNS.Properties;
 using System.ServiceProcess;
 
-namespace SinkDNS.Modules.WindowsSystem
+namespace SinkDNS.Modules.DNSCrypt
 {
     //This will manage and monitor DNSCrypt as a service. It will start, stop, and restart the service as needed. Including checking its status.
-    internal class LocalSystemManager
+    internal class DnsCryptServiceManager
     {
         private const string DnsCryptServiceName = "dnscrypt-proxy";
 

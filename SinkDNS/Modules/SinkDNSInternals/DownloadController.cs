@@ -25,13 +25,13 @@ using System.Net.Http.Headers;
 namespace SinkDNS.Modules.SinkDNSInternals
 {
     //This will manage downloads for SinkDNS, DNSCrypt, and BlockLists, including starting, stopping, and monitoring download progress.
-    internal class DownloadManager
+    internal class DownloadController
     {
         private static readonly HttpClient httpClient = new();
 
         private static readonly TimeSpan DefaultTimeout = TimeSpan.FromSeconds(30);
 
-        static DownloadManager()
+        static DownloadController()
         {
             // Set default headers to mimic a browser
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("*/*"));

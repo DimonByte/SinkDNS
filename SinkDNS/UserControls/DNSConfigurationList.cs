@@ -1,8 +1,7 @@
 ﻿using SinkDNS.Modules.SinkDNSInternals;
-using SinkDNS.Properties;
 using System.Data;
-using SinkDNS.Modules.WindowsSystem;
 using SinkDNS.Modules.DNSCrypt.Data;
+using SinkDNS.Modules.DNSCrypt;
 
 namespace SinkDNS.UserControls
 {
@@ -12,46 +11,23 @@ namespace SinkDNS.UserControls
         {
             InitializeComponent();
         }
-        private string DNSCryptPath = LocalSystemManager.GetDNSCryptInstallationDirectory(); //Cache result.
+        private string DNSCryptPath = DnsCryptServiceManager.GetDNSCryptInstallationDirectory(); //Cache result.
         private async void DNSConfigurationList_Load(object sender, EventArgs e)
         {
             TraceLogger.Log("Loading DNS Configuration List...");
             string? markdownContent = null;
             try
             {
-                //string? markdownContent = await DownloadManager.DownloadStringAsync("https://raw.githubusercontent.com/DNSCrypt/dnscrypt-resolvers/master/v3/public-resolvers.md");
-                //Check if the file "public-resolvers.md" exists in the Settings.Default.ResolversFolderLocation, if not download it with DownloadFileAsync.
-                if (!File.Exists(Path.Combine(Settings.Default.ResolversFolderLocation, "public-resolvers.md")))
-                {
-                    TraceLogger.Log($"public-resolvers.md not found on disk in {Settings.Default.ResolversFolderLocation}, downloading...");
-                    await DownloadManager.DownloadFileAsync("https://raw.githubusercontent.com/DNSCrypt/dnscrypt-resolvers/master/v3/public-resolvers.md", Path.Combine(Settings.Default.ResolversFolderLocation, "public-resolvers.md"));
-                    markdownContent = File.ReadAllText(Path.Combine(Settings.Default.ResolversFolderLocation, "public-resolvers.md"));
-                }
-                else
-                {
-                    DateTime creationDate = File.GetCreationTime(Path.Combine(Settings.Default.ResolversFolderLocation, "public-resolvers.md"));
-                    if ((DateTime.Now - creationDate).TotalDays > 7)
-                    {
-                        TraceLogger.Log($"public-resolvers.md is older than 7 days, redownloading...");
-                        await DownloadManager.DownloadFileAsync("https://raw.githubusercontent.com/DNSCrypt/dnscrypt-resolvers/master/v3/public-resolvers.md", Path.Combine(Settings.Default.ResolversFolderLocation, "public-resolvers.md"));
-                        markdownContent= File.ReadAllText(Path.Combine(Settings.Default.ResolversFolderLocation, "public-resolvers.md"));
-                    }
-                    else
-                    {
-                        TraceLogger.Log($"public-resolvers.md is up to date (not older than 7 days), loading from disk...");
-                        markdownContent = File.ReadAllText(Path.Combine(Settings.Default.ResolversFolderLocation, "public-resolvers.md"));
-                    }
-                }
+                markdownContent = await ResolverManager.DownloadPublicResolversAsync();
                 if (markdownContent == null)
                 {
-                    TraceLogger.Log("Failed to load resolver list: Content is null", Modules.Enums.StatusSeverityType.Error);
+                    TraceLogger.LogAndThrowMsgBox("An error occurred when downloading the public resolvers list.\n\nCheck your internet connection and see if your antivirus has blocked write access to the resolvers folder.\nReason: ResolverList returned null.", Modules.Enums.StatusSeverityType.Error);
                     return;
                 }
-                markdownContent = markdownContent.Replace("\r\n", "\n").Replace("\r", "\n"); // Normalize line endings
-                List<string> resolverNames = [.. PublicResolverManager.ParseResolverNamesFromMarkdown(markdownContent).OrderBy(name => name)];
+                List<string> resolverNames = [.. ResolverManager.ParseResolverNamesFromMarkdown(markdownContent).OrderBy(name => name)];
                 checkedListBox1.Items.AddRange([.. resolverNames]);
                 string tomlPath = Path.Combine(DNSCryptPath, "dnscrypt-proxy.toml");
-                List<string> selectedResolverNames = PublicResolverManager.GetConfiguredResolversFromToml(File.ReadAllText(tomlPath));
+                List<string> selectedResolverNames = ResolverManager.GetConfiguredResolversFromToml(File.ReadAllText(tomlPath));
                 SetCheckBoxesOnListbox(selectedResolverNames);
             }
             catch (Exception ex)
@@ -82,15 +58,15 @@ namespace SinkDNS.UserControls
         private void ApplyBtn_Click(object sender, EventArgs e)
         {
             TraceLogger.Log("Attempting to apply selected DNS resolvers...");
-            PublicResolverManager.WriteNewResolversToToml(Path.Combine(DNSCryptPath, "dnscrypt-proxy.toml"), [.. checkedListBox1.CheckedItems.Cast<string>()]);
+            ResolverManager.WriteNewResolversToToml(Path.Combine(DNSCryptPath, "dnscrypt-proxy.toml"), [.. checkedListBox1.CheckedItems.Cast<string>()]);
         }
 
         private void ApplyAndRestartBtn_Click(object sender, EventArgs e)
         {
             TraceLogger.Log("Attempting to apply selected DNS resolvers...");
-            PublicResolverManager.WriteNewResolversToToml(Path.Combine(DNSCryptPath, "dnscrypt-proxy.toml"), [.. checkedListBox1.CheckedItems.Cast<string>()]);
+            ResolverManager.WriteNewResolversToToml(Path.Combine(DNSCryptPath, "dnscrypt-proxy.toml"), [.. checkedListBox1.CheckedItems.Cast<string>()]);
             TraceLogger.Log("Attempting to restart DNSCrypt service...");
-            LocalSystemManager.RestartDnsCrypt();
+            DnsCryptServiceManager.RestartDnsCrypt();
         }
 
         private void AddCustomToListBtn_Click(object sender, EventArgs e)

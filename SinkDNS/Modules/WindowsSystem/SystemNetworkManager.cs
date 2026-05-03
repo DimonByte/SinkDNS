@@ -22,6 +22,7 @@
 
 using SinkDNS.Modules.SinkDNSInternals;
 using SinkDNS.Properties;
+using System.Net;
 using System.Net.NetworkInformation;
 
 namespace SinkDNS.Modules.WindowsSystem
@@ -45,7 +46,7 @@ namespace SinkDNS.Modules.WindowsSystem
                         Settings.Default.PrimaryNetworkAdapter = adapterName;
                         Settings.Default.Save();
                         TraceLogger.Log($"Saved primary network adapter: {adapterName}");
-                        if (IOManager.BackupDNSConfigOfPrimaryNetworkAdapter(adapterName) == null)
+                        if (BackupDNSConfigOfPrimaryNetworkAdapter(adapterName) == null)
                         {
                             TraceLogger.LogAndThrowMsgBox($"Failed to backup DNS configuration of adapter {adapterName}.", Enums.StatusSeverityType.Error);
                         }
@@ -86,17 +87,29 @@ namespace SinkDNS.Modules.WindowsSystem
             {
                 if (IsIPv6EnabledOnSystem())
                 {
-                    
+                    //Set both IPv4 and IPv6 DNS to DNSCrypt local address. Which are 127.0.0.1 and ::1 respectively.
+
                 }
                 else
                 {
-
+                    //Set only IPv4 DNS to DNSCrypt local address, and disable ipv6 dns. Set IPv4 DNS to 127.0.0.1
                 }
             }
             else
             {
                 TraceLogger.Log("No primary network adapter selected. Cannot set DNS to DNSCrypt.", Enums.StatusSeverityType.Error);
             }
+        }
+
+        public static List<string> GetNetworkAdapterNames()
+        {
+            List<string> adapterNames = new List<string>();
+            NetworkInterface[] networkInterfaces = NetworkInterface.GetAllNetworkInterfaces();
+            foreach (NetworkInterface networkInterface in networkInterfaces)
+            {
+                adapterNames.Add(networkInterface.Name);
+            }
+            return adapterNames;
         }
 
         private static bool IsIPv6EnabledOnSystem()
@@ -125,6 +138,64 @@ namespace SinkDNS.Modules.WindowsSystem
             }
             TraceLogger.Log("Unable to determine if IPv6 is enabled on the system. Network is not available.", Enums.StatusSeverityType.Error);
             return false;
+        }
+
+        private static bool? BackupDNSConfigOfPrimaryNetworkAdapter(string adapterName)
+        {
+            IEnumerable<NetworkInterface> targets;
+
+            if (string.IsNullOrEmpty(adapterName))
+            {
+                TraceLogger.Log("No primary network adapter selected. Backing up all interfaces...", Enums.StatusSeverityType.Warning);
+                targets = NetworkInterface.GetAllNetworkInterfaces();
+            }
+            else
+            {
+                var adapter = NetworkInterface.GetAllNetworkInterfaces().FirstOrDefault(n => n.Name == adapterName);
+                if (adapter == null)
+                {
+                    return null;
+                }
+                targets = [adapter];
+            }
+            bool allSuccessful = true;
+            foreach (var adapter in targets)
+            {
+                if (!TryBackupAdapter(adapter))
+                {
+                    allSuccessful = false;
+                }
+            }
+            return allSuccessful;
+        }
+
+        private static bool TryBackupAdapter(NetworkInterface adapter)
+        {
+            try
+            {
+                IPInterfaceProperties ipProperties = adapter.GetIPProperties();
+                IPAddressCollection dnsAddresses = ipProperties.DnsAddresses;
+
+                if (dnsAddresses.Count == 0)
+                {
+                    TraceLogger.Log($"No DNS addresses found for adapter {adapter.Name}. Nothing to backup.", Enums.StatusSeverityType.Warning);
+                    return false;
+                }
+
+                string backupFilePath = Path.Combine(Settings.Default.BackupFolderLocation, $"{adapter.Name}_dns_backup.txt");
+
+                TraceLogger.Log($"Backing up DNS config for adapter {adapter.Name} to {backupFilePath}");
+
+                var dnsStrings = dnsAddresses.Cast<IPAddress>().Select(addr => addr.ToString());
+                File.WriteAllLines(backupFilePath, dnsStrings);
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                TraceLogger.Log($"Error backing up DNS config for adapter {adapter.Name}: {ex}", Enums.StatusSeverityType.Error);
+                return false;
+            }
         }
     }
 }

@@ -126,6 +126,7 @@
             Controls.Add(panel1);
             Name = "SinkDNSFirstTimeSetup";
             Text = "SinkDNSFirstTimeSetup";
+            Load += SinkDNSFirstTimeSetup_Load;
             tabControl1.ResumeLayout(false);
             ResumeLayout(false);
         }

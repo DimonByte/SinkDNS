@@ -61,7 +61,7 @@ namespace SinkDNS.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("config/userblocklist.txt")]
+        [global::System.Configuration.DefaultSettingValueAttribute("config/userwebsiteblocklist.ini")]
         public string UserBlocklistIniLocation {
             get {
                 return ((string)(this["UserBlocklistIniLocation"]));
@@ -70,7 +70,7 @@ namespace SinkDNS.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("config/userwhitelist.txt")]
+        [global::System.Configuration.DefaultSettingValueAttribute("config/userwebsitewhitedomainlist.ini")]
         public string UserWhitelistIniLocation {
             get {
                 return ((string)(this["UserWhitelistIniLocation"]));
@@ -275,6 +275,54 @@ namespace SinkDNS.Properties {
             }
             set {
                 this["DNSCryptMonitoringUIPassword"] = value;
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("public-resolvers.md")]
+        public string PublicResolversFile {
+            get {
+                return ((string)(this["PublicResolversFile"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("custom-resolvers.ini")]
+        public string CustomResolversFile {
+            get {
+                return ((string)(this["CustomResolversFile"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("hostfiles/hostlistdirectory")]
+        public string HostListDirectory {
+            get {
+                return ((string)(this["HostListDirectory"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("directory.json")]
+        public string HostListDirectoryFile {
+            get {
+                return ((string)(this["HostListDirectoryFile"]));
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("7")]
+        public int CacheExpirationDays {
+            get {
+                return ((int)(this["CacheExpirationDays"]));
+            }
+            set {
+                this["CacheExpirationDays"] = value;
             }
         }
     }

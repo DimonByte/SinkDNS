@@ -20,6 +20,7 @@
 //OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //SOFTWARE.
 
+using SinkDNS.Modules.DNSCrypt;
 using SinkDNS.Modules.SinkDNSInternals;
 using SinkDNS.Modules.WindowsSystem;
 using SinkDNS.Properties;
@@ -55,7 +56,7 @@ namespace SinkDNS
                 return;   // Mutex will be released automatically when process exits
             }
             IOManager.CreateNecessaryDirectoriesAndFiles();
-            LocalSystemManager.IsDNSCryptInstalled();
+            DnsCryptServiceManager.IsDNSCryptInstalled();
             Application.SetCompatibleTextRenderingDefault(false);
             ApplicationConfiguration.Initialize();
             TraceLogger.ClearExpiredLogs();

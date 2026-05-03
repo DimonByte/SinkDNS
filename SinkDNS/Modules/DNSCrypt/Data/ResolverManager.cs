@@ -22,13 +22,48 @@
 
 using SinkDNS.Modules.SinkDNSInternals;
 using SinkDNS.Modules.WindowsSystem;
+using SinkDNS.Properties;
 using System.Text.RegularExpressions;
 
 namespace SinkDNS.Modules.DNSCrypt.Data
 {
     // This will load the public resolvers from DNSCrypt and return a list of them.
-    internal class PublicResolverManager
+    internal class ResolverManager
     {
+
+        public static async Task<string> DownloadPublicResolversAsync()
+        {
+            string? markdownContent = null;
+            if (!File.Exists(Path.Combine(Settings.Default.ResolversFolderLocation, Settings.Default.PublicResolversFile)))
+            {
+                TraceLogger.Log($"{Settings.Default.PublicResolversFile} not found on disk in {Settings.Default.ResolversFolderLocation}, downloading...");
+                await DownloadController.DownloadFileAsync("https://raw.githubusercontent.com/DNSCrypt/dnscrypt-resolvers/master/v3/public-resolvers.md", Path.Combine(Settings.Default.ResolversFolderLocation, "public-resolvers.md"));
+                markdownContent = File.ReadAllText(Path.Combine(Settings.Default.ResolversFolderLocation, "public-resolvers.md"));
+            }
+            else
+            {
+                DateTime creationDate = File.GetLastWriteTime(Path.Combine(Settings.Default.ResolversFolderLocation, Settings.Default.PublicResolversFile));
+                if ((DateTime.Now - creationDate).TotalDays > Settings.Default.CacheExpirationDays)
+                {
+                    TraceLogger.Log($"{Settings.Default.PublicResolversFile} is older than {Settings.Default.CacheExpirationDays} days, redownloading...");
+                    await DownloadController.DownloadFileAsync("https://raw.githubusercontent.com/DNSCrypt/dnscrypt-resolvers/master/v3/public-resolvers.md", Path.Combine(Settings.Default.ResolversFolderLocation, "public-resolvers.md"));
+                    markdownContent = File.ReadAllText(Path.Combine(Settings.Default.ResolversFolderLocation, Settings.Default.PublicResolversFile));
+                }
+                else
+                {
+                    TraceLogger.Log($"{Settings.Default.PublicResolversFile} is up to date (not older than 7 days), loading from disk...");
+                    markdownContent = File.ReadAllText(Path.Combine(Settings.Default.ResolversFolderLocation, Settings.Default.PublicResolversFile));
+                }
+            }
+            if (markdownContent == null)
+            {
+                TraceLogger.Log("Failed to load public resolver list: Content is null", Modules.Enums.StatusSeverityType.Error);
+                return null;
+            }
+            markdownContent = markdownContent.Replace("\r\n", "\n").Replace("\r", "\n"); // Normalize line endings
+            return markdownContent;
+        }
+
         public static List<string> ParseResolverNamesFromMarkdown(string? markdownContent)
         {
             //Format of the markdown is:

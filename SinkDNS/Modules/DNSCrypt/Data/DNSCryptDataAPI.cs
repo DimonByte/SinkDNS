@@ -17,7 +17,7 @@ namespace SinkDNS.Modules.DNSCrypt.Data
     internal class DNSCryptDataAPI
     {
         private const string ApiUrl = "http://127.0.0.1:8080/api/metrics";
-        private static readonly HttpClient Client = new HttpClient(new HttpClientHandler
+        private static readonly HttpClient Client = new(new HttpClientHandler
         {
             Credentials = new System.Net.NetworkCredential(Settings.Default.DNSCryptMonitoringUIUsername, Settings.Default.DNSCryptMonitoringUIPassword)
         });
@@ -43,16 +43,16 @@ namespace SinkDNS.Modules.DNSCrypt.Data
             public double QueriesPerSecond { get; set; }
 
             [JsonPropertyName("query_types")]
-            public List<QueryType> QueryTypes { get; set; }
+            public required List<QueryType> QueryTypes { get; set; }
 
             [JsonPropertyName("recent_queries")]
-            public List<RecentQuery> RecentQueries { get; set; }
+            public required List<RecentQuery> RecentQueries { get; set; }
 
             [JsonPropertyName("servers")]
-            public List<ServerMetrics> Servers { get; set; }
+            public required List<ServerMetrics> Servers { get; set; }
 
             [JsonPropertyName("top_domains")]
-            public List<TopDomain> TopDomains { get; set; }
+            public required List<TopDomain> TopDomains { get; set; }
 
             [JsonPropertyName("total_queries")]
             public int TotalQueries { get; set; }
@@ -66,7 +66,7 @@ namespace SinkDNS.Modules.DNSCrypt.Data
             [JsonPropertyName("count")]
             public int Count { get; set; }
             [JsonPropertyName("type")]
-            public string Type { get; set; }
+            public required string Type { get; set; }
         }
 
         public class RecentQuery
@@ -74,17 +74,17 @@ namespace SinkDNS.Modules.DNSCrypt.Data
             [JsonPropertyName("timestamp")]
             public DateTime Timestamp { get; set; }
             [JsonPropertyName("client_ip")]
-            public string ClientIp { get; set; }
+            public required string ClientIp { get; set; }
             [JsonPropertyName("domain")]
-            public string Domain { get; set; }
+            public required string Domain { get; set; }
             [JsonPropertyName("type")]
-            public string Type { get; set; }
+            public required string Type { get; set; }
             [JsonPropertyName("response_code")]
-            public string ResponseCode { get; set; }
+            public required string ResponseCode { get; set; }
             [JsonPropertyName("response_time")]
             public double ResponseTime { get; set; }
             [JsonPropertyName("server")]
-            public string Server { get; set; }
+            public required string Server { get; set; }
             [JsonPropertyName("cache_hit")]
             public bool CacheHit { get; set; }
         }
@@ -94,7 +94,7 @@ namespace SinkDNS.Modules.DNSCrypt.Data
             [JsonPropertyName("avg_response_ms")]
             public double AvgResponseMs { get; set; }
             [JsonPropertyName("name")]
-            public string Name { get; set; }
+            public required string Name { get; set; }
             [JsonPropertyName("queries")]
             public int Queries { get; set; }
         }
@@ -104,7 +104,7 @@ namespace SinkDNS.Modules.DNSCrypt.Data
             [JsonPropertyName("count")]
             public int Count { get; set; }
             [JsonPropertyName("domain")]
-            public string Domain { get; set; }
+            public required string Domain { get; set; }
         }
 
         public static async Task<object> GetData(MetricsType metricsType)
@@ -138,7 +138,7 @@ namespace SinkDNS.Modules.DNSCrypt.Data
             catch (Exception ex)
             {
                 TraceLogger.Log($"Error while retrieving data from DNSCryptAPI: {ex.Message}", Enums.StatusSeverityType.Error);
-                return $"[ERROR] {ex.Message}";
+                return null;
             }
         }
     }
