@@ -340,19 +340,19 @@ namespace SinkDNS.Modules.WindowsSystem
                 }
                 var lines = File.ReadAllLines(backuplocation);
                 string ipv4Primary = lines.FirstOrDefault(line => line.StartsWith("IPv4 Primary: "))
-                    ?.Substring("IPv4 Primary: ".Length)
+                    ?["IPv4 Primary: ".Length..]
                     ?.Trim() ?? string.Empty;
 
                 string ipv4Secondary = lines.FirstOrDefault(line => line.StartsWith("IPv4 Secondary: "))
-                    ?.Substring("IPv4 Secondary: ".Length)
+                    ?["IPv4 Secondary: ".Length..]
                     ?.Trim() ?? string.Empty;
 
                 string ipv6Primary = lines.FirstOrDefault(line => line.StartsWith("IPv6 Primary: "))
-                    ?.Substring("IPv6 Primary: ".Length)
+                    ?["IPv6 Primary: ".Length..]
                     ?.Trim() ?? string.Empty;
 
                 string ipv6Secondary = lines.FirstOrDefault(line => line.StartsWith("IPv6 Secondary: "))
-                    ?.Substring("IPv6 Secondary: ".Length)
+                    ?["IPv6 Secondary: ".Length..]
                     ?.Trim() ?? string.Empty;
 
                 TraceLogger.Log($"Read DNS configuration from backup at {backuplocation}");

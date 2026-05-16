@@ -316,6 +316,7 @@ namespace SinkDNS.Modules.DNSCrypt
         }
         public static bool RestartDnsCrypt(bool checkRestartWarning = false)
         {
+            GlobalNotifyIcon.Instance.SetIcon(Resources.UpdateAvailableIcon);
             if (checkRestartWarning)
             { // Used for when the user enable query logging, which requires a restart of the service. This is to prevent accidental restarts without warning.
                 if (!Settings.Default.DisableDNSCryptRestartWarning)
@@ -345,31 +346,36 @@ namespace SinkDNS.Modules.DNSCrypt
 
                     if (!result)
                     {
+                        GlobalNotifyIcon.Instance.SetIcon(Resources.WarningIcon);
                         TraceLogger.LogAndThrowMsgBox("Failed to restart DNSCrypt service during restart.", Enums.StatusSeverityType.Error);
                         return false;
                     }
-
+                    GlobalNotifyIcon.Instance.SetIcon(Resources.SinkDNSIcon);
                     return true;
                 }
                 else
                 {
                     if (!StopDnsCrypt())
                     {
+                        GlobalNotifyIcon.Instance.SetIcon(Resources.WarningIcon);
                         TraceLogger.LogAndThrowMsgBox("Failed to stop DNSCrypt service during restart.", Enums.StatusSeverityType.Error);
                         return false;
                     }
                     Task.Delay(1000).Wait();
                     if (!StartDnsCrypt())
                     {
+                        GlobalNotifyIcon.Instance.SetIcon(Resources.WarningIcon);
                         TraceLogger.LogAndThrowMsgBox("Failed to start DNSCrypt service during restart.", Enums.StatusSeverityType.Error);
                         return false;
                     }
                     // Flush DNS cache
+                    GlobalNotifyIcon.Instance.SetIcon(Resources.SinkDNSIcon);
                     return CommandRunner.RunElevatedCommand("ipconfig", "/flushdns");
                 }
             }
             catch (Exception ex)
             {
+                GlobalNotifyIcon.Instance.SetIcon(Resources.WarningIcon);
                 TraceLogger.LogAndThrowMsgBox($"Error restarting DNSCrypt service: {ex}", Enums.StatusSeverityType.Error);
                 return false;
             }

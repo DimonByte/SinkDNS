@@ -50,7 +50,6 @@ namespace SinkDNS.Modules.SinkDNSInternals
                 TraceLogger.Log($"Invalid list type specified for update: {listType}", Enums.StatusSeverityType.Error);
                 return;
             }
-            GlobalNotifyIcon.Instance.SetIcon(Resources.UpdateAvailableIcon);
             if (Settings.Default.RestartDNSCryptAfterUpdatingLists)
             {
                 bool RestartResult = DnsCryptServiceManager.RestartDnsCrypt();
@@ -75,7 +74,6 @@ namespace SinkDNS.Modules.SinkDNSInternals
                 {
                     NotificationManager.ShowNotification($"{listName} Updated", $"{listName} have been updated with {File.ReadAllLines(listType == Enums.ListType.Blocklist ? Settings.Default.CombinedBlocklistFileLocation : Settings.Default.CombinedWhitelistFileLocation).Length} unique entries and will be applied after a DNSCrypt service restart.", Enums.StatusSeverityType.Information);
                 }
-                GlobalNotifyIcon.Instance.SetIcon(Resources.SinkDNSIcon);
                 TraceLogger.Log($"Finished {listName} update process. DNSCrypt restart attempted: {RestartResult}, Problem when downloading lists: {ProblemWhenDownloadingLists}", Enums.StatusSeverityType.Information);
                 ProblemWhenDownloadingLists = false;
             }
