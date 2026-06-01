@@ -1,6 +1,6 @@
 ﻿namespace SinkDNS.UserControls
 {
-    partial class DNSConfigurationList
+    partial class PublicResolversControl
     {
         /// <summary> 
         /// Required designer variable.

@@ -323,6 +323,7 @@ namespace SinkDNS.Modules.DNSCrypt
                 {
                     DialogResult result = MessageBox.Show("Restarting the DNSCrypt service will temporarily disrupt your internet connection. Do you want to proceed?", "Restart DNSCrypt Service", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
                     if (result != DialogResult.Yes) { 
+                        NotificationManager.ShowNotification("DNSCrypt Restart Cancelled", "The DNSCrypt service restart has been cancelled. Your current settings have not been applied. If you want to apply the new settings, please restart the DNSCrypt service from the main menu.", Enums.StatusSeverityType.Warning);
                         return false;
                     }
                 }
@@ -347,9 +348,11 @@ namespace SinkDNS.Modules.DNSCrypt
                     if (!result)
                     {
                         GlobalNotifyIcon.Instance.SetIcon(Resources.WarningIcon);
+                        NotificationManager.ShowNotification("DNSCrypt Restart Failed", "Failed to restart the DNSCrypt service. Please try restarting the service manually from an elevated command prompt.", Enums.StatusSeverityType.Error);
                         TraceLogger.LogAndThrowMsgBox("Failed to restart DNSCrypt service during restart.", Enums.StatusSeverityType.Error);
                         return false;
                     }
+                    NotificationManager.ShowNotification("DNSCrypt Restarted", "The DNSCrypt service has been restarted successfully and the DNS cache has been flushed.", Enums.StatusSeverityType.Information);
                     GlobalNotifyIcon.Instance.SetIcon(Resources.SinkDNSIcon);
                     return true;
                 }
@@ -358,6 +361,7 @@ namespace SinkDNS.Modules.DNSCrypt
                     if (!StopDnsCrypt())
                     {
                         GlobalNotifyIcon.Instance.SetIcon(Resources.WarningIcon);
+                        NotificationManager.ShowNotification("DNSCrypt Restart Failed", "Failed to restart the DNSCrypt service. Please try restarting the service manually.", Enums.StatusSeverityType.Error);
                         TraceLogger.LogAndThrowMsgBox("Failed to stop DNSCrypt service during restart.", Enums.StatusSeverityType.Error);
                         return false;
                     }
@@ -365,12 +369,24 @@ namespace SinkDNS.Modules.DNSCrypt
                     if (!StartDnsCrypt())
                     {
                         GlobalNotifyIcon.Instance.SetIcon(Resources.WarningIcon);
+                        NotificationManager.ShowNotification("DNSCrypt Restart Failed", "Failed to restart the DNSCrypt service. Please try restarting the service manually.", Enums.StatusSeverityType.Error);
                         TraceLogger.LogAndThrowMsgBox("Failed to start DNSCrypt service during restart.", Enums.StatusSeverityType.Error);
                         return false;
                     }
                     // Flush DNS cache
                     GlobalNotifyIcon.Instance.SetIcon(Resources.SinkDNSIcon);
-                    return CommandRunner.RunElevatedCommand("ipconfig", "/flushdns");
+                    if (CommandRunner.RunElevatedCommand("ipconfig", "/flushdns"))
+                    {
+                        TraceLogger.Log("Flushed DNS cache successfully after DNSCrypt restart.");
+                        NotificationManager.ShowNotification("DNSCrypt Restarted", "The DNSCrypt service has been restarted successfully and the DNS cache has been flushed.", Enums.StatusSeverityType.Information);
+                        return true;
+                    }
+                    else
+                    {
+                        TraceLogger.Log("Failed to flush DNS cache after DNSCrypt restart.", Enums.StatusSeverityType.Warning);
+                        NotificationManager.ShowNotification("DNSCrypt Restarted with Warning", "The DNSCrypt service has been restarted successfully, but flushing the DNS cache failed. You may want to flush your DNS cache manually by running 'ipconfig /flushdns' in an elevated command prompt.", Enums.StatusSeverityType.Warning);
+                        return false;
+                    }
                 }
             }
             catch (Exception ex)

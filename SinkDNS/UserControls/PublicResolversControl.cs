@@ -5,9 +5,9 @@ using SinkDNS.Modules.DNSCrypt;
 
 namespace SinkDNS.UserControls
 {
-    public partial class DNSConfigurationList : UserControl
+    public partial class PublicResolversControl : UserControl
     {
-        public DNSConfigurationList()
+        public PublicResolversControl()
         {
             InitializeComponent();
         }

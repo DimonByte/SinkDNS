@@ -193,7 +193,7 @@ namespace SinkDNS
 
         private void PublicResolversBtn_Click(object sender, EventArgs e)
         {
-            LoadControl(new DNSConfigurationList());
+            LoadControl(new PublicResolversControl());
         }
 
         private void bypassFilteringToolStripMenuItem_Click(object sender, EventArgs e)
