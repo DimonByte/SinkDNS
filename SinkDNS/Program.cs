@@ -20,6 +20,7 @@
 //OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //SOFTWARE.
 
+using SinkDNS.Modules;
 using SinkDNS.Modules.DNSCrypt;
 using SinkDNS.Modules.SinkDNSInternals;
 using SinkDNS.Modules.WindowsSystem;
@@ -37,7 +38,7 @@ namespace SinkDNS
         public static bool ManagerFormCurrentPageHasUnsavedChanges { get; set; } = false;
         public static bool firstTimeSetupRequired = false;
         [STAThread]
-        static void Main()
+        static void Main(string[] args)
         {
             // To customize application configuration such as set high DPI settings or default font,
             // see https://aka.ms/applicationconfiguration.
@@ -82,6 +83,17 @@ namespace SinkDNS
             else
             {
                 TraceLogger.Log("First time setup is not required. Running main manager form.");
+                //Check for /updateblocklists arguments.
+                if (args != null && args.Length > 0)
+                {
+                    TraceLogger.Log($"Args passed:{args}");
+                    if (Array.IndexOf(args, "/updatelists") >= 0)
+                    {
+                        // If the argument is found, execute the action once.
+                        TraceLogger.Log("Updating Lists...");
+                        HostListManager.UpdateLists(Enums.ListType.Both);
+                    }
+                }
                 Application.Run(new SinkDNSManagerForm());
             }
             TraceLogger.Log("SinkDNS Exiting...");

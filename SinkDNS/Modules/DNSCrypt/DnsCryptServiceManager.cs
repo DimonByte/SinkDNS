@@ -85,7 +85,7 @@ namespace SinkDNS.Modules.DNSCrypt
             }
         }
 
-        public static string ?GetDNSCryptInstallationDirectory(bool includeExecutablePath = false)
+        public static string? GetDNSCryptInstallationDirectory(bool includeExecutablePath = false)
         {
             TraceLogger.Log("Getting DNSCrypt installation directory...");
             if (Settings.Default.DNSCryptInstallationLocation != null && Directory.Exists(Settings.Default.DNSCryptInstallationLocation))
@@ -231,7 +231,7 @@ namespace SinkDNS.Modules.DNSCrypt
                 TraceLogger.Log($"Error checking DNSCrypt service installation: {ex}", Enums.StatusSeverityType.Error);
                 return false;
             }
-        }        
+        }
 
         public static bool StartDnsCrypt()
         {
@@ -322,7 +322,8 @@ namespace SinkDNS.Modules.DNSCrypt
                 if (!Settings.Default.DisableDNSCryptRestartWarning)
                 {
                     DialogResult result = MessageBox.Show("Restarting the DNSCrypt service will temporarily disrupt your internet connection. Do you want to proceed?", "Restart DNSCrypt Service", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-                    if (result != DialogResult.Yes) { 
+                    if (result != DialogResult.Yes)
+                    {
                         NotificationManager.ShowNotification("DNSCrypt Restart Cancelled", "The DNSCrypt service restart has been cancelled. Your current settings have not been applied. If you want to apply the new settings, please restart the DNSCrypt service from the main menu.", Enums.StatusSeverityType.Warning);
                         return false;
                     }

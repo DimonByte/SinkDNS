@@ -30,8 +30,6 @@ using SinkDNS.Modules.SinkDNSInternals;
 using SinkDNS.Modules.WindowsSystem;
 using SinkDNS.Properties;
 using SinkDNS.UserControls;
-using System.Net;
-using System.Net.NetworkInformation;
 
 namespace SinkDNS
 {
@@ -160,7 +158,7 @@ namespace SinkDNS
 
         private void updateBlocklistsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            HostListManager.UpdateLists(Enums.ListType.Blocklist);
+            HostListManager.UpdateLists(Enums.ListType.Both);
         }
 
         private void openManagerToolStripMenuItem_Click(object sender, EventArgs e)

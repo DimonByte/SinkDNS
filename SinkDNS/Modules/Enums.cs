@@ -13,7 +13,8 @@
         public enum ListType
         {
             Blocklist,
-            Whitelist
+            Whitelist,
+            Both
         }
     }
 }

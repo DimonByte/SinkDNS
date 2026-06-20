@@ -34,7 +34,13 @@ namespace SinkDNS.Modules.SinkDNSInternals
         private static bool ProblemWhenDownloadingLists = false;
         public static void UpdateLists(Enums.ListType listType)
         {
-            string listName = listType == Enums.ListType.Blocklist ? "Blocklists" : "Whitelists";
+            string listName = listType switch
+            {
+                Enums.ListType.Blocklist => "Blocklists",
+                Enums.ListType.Whitelist => "Whitelists",
+                Enums.ListType.Both => "Both", // <-- Added the case for 'Both'
+                _ => throw new ArgumentOutOfRangeException(nameof(listType), "Unknown list type provided.") // Safety fallback
+            };
             NotificationManager.ShowNotification($"Updating {listName}", $"Downloading and updating {listName}...", Enums.StatusSeverityType.Information);
             GlobalNotifyIcon.Instance.SetIcon(Resources.DownloadingIcon);
             if (listType == Enums.ListType.Blocklist)
@@ -45,11 +51,22 @@ namespace SinkDNS.Modules.SinkDNSInternals
             {
                 DownloadListsAsync(Settings.Default.WhitelistIniLocation, Settings.Default.WhitelistFolderLocation, Settings.Default.CombinedWhitelistFileLocation).GetAwaiter().GetResult();
             }
+            else if (listType == Enums.ListType.Both)
+            {
+                DownloadListsAsync(Settings.Default.BlocklistIniLocation, Settings.Default.BlocklistFolderLocation, Settings.Default.CombinedBlocklistFileLocation).GetAwaiter().GetResult();
+                DownloadListsAsync(Settings.Default.WhitelistIniLocation, Settings.Default.WhitelistFolderLocation, Settings.Default.CombinedWhitelistFileLocation).GetAwaiter().GetResult();
+            }
             else
             {
                 TraceLogger.Log($"Invalid list type specified for update: {listType}", Enums.StatusSeverityType.Error);
                 return;
             }
+            // Read the file as lines (creates an array of strings)
+            string[] UserWebsiteWhitelistLines = File.ReadAllLines(Settings.Default.UserWhitelistIniLocation);
+            File.AppendAllLines(Settings.Default.CombinedWhitelistFileLocation, UserWebsiteWhitelistLines);
+            // Read the file as lines (creates an array of strings)
+            string[] UserWebsiteBlocklistLines = File.ReadAllLines(Settings.Default.UserBlocklistIniLocation);
+            File.AppendAllLines(Settings.Default.CombinedBlocklistFileLocation, UserWebsiteBlocklistLines);
             if (Settings.Default.RestartDNSCryptAfterUpdatingLists)
             {
                 bool RestartResult = DnsCryptServiceManager.RestartDnsCrypt();
@@ -67,7 +84,7 @@ namespace SinkDNS.Modules.SinkDNSInternals
                     NotificationManager.ShowNotification($"{listName} Updated with Issues", $"{listName} update was attempted and DNSCrypt restarted successfully, but there were issues during the download process. Check logs for details.", Enums.StatusSeverityType.Warning);
                 }
                 else if (!RestartResult & ProblemWhenDownloadingLists)
-                 {
+                {
                     NotificationManager.ShowNotification($"{listName} Updated with Issues", $"{listName} update was attempted, but DNSCrypt restart failed and there were issues during the download process. Check logs for details.", Enums.StatusSeverityType.Error);
                 }
                 else
@@ -81,26 +98,14 @@ namespace SinkDNS.Modules.SinkDNSInternals
 
         private static async Task DownloadListsAsync(string IniLocation, string ListFolderLocation, string CombinedListLocation)
         {
+            TraceLogger.Log($"Starting download async for INI {IniLocation} | ListFolderLocation: {ListFolderLocation} | CombinedListLocation: {CombinedListLocation}");
             DateTime StartOfBlockList = DateTime.Now;
             if (!File.Exists(IniLocation))
             {
                 TraceLogger.LogAndThrowMsgBox($"List configuration file not found: {IniLocation}", Enums.StatusSeverityType.Warning);
                 return;
             }
-            foreach (var file in Directory.GetFiles(ListFolderLocation))
-            {
-                try
-                {
-                    File.Delete(file);
-                }
-                catch (Exception ex)
-                {
-                    ProblemWhenDownloadingLists = true;
-                    TraceLogger.Log($"Failed to delete old list file: {file}. Download halted. Exception: {ex}", Enums.StatusSeverityType.Error);
-                    return;
-                }
-            }
-
+            
             List<string> urls = ReadUrlsFromFile(IniLocation);
             foreach (var url in urls)
             {
@@ -113,14 +118,16 @@ namespace SinkDNS.Modules.SinkDNSInternals
             IOManager.MergeFiles(ListFolderLocation, CombinedListLocation);
             IOManager.RemoveDuplicates(CombinedListLocation);
             TraceLogger.Log("List update complete. Checking if all files have been updated recently");
-            //Check if the files in the blocklist have a update date via using the StartOfBlockList, if the file has been modified before the StartOfBlockList, then it means the file was not updated during this download process, and we should log a warning about it.
+
+            //Possible fix for "This causes IO exception when IOManager attempts to merge the files. Being used by another process."
+            //We will check after downloads are complete to delete the files since then we are no longer locked.
             foreach (var file in Directory.GetFiles(ListFolderLocation))
             {
                 DateTime lastWriteTime = File.GetLastWriteTime(file);
                 if (lastWriteTime < StartOfBlockList)
                 {
-                    ProblemWhenDownloadingLists = true;
-                    TraceLogger.Log($"Warning: List file {file} was not updated during this download process. Check logs if the download process failed on this file. Last write time: {lastWriteTime}", Enums.StatusSeverityType.Warning);
+                    TraceLogger.Log($"Deleting {file} since it was not written to during downloadlistasync. (LastWriteTime is less than StartOfBlockListTime)");
+                    File.Delete(file);
                 }
                 else
                 {

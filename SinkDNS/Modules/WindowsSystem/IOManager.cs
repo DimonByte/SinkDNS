@@ -19,15 +19,12 @@
 //LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 //OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //SOFTWARE.
+using SinkDNS.Modules.SinkDNSInternals;
+using SinkDNS.Properties;
+using System.Text;
 
 namespace SinkDNS.Modules.WindowsSystem
 {
-    using SinkDNS.Modules.SinkDNSInternals;
-    using SinkDNS.Properties;
-    using System.Net;
-    using System.Net.NetworkInformation;
-    using System.Text;
-
     //This will handle folder and file management for SinkDNS, like creating necessary directories.
     internal class IOManager
     {
